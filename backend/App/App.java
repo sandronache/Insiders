@@ -10,21 +10,23 @@ import java.util.Map;
 public class App {
     private static Map<String, Post> posts;
     private static Map<String, User> users;
-    private static User currentuser;
+    private static User currentUser;
     private static boolean isLoggedIn;
-
-    public App() {
+    private static final App INSTANCE = null;
+    private App() {
         posts = new HashMap<>();
         users = new HashMap<>();
-        currentuser = null;
+        currentUser = null;
         isLoggedIn = false;
     }
-
+    public static App getInstance() {
+        return new App();
+    }
     public boolean register(String username, String email, String password) {
         if (users.containsKey(username))
             return false;
-        currentuser = new User(username, email, password);
-        users.put(username, currentuser);
+        currentUser = new User(username, email, password);
+        users.put(username, currentUser);
         return true;
     }
 
@@ -37,10 +39,10 @@ public class App {
         return false;
     }
 
-    public static void run() {
+    public void run() {
         Scanner input = new Scanner(System.in);
         while (true) {
-            if (currentuser == null) { // not yet logged in
+            if (currentUser == null) { // not yet logged in
                 boolean wrongChoice = true;
                 while (wrongChoice) {
                     System.out.println("1. Register");
@@ -106,7 +108,7 @@ public class App {
                         case "1":
                             System.out.println("Enter the content of the post");
                             String content = input.nextLine();
-                            posts.put(currentuser.getUsername(), new Post(content));
+                            posts.put(currentUser.getUsername(), new Post(content, currentUser.getUsername()));
                             wrongChoice = false;
                             break;
                         case "2":
@@ -133,7 +135,7 @@ public class App {
                             wrongChoice = false;
                             break;
                         case "5":
-                            currentuser = null;
+                            currentUser = null;
                             isLoggedIn = false;
                             System.out.println("You have been logged out");
                             wrongChoice = false;
