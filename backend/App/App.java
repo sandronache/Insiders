@@ -12,7 +12,7 @@ public class App {
     private static Map<String, User> users;
     private static User currentUser;
     private static boolean isLoggedIn;
-    private static final App INSTANCE = null;
+    private static final App INSTANCE = new App();
     private App() {
         posts = new HashMap<>();
         users = new HashMap<>();
@@ -20,8 +20,8 @@ public class App {
         isLoggedIn = false;
     }
     public static App getInstance() {
-        return new App();
-    }
+        return INSTANCE;
+    } // created as a singleton
     public boolean register(String username, String email, String password) {
         if (users.containsKey(username))
             return false;
@@ -39,7 +39,7 @@ public class App {
         return false;
     }
 
-    public void run() {
+    public void run(){
         Scanner input = new Scanner(System.in);
         while (true) {
             if (currentUser == null) { // not yet logged in
@@ -92,8 +92,8 @@ public class App {
                 }
             }
             else {
-                for (int i = 0; i < posts.size(); i++) { // displays the feed
-                    posts[i].display();
+                for (Post post : posts.values()) { // displays the feed
+                    System.out.println(post); // Assuming Post has a toString() method
                 }
                 boolean wrongChoice = true;
                 while (wrongChoice) {
@@ -120,12 +120,11 @@ public class App {
                         case "3":
                             System.out.println("Enter the id of the post you want to vote");
                             String post_id = input.nextLine();
-                            do {
+                            String vote;
+                           do {
                                 System.out.println("Do you want to upvote or downvote this post? (1/0");
-                                String vote = input.nextLine();
-                                if (vote != "0" || vote != "1")
-                                    System.out.println("Invalid choice");
-                            } while (vote != "0" || vote != "1");
+                                vote = input.nextLine();
+                            } while (vote.equals("0") || vote.equals("1"));
                             // TODO
                             wrongChoice = false;
                             break;
