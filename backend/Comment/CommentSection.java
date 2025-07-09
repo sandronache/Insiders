@@ -31,4 +31,22 @@ public class CommentSection {
 
         comments.get(idx).deleteReply(remaining_id);
     }
+
+    public void addUpVote(String id, String username) {
+        int idx = Helper.extractFirstLevel(id);
+        String remaining_id = Helper.extractRemainingLevels(id);
+
+        comments.get(idx).addUpVote(remaining_id, username);
+    }
+
+    public void addDownVote(String id, String username) {
+        int idx = Helper.extractFirstLevel(id);
+        String remaining_id = Helper.extractRemainingLevels(id);
+
+        comments.get(idx).addDownVote(remaining_id, username);
+    }
+
+    public ArrayList<Comment> getComments() {
+        return comments;
+    }
 }
