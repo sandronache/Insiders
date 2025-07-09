@@ -16,4 +16,8 @@ public class Helper {
         int dot = input.indexOf('.');
         return input.substring(dot + 1);
     }
+
+    public static boolean isCommentIdValid(String input) {
+        return input.matches("(\\d\\.)*\\d");
+    }
 }

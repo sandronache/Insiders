@@ -1,21 +1,23 @@
 package App;
 
+import Comment.Helper;
 import Post.Post;
 import Post.PostRenderer;
 import Login.User;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.HashMap;
 import java.util.Map;
 
 public class App {
-    private Map<String, Post> posts;
+    private ArrayList<Post> posts;
     private Map<String, User> users;
     private User currentUser;
     private static final App INSTANCE = new App();
     private Scanner input = new Scanner(System.in);
     private App() {
-        posts = new HashMap<>();
+        posts = new ArrayList<>();
         users = new HashMap<>();
         currentUser = null;
     }
@@ -115,7 +117,7 @@ public class App {
 
     private void showFeed() {
         int idx = 0;
-        for (Post post: posts.values()) {
+        for (Post post: posts) {
             System.out.println(PostRenderer.renderFeedPost(post, String.valueOf(idx)));
             idx++;
         }
@@ -125,7 +127,7 @@ public class App {
         System.out.println("Enter the content of the post");
         String content = input.nextLine();
 
-        posts.put(currentUser.getUsername(), new Post(content, currentUser.getUsername()));
+        posts.add(new Post(content, currentUser.getUsername()));
     }
 
     private void deleteCurrentUserPrompt() {
@@ -153,6 +155,11 @@ public class App {
                     addNewPostPrompt();
                     break;
                 case "2":
+                    int postNumber = enterPostPrompt();
+                    if (postNumber != -1) {
+                        clearCLI();
+                        postPrompt(postNumber);
+                    }
                     break;
                 case "3":
                     deleteCurrentUserPrompt();
@@ -161,6 +168,155 @@ public class App {
                 case "4":
                     logoutPrompt();
                     onFeed = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice");
+                    break;
+            }
+            clearCLI();
+        }
+    }
+
+    private int enterPostPrompt() {
+        if (posts.isEmpty()) {
+            System.out.println("No post available");
+            return -1;
+        }
+        System.out.println("Insert post id (<" + posts.size() + "):");
+        while (true) {
+            int postNumber = Integer.parseInt(input.nextLine());
+            if (postNumber >= 0 && postNumber < posts.size()) {
+                return postNumber;
+            }
+            System.out.println("Invalid choice, try again");
+        }
+    }
+
+    private void votePostPrompt(Post chosenPost) {
+        System.out.println("1. Upvote");
+        System.out.println("2. Downvote");
+        System.out.println(">>>");
+        String choice = input.nextLine();
+        switch (choice) {
+            case "1":
+                chosenPost.addUpVotePost(currentUser.getUsername());
+                System.out.println("Vote added successfully!");
+                break;
+            case "2":
+                chosenPost.addDownVotePost(currentUser.getUsername());
+                System.out.println("Vote added successfully!");
+                break;
+            default:
+                System.out.println("Invalid choice");
+                break;
+        }
+    }
+
+    private void addCommentPrompt(Post chosenPost) {
+        System.out.println("Text..:");
+        String content = input.nextLine();
+        chosenPost.addComment(content, currentUser.getUsername());
+        System.out.println("Comment added successfully!");
+    }
+
+    private void addReplyPrompt(Post chosenPost) {
+        System.out.println("Insert comment id found between \"[]\":");
+        while(true) {
+            String id = input.nextLine();
+            if (Helper.isCommentIdValid(id)) {
+                // ++check if id also exists
+                System.out.println("Text..:");
+                String content = input.nextLine();
+                chosenPost.addReply(id, content, currentUser.getUsername());
+                break;
+            }
+            System.out.println("Invalid choice, try again");
+        }
+    }
+
+    private void deleteCommentOrReplyPrompt(Post chosenPost) {
+        System.out.println("Insert comment or reply id found between \"[]\":");
+        while(true) {
+            String id = input.nextLine();
+            if (Helper.isCommentIdValid(id)) {
+                // ++check if id also exists
+                if (id.length() == 1) {
+                    chosenPost.deleteComment(id);
+                } else {
+                    chosenPost.deleteReply(id);
+                }
+                break;
+            }
+            System.out.println("Invalid choice, try again");
+        }
+    }
+
+    private void voteCommentOrReplyPrompt(Post chosenPost) {
+        System.out.println("Insert comment or reply id found between \"[]\":");
+        while(true) {
+            String id = input.nextLine();
+            if (Helper.isCommentIdValid(id)) {
+                // ++check if id also exists
+                boolean isVoted = false;
+                while(!isVoted) {
+                    System.out.println("1. Upvote");
+                    System.out.println("2. Downvote");
+                    System.out.println(">>>");
+                    String choice = input.nextLine();
+                    switch (choice) {
+                        case "1":
+                            chosenPost.addUpVoteComment(id, currentUser.getUsername());
+                            isVoted = true;
+                            System.out.println("Vote added successfully!");
+                            break;
+                        case "2":
+                            chosenPost.addDownVoteComment(id, currentUser.getUsername());
+                            isVoted = true;
+                            System.out.println("Vote added successfully!");
+                            break;
+                        default:
+                            System.out.println("Invalid choice");
+                            break;
+                    }
+                }
+                break;
+            }
+            System.out.println("Invalid choice, try again");
+        }
+    }
+
+
+    private void postPrompt(int id) {
+        Post chosenPost = posts.get(id);
+        boolean isGoingBackToFeed = false;
+        while (!isGoingBackToFeed) {
+            System.out.println(PostRenderer.renderFullPost(chosenPost));
+            System.out.println("1. Vote post");
+            System.out.println("2. Add comment");
+            System.out.println("3. Add reply");
+            System.out.println("4. Delete comment or reply");
+            System.out.println("5. Vote comment or reply");
+            System.out.println("6. Go back to feed");
+            System.out.println(">>>");
+            String choice = input.nextLine();
+            switch (choice) {
+                case "1":
+                    votePostPrompt(chosenPost);
+                    break;
+                case "2":
+                    addCommentPrompt(chosenPost);
+                    break;
+                case "3":
+                    addReplyPrompt(chosenPost);
+                    break;
+                case "4":
+                    deleteCommentOrReplyPrompt(chosenPost);
+                    break;
+                case "5":
+                    voteCommentOrReplyPrompt(chosenPost);
+                    break;
+                case "6":
+                    isGoingBackToFeed = true;
                     break;
                 default:
                     System.out.println("Invalid choice");
