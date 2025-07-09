@@ -78,14 +78,4 @@ public class Post {
     public ArrayList<Comment> getComments() {
         return comments.getComments();
     }
-    @Override
-    public String toString() {
-        return "Post{" +
-                "content='" + content + '\'' +
-                ", username='" + username + '\'' +
-                ", votes=" + votes.getUpvoteCount() + " upvotes, " + votes.getDownvoteCount() + " downvotes" +
-                ", comments=" + comments.getComments().size() +
-                '}';
-    }
-    //Implemented toString method for better readability in App.java
 }

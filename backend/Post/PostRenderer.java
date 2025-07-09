@@ -3,7 +3,15 @@ package Post;
 import Comment.Comment;
 
 public class PostRenderer {
-    public static String render(Post post) {
+    public static String renderFeedPost(Post post, String id) {
+
+        String s = "Post " + id + " by (" + post.getUsername() + "):\n\n" +
+                "   " + post.getContent() + "\n\n" +
+                "upvotes = " + post.getUpVoteCount() + "\n" +
+                "downvotes = " + post.getDownVoteCount() + "\n\n";
+        return s;
+    }
+    public static String renderFullPost(Post post) {
         StringBuilder sb = new StringBuilder();
         sb.append('(').append(post.getUsername()).append("):\n");
         sb.append(post.getContent()).append("\n\n");
@@ -27,7 +35,7 @@ public class PostRenderer {
         sb.append("downvotes = ").append(comment.getDownVoteCount()).append("\n\n\n");
 
         for (int i = 0; i < comment.getReplies().size(); i++) {
-            renderComment(comment.getReplies().get(i), sb, depth + 1, id + '.' + String.valueOf(i));
+            renderComment(comment.getReplies().get(i), sb, depth + 1, id + '.' + i);
         }
     }
 }
