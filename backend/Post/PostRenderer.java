@@ -4,16 +4,27 @@ import Comment.Comment;
 
 public class PostRenderer {
     public static String renderFeedPost(Post post, String id) {
-
-        String s = "Post " + id + " by (" + post.getUsername() + "):\n\n" +
-                "   " + post.getContent() + "\n\n" +
+        StringBuilder sb = new StringBuilder();
+        /* String s= "Post " + id + " by (" + post.getUsername() + "):\n\n" +
+                post.getContent() + "\n\n" +
                 "upvotes = " + post.getUpVoteCount() + "\n" +
                 "downvotes = " + post.getDownVoteCount() + "\n\n";
-        return s;
+        return s;*/
+        sb.append("Post ").append(id).append(" by (").append(post.getUsername()).append("):\n\n");
+        if (post.isEmoji()) {
+            sb.append("🔥 ");
+        }
+        sb.append(post.getContent()).append("\n\n");
+        sb.append("upvotes = ").append(post.getUpVoteCount()).append("\n");
+        sb.append("downvotes = ").append(post.getDownVoteCount()).append("\n\n");
+        return sb.toString();
     }
     public static String renderFullPost(Post post) {
         StringBuilder sb = new StringBuilder();
         sb.append('(').append(post.getUsername()).append("):\n");
+        if (post.isEmoji()) {
+            sb.append("🔥 ");
+        }
         sb.append(post.getContent()).append("\n\n");
         sb.append("upvotes = ").append(post.getUpVoteCount()).append("\n");
         sb.append("downvotes = ").append(post.getDownVoteCount()).append("\n\n\n");
@@ -24,8 +35,10 @@ public class PostRenderer {
     }
 
     public static void renderComment(Comment comment, StringBuilder sb, int depth, String id) {
-        sb.append("  ".repeat(depth)).append("-> [").append(id).append("] ");
+        sb.append("     ".repeat(depth)).append("-> [").append(id).append("] ");
         sb.append('(').append(comment.getUsername()).append(')');
+        if (comment.isEmoji())
+            sb.append("🔥");
         sb.append("  ").append(comment.getContent()).append('\n');
 
         sb.append("   ".repeat(depth));

@@ -33,7 +33,7 @@ public class Vote {
     }
 
     private void checkEmoji() {
-        isEmoji = upvotes.size() >= 10;
+        isEmoji = upvotes.size()-downvotes.size() >= 1;
     }
 
     public int getUpvoteCount() {
