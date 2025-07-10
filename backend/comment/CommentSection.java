@@ -1,9 +1,9 @@
-package Comment;
+package comment;
 
 import java.util.ArrayList;
 
 public class CommentSection {
-    private ArrayList<Comment> comments;
+    private final ArrayList<Comment> comments;
 
     public CommentSection() {
         this.comments = new ArrayList<>();

@@ -1,9 +1,9 @@
-package Login;
+package login;
 
 public class User {
-    private String username;
-    private String email;
-    private int hashedPassword;
+    private final String username;
+    private final String email;
+    private final int hashedPassword;
 
     public User(String username, String email, String password) {
         this.username = username;

@@ -1,6 +1,6 @@
-package Post;
+package post;
 
-import Comment.Comment;
+import comment.Comment;
 
 public class PostRenderer {
     public static String renderFeedPost(Post post, String id) {
@@ -10,7 +10,7 @@ public class PostRenderer {
                 "upvotes = " + post.getUpVoteCount() + "\n" +
                 "downvotes = " + post.getDownVoteCount() + "\n\n";
         return s;*/
-        sb.append("Post ").append(id).append(" by (").append(post.getUsername()).append("):\n\n");
+        sb.append("post ").append(id).append(" by (").append(post.getUsername()).append("):\n\n");
         if (post.isEmoji()) {
             sb.append("🔥 ");
         }

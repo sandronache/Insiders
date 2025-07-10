@@ -1,16 +1,16 @@
-package Post;
+package post;
 
-import Comment.Comment;
-import Comment.CommentSection;
-import Vote.Vote;
+import comment.Comment;
+import comment.CommentSection;
+import vote.Vote;
 
 import java.util.ArrayList;
 
 public class Post {
     private String content;
-    private String username;
-    private Vote votes;
-    private CommentSection comments;
+    private final String username;
+    private final Vote votes;
+    private final CommentSection comments;
 
     public Post(String content, String username) {
         this.content = content;

@@ -1,14 +1,14 @@
-package Comment;
+package comment;
 
-import Vote.Vote;
+import vote.Vote;
 
 import java.util.ArrayList;
 
 public class Comment {
-    private String content;
-    private String username;
-    private Vote votes;
-    private ArrayList<Comment> replies;
+    private final String content;
+    private final String username;
+    private final Vote votes;
+    private final ArrayList<Comment> replies;
     private boolean isDeleted;
 
     public Comment(String content, String username) {

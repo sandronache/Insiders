@@ -1,4 +1,4 @@
-package Comment;
+package comment;
 
 public class Helper {
     public static int extractFirstLevel(String input) {

@@ -1,9 +1,9 @@
-package App;
+package app;
 
-import Comment.Helper;
-import Post.Post;
-import Post.PostRenderer;
-import Login.User;
+import comment.Helper;
+import post.Post;
+import post.PostRenderer;
+import login.User;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class App {
-    private ArrayList<Post> posts;
-    private Map<String, User> users;
+    private final ArrayList<Post> posts;
+    private final Map<String, User> users;
     private User currentUser;
     private static final App INSTANCE = new App();
-    private Scanner input = new Scanner(System.in);
+    private final Scanner input = new Scanner(System.in);
     private App() {
         posts = new ArrayList<>();
         users = new HashMap<>();

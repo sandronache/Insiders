@@ -1,6 +1,4 @@
-package Login;
-
-import Login.User;
+package login;
 
 import java.util.HashMap;
 import java.util.Map;

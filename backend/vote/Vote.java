@@ -1,4 +1,4 @@
-package Vote;
+package vote;
 
 import java.util.HashSet;
 import java.util.Set;
