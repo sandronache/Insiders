@@ -15,11 +15,14 @@ public class CommentSection {
 
     public void deleteComment(String id) {
         int idx = Integer.parseInt(id);
+        if (idx < 0 || idx >= comments.size()) return;
         comments.get(idx).setDeleted();
     }
 
     public void addReply(String id, String content, String username) {
         int idx = Helper.extractFirstLevel(id);
+        if (idx < 0 || idx >= comments.size()) return;
+
         String remaining_id = Helper.extractRemainingLevels(id);
 
         comments.get(idx).addReply(remaining_id, content, username);
@@ -27,6 +30,8 @@ public class CommentSection {
 
     public void deleteReply(String id) {
         int idx = Helper.extractFirstLevel(id);
+        if (idx < 0 || idx >= comments.size()) return;
+
         String remaining_id = Helper.extractRemainingLevels(id);
 
         comments.get(idx).deleteReply(remaining_id);
@@ -34,6 +39,8 @@ public class CommentSection {
 
     public void addUpVote(String id, String username) {
         int idx = Helper.extractFirstLevel(id);
+        if (idx < 0 || idx >= comments.size()) return;
+
         String remaining_id = Helper.extractRemainingLevels(id);
 
         comments.get(idx).addUpVote(remaining_id, username);
@@ -41,6 +48,8 @@ public class CommentSection {
 
     public void addDownVote(String id, String username) {
         int idx = Helper.extractFirstLevel(id);
+        if (idx < 0 || idx >= comments.size()) return;
+
         String remaining_id = Helper.extractRemainingLevels(id);
 
         comments.get(idx).addDownVote(remaining_id, username);

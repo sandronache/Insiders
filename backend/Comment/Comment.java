@@ -25,6 +25,8 @@ public class Comment {
             return;
         }
         int idx = Helper.extractFirstLevel(id);
+        if (idx < 0 || idx >= replies.size()) return;
+
         String remaining_id = Helper.extractRemainingLevels(id);
 
         replies.get(idx).addReply(remaining_id, content, username);
@@ -36,6 +38,8 @@ public class Comment {
             return;
         }
         int idx = Helper.extractFirstLevel(id);
+        if (idx < 0 || idx >= replies.size()) return;
+
         String remaining_id = Helper.extractRemainingLevels(id);
 
         replies.get(idx).deleteReply(remaining_id);
@@ -47,6 +51,8 @@ public class Comment {
             return;
         }
         int idx = Helper.extractFirstLevel(id);
+        if (idx < 0 || idx >= replies.size()) return;
+
         String remaining_id = Helper.extractRemainingLevels(id);
 
         replies.get(idx).addUpVote(remaining_id, username);
@@ -58,6 +64,8 @@ public class Comment {
             return;
         }
         int idx = Helper.extractFirstLevel(id);
+        if (idx < 0 || idx >= replies.size()) return;
+
         String remaining_id = Helper.extractRemainingLevels(id);
 
         replies.get(idx).addDownVote(remaining_id, username);
