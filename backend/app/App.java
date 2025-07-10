@@ -1,32 +1,31 @@
 package app;
 
-import comment.Helper;
+import utils.Helper;
+import Services.UserService;
 import post.Post;
 import post.PostRenderer;
-import login.User;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.HashMap;
-import java.util.Map;
 
 public class App {
+    public static int MAX_NUMBER_OF_STUFF = 10000;
     private final ArrayList<Post> posts;
-    private final Map<String, User> users;
-    private User currentUser;
+    private final UserService users;
     private static final App INSTANCE = new App();
     private final Scanner input = new Scanner(System.in);
     private App() {
+        System.out.println("omg I'm alive !");
         posts = new ArrayList<>();
-        users = new HashMap<>();
-        currentUser = null;
+        users = new UserService();
     }
     public static App getInstance() {
+        System.out.println("Getting instance ");
         return INSTANCE;
     } // created as a singleton
 
     private void addPost(String content) {
-        posts.add(new Post(content, currentUser.getUsername()));
+        posts.add(new Post(content, users.getCurrUsername()));
     }
 
     private void deletePost(int idx) {
@@ -34,28 +33,19 @@ public class App {
     }
 
     public boolean register(String username, String email, String password) {
-        if (users.containsKey(username))
-            return false;
-        currentUser = new User(username, email, password);
-        users.put(username, currentUser);
-        return true;
+        return users.register(username, email, password);
     }
 
     public boolean login(String username, String password) {
-        User user = users.get(username);
-        if (user != null && user.checkPassword(password)) {
-            currentUser = user;
-            return true;
-        }
-        return false;
+        return users.login(username, password);
     }
 
     public void logout() {
-        currentUser = null;
+        users.logout();
     }
 
     private void deleteCurrentUser() {
-        users.remove(currentUser.getUsername());
+        users.deleteUser();
         logout();
         // ++ erasing all posted content (posts, replies, comments)
     }
@@ -216,11 +206,11 @@ public class App {
         String choice = input.nextLine();
         switch (choice) {
             case "1":
-                chosenPost.addUpVotePost(currentUser.getUsername());
+                chosenPost.addUpVotePost(users.getCurrUsername());
                 System.out.println("Vote added successfully!");
                 break;
             case "2":
-                chosenPost.addDownVotePost(currentUser.getUsername());
+                chosenPost.addDownVotePost(users.getCurrUsername());
                 System.out.println("Vote added successfully!");
                 break;
             default:
@@ -232,7 +222,7 @@ public class App {
     private void addCommentPrompt(Post chosenPost) {
         System.out.println("Text..:");
         String content = input.nextLine();
-        chosenPost.addComment(content, currentUser.getUsername());
+        chosenPost.addComment(content, users.getCurrUsername());
         System.out.println("Comment added successfully!");
     }
 
@@ -244,7 +234,7 @@ public class App {
                 // ++check if id also exists
                 System.out.println("Text..:");
                 String content = input.nextLine();
-                chosenPost.addReply(id, content, currentUser.getUsername());
+                chosenPost.addReply(id, content, users.getCurrUsername());
                 break;
             }
             System.out.println("Invalid choice, try again");
@@ -282,11 +272,11 @@ public class App {
                     String choice = input.nextLine();
                     switch (choice) {
                         case "1":
-                            chosenPost.addUpVoteComment(id, currentUser.getUsername());
+                            chosenPost.addUpVoteComment(id, users.getCurrUsername());
                             isVoted = true;
                             break;
                         case "2":
-                            chosenPost.addDownVoteComment(id, currentUser.getUsername());
+                            chosenPost.addDownVoteComment(id, users.getCurrUsername());
                             isVoted = true;
                             break;
                         default:

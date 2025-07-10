@@ -3,10 +3,13 @@ package vote;
 import java.util.HashSet;
 import java.util.Set;
 
+// classe de date
+// (DTO / Model)
 public class Vote {
     private final Set<String> upvotes;
     private final Set<String> downvotes;
     private boolean isEmoji;
+
 
     public Vote() {
         this.upvotes = new HashSet<>();

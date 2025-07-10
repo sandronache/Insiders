@@ -1,5 +1,7 @@
 package comment;
 
+import utils.Helper;
+
 import java.util.ArrayList;
 
 public class CommentSection {

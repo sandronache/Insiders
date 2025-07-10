@@ -1,7 +1,7 @@
 package mihnea;
 
 import login.User;
-import login.UserService;
+import Services.UserService;
 
 import java.util.Scanner;
 
@@ -87,11 +87,7 @@ public class AuthCLI {
     }
 
     private static void logout() {
-        if (userService.logout()) {
-            System.out.println("Logout successful!");
-        } else {
-            System.out.println("You are not logged in!");
-        }
+        userService.logout();
     }
 
     private static void displayCurrentUser() {

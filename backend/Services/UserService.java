@@ -1,4 +1,6 @@
-package login;
+package Services;
+
+import login.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,8 @@ public class UserService {
         if (users.containsKey(username)) {
             return false;
         }
-        users.put(username, new User(username, email, password));
+        currentUser = new User(username, email, password);
+        users.put(username, currentUser);
         return true;
     }
 
@@ -29,16 +32,24 @@ public class UserService {
         return false;
     }
 
-    public boolean logout() {
-        if (currentUser != null) {
-            currentUser = null;
-            return true;
-        }
-        return false;
+    public void logout() {
+        currentUser = null;
+    }
+
+    public String getCurrUsername() {
+        return currentUser.getUsername();
     }
 
     public User getCurrentUser() {
         return currentUser;
+    }
+
+    public void addUser(String username, String email, int hashedPassword) {
+        users.put(username, new User(username, email, hashedPassword));
+    }
+
+    public void deleteUser() {
+        users.remove(currentUser.getUsername());
     }
 
     public boolean isLoggedIn() {

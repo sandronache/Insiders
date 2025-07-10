@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 public class Post {
     private String content;
-    private final String username;
-    private final Vote votes;
-    private final CommentSection comments;
+    private  String username;
+    private  Vote votes;
+    private  CommentSection comments;
 
     public Post(String content, String username) {
         this.content = content;
@@ -18,6 +18,12 @@ public class Post {
         this.comments = new CommentSection();
         this.votes = new Vote();
     }
+
+    /*
+    public void getComments()
+    {
+        CommentService.getIsntance().getCommentsForId(this.id);
+    }*/
 
     public void addComment(String content, String username) {
         comments.addComment(content, username);

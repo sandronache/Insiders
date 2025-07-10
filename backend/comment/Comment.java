@@ -1,5 +1,6 @@
 package comment;
 
+import utils.Helper;
 import vote.Vote;
 
 import java.util.ArrayList;

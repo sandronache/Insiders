@@ -11,6 +11,12 @@ public class User {
         this.hashedPassword = password.hashCode();
     }
 
+    public User(String username, String email, int hashedPassword) {
+        this.username = username;
+        this.email = email;
+        this.hashedPassword = hashedPassword;
+    }
+
     public String getUsername() {
         return username;
     }
