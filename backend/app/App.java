@@ -24,6 +24,15 @@ public class App {
     public static App getInstance() {
         return INSTANCE;
     } // created as a singleton
+
+    private void addPost(String content) {
+        posts.add(new Post(content, currentUser.getUsername()));
+    }
+
+    private void deletePost(int idx) {
+        posts.remove(idx);
+    }
+
     public boolean register(String username, String email, String password) {
         if (users.containsKey(username))
             return false;
@@ -127,7 +136,7 @@ public class App {
         System.out.println("Enter the content of the post");
         String content = input.nextLine();
 
-        posts.add(new Post(content, currentUser.getUsername()));
+        addPost(content);
     }
 
     private void deleteCurrentUserPrompt() {
@@ -138,43 +147,6 @@ public class App {
     private void logoutPrompt() {
         logout();
         System.out.println("You have been logged out");
-    }
-
-    private void feedPrompt() {
-        boolean onFeed = true;
-        while(onFeed) {
-            showFeed();
-            System.out.println("1. Create a new post");
-            System.out.println("2. Enter a post");
-            System.out.println("3. Delete current user");
-            System.out.println("4. Logout");
-            System.out.println(">>>");
-            String choice = input.nextLine();
-            switch (choice) {
-                case "1":
-                    addNewPostPrompt();
-                    break;
-                case "2":
-                    int postNumber = enterPostPrompt();
-                    if (postNumber != -1) {
-                        clearCLI();
-                        postPrompt(postNumber);
-                    }
-                    break;
-                case "3":
-                    deleteCurrentUserPrompt();
-                    onFeed = false;
-                    break;
-                case "4":
-                    logoutPrompt();
-                    onFeed = false;
-                    break;
-                default:
-                    System.out.println("Invalid choice");
-                    break;
-            }
-            clearCLI();
-        }
     }
 
     private int enterPostPrompt() {
@@ -189,6 +161,51 @@ public class App {
                 return postNumber;
             }
             System.out.println("Invalid choice, try again");
+        }
+    }
+
+    private void feedPrompt() {
+        boolean onFeed = true;
+        int postNumber;
+        while(onFeed) {
+            showFeed();
+            System.out.println("1. Create a new post");
+            System.out.println("2. Delete a post");
+            System.out.println("3. Enter a post");
+            System.out.println("4. Delete current user");
+            System.out.println("5. Logout");
+            System.out.println(">>>");
+            String choice = input.nextLine();
+            switch (choice) {
+                case "1":
+                    addNewPostPrompt();
+                    break;
+                case "2":
+                    postNumber = enterPostPrompt();
+                    if (postNumber != -1) {
+                        deletePost(postNumber);
+                    }
+                    break;
+                case "3":
+                    postNumber = enterPostPrompt();
+                    if (postNumber != -1) {
+                        clearCLI();
+                        postPrompt(postNumber);
+                    }
+                    break;
+                case "4":
+                    deleteCurrentUserPrompt();
+                    onFeed = false;
+                    break;
+                case "5":
+                    logoutPrompt();
+                    onFeed = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice");
+                    break;
+            }
+            clearCLI();
         }
     }
 
@@ -267,12 +284,10 @@ public class App {
                         case "1":
                             chosenPost.addUpVoteComment(id, currentUser.getUsername());
                             isVoted = true;
-                            System.out.println("Vote added successfully!");
                             break;
                         case "2":
                             chosenPost.addDownVoteComment(id, currentUser.getUsername());
                             isVoted = true;
-                            System.out.println("Vote added successfully!");
                             break;
                         default:
                             System.out.println("Invalid choice");

@@ -1,7 +1,7 @@
 package mihnea;
 
-import Login.User;
-import Login.UserService;
+import login.User;
+import login.UserService;
 
 import java.util.Scanner;
 
