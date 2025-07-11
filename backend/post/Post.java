@@ -4,6 +4,7 @@ import comment.Comment;
 import comment.CommentSection;
 import vote.Vote;
 import Services.VotingService;
+import Services.ContentService;
 
 import java.util.ArrayList;
 
@@ -13,6 +14,7 @@ public class Post {
     private Vote votes;
     private CommentSection comments;
     private final VotingService votingService;
+    private final ContentService contentService;
 
     public Post(String content, String username) {
         this.content = content;
@@ -20,6 +22,7 @@ public class Post {
         this.comments = new CommentSection();
         this.votes = new Vote();
         this.votingService = VotingService.getInstance();
+        this.contentService = ContentService.getInstance();
     }
 
     /*
