@@ -3,20 +3,23 @@ package post;
 import comment.Comment;
 import comment.CommentSection;
 import vote.Vote;
+import Services.VotingService;
 
 import java.util.ArrayList;
 
 public class Post {
     private String content;
-    private  String username;
-    private  Vote votes;
-    private  CommentSection comments;
+    private String username;
+    private Vote votes;
+    private CommentSection comments;
+    private final VotingService votingService;
 
     public Post(String content, String username) {
         this.content = content;
         this.username = username;
         this.comments = new CommentSection();
         this.votes = new Vote();
+        this.votingService = VotingService.getInstance();
     }
 
     /*
@@ -42,19 +45,19 @@ public class Post {
     }
 
     public void addUpVoteComment(String id, String username) {
-        comments.addUpVote(id, username);
+        votingService.upvoteCommentByPath(this, id, username);
     }
 
     public void addDownVoteComment(String id, String username) {
-        comments.addDownVote(id, username);
+        votingService.downvoteCommentByPath(this, id, username);
     }
 
     public void addUpVotePost(String username) {
-        votes.addUpVote(username);
+        votingService.upvotePost(this, username);
     }
 
     public void addDownVotePost(String username) {
-        votes.addDownVote(username);
+        votingService.downvotePost(this, username);
     }
 
     public String getContent() {
@@ -70,15 +73,15 @@ public class Post {
     }
 
     public int getUpVoteCount() {
-        return votes.getUpvoteCount();
+        return votingService.getPostUpvoteCount(this);
     }
 
     public int getDownVoteCount() {
-        return votes.getDownvoteCount();
+        return votingService.getPostDownvoteCount(this);
     }
 
     public boolean isEmoji() {
-        return votes.isEmoji();
+        return votingService.isPostEmoji(this);
     }
 
     public ArrayList<Comment> getComments() {
