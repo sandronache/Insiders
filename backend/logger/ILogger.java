@@ -1,0 +1,14 @@
+package logger;
+
+public interface ILogger {
+
+    void logDebug(String message);
+
+    void logInfo(String message);
+
+    void logWarning(String message);
+
+    void logError(String message);
+
+    void logFatal(String message);
+}
