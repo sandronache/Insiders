@@ -1,14 +1,15 @@
-import app.App;
+import app.AppInterface;
+import app.CLIInterface;
+import service.*;
 
 public class Main {
     public static void main(String[] args) {
+        VotingService votingService = new VotingService();
+        CommentService commentService = new CommentService(votingService);
+        ContentService contentService = new ContentService(votingService, commentService);
+        AppDataService appDataService = new AppDataService(contentService);
 
-        // fasad? pt logger un design pattern?
-
-       // int stuff = App.MAX_NUMBER_OF_STUFF;
-        //
-        System.out.println("Main staring");
-        App app = App.getInstance();
+        AppInterface app = new CLIInterface(contentService, appDataService);
         app.run();
     }
 }

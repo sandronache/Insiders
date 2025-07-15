@@ -1,61 +1,30 @@
 package app;
 
+import model.AppData;
+import service.AppDataService;
+import service.ContentService;
 import utils.Helper;
-import Services.UserService;
-import Services.ContentService;
-import Services.VotingService;
-import post.Post;
-import post.PostRenderer;
+import model.Post;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
-public class App {
-    public static int MAX_NUMBER_OF_STUFF = 10000;
-    private final ArrayList<Post> posts;
-    private final UserService users;
-    private final ContentService contentService;
-    private final VotingService votingService;
-    private static final App INSTANCE = new App();
+public class CLIInterface implements AppInterface {
+    private ContentService contentService;
+    private AppDataService appDataService;
+    private AppData appData;
     private final Scanner input = new Scanner(System.in);
 
-    private App() {
-        System.out.println("omg I'm alive !");
-        posts = new ArrayList<>();
-        users = new UserService();
-        contentService = ContentService.getInstance();
-        votingService = VotingService.getInstance();
-    }
-
-    public static App getInstance() {
-        System.out.println("Getting instance ");
-        return INSTANCE;
-    } // created as a singleton
-
-    private void addPost(String content) {
-        Post newPost = contentService.createPost(content, users.getCurrUsername());
-        posts.add(newPost);
-    }
-
-    private void deletePost(int idx) {
-        posts.remove(idx);
-    }
-
-    public boolean register(String username, String email, String password) {
-        return users.register(username, email, password);
-    }
-
-    public boolean login(String username, String password) {
-        return users.login(username, password);
-    }
-
-    public void logout() {
-        users.logout();
+    public CLIInterface(ContentService contentService,
+                        AppDataService appDataService) {
+        this.contentService = contentService;
+        this.appDataService = appDataService;
+        appData = appDataService.createAppData();
     }
 
     private void deleteCurrentUser() {
-        users.deleteUser();
-        logout();
+        appDataService.deleteUser(appData);
+        appDataService.logout(appData);
         // ++ erasing all posted content (posts, replies, comments)
     }
 
@@ -67,7 +36,12 @@ public class App {
         System.out.println("Enter password: ");
         String password = input.nextLine();
 
-        boolean isRegistered = register(username, email, password);
+        boolean isRegistered = appDataService.register(
+                appData,
+                username,
+                email,
+                password
+        );
 
         if (isRegistered) {
             System.out.println("You have successfully registered!");
@@ -83,7 +57,11 @@ public class App {
         System.out.println("Enter password: ");
         String password = input.nextLine();
 
-        boolean isLoggedIn = login(username, password);
+        boolean isLoggedIn = appDataService.login(
+                appData,
+                username,
+                password
+        );
 
         if (isLoggedIn) {
             System.out.println("You have successfully logged in!");
@@ -124,18 +102,14 @@ public class App {
     }
 
     private void showFeed() {
-        int idx = 0;
-        for (Post post: posts) {
-            System.out.println(PostRenderer.renderFeedPost(post, String.valueOf(idx)));
-            idx++;
-        }
+        System.out.println(appDataService.renderFeed(appData));
     }
 
     private void addNewPostPrompt() {
         System.out.println("Enter the content of the post");
         String content = input.nextLine();
 
-        addPost(content);
+        appDataService.addPost(appData, content);
     }
 
     private void deleteCurrentUserPrompt() {
@@ -144,11 +118,12 @@ public class App {
     }
 
     private void logoutPrompt() {
-        logout();
+        appDataService.logout(appData);
         System.out.println("You have been logged out");
     }
 
     private int enterPostPrompt() {
+        LinkedList<Post> posts = appData.getLoadedPosts();
         if (posts.isEmpty()) {
             System.out.println("No post available");
             return -1;
@@ -182,7 +157,10 @@ public class App {
                 case "2":
                     postNumber = enterPostPrompt();
                     if (postNumber != -1) {
-                        deletePost(postNumber);
+                        appDataService.deletePost(
+                                appData,
+                                postNumber
+                        );
                     }
                     break;
                 case "3":
@@ -215,11 +193,17 @@ public class App {
         String choice = input.nextLine();
         switch (choice) {
             case "1":
-                votingService.upvotePost(chosenPost, users.getCurrUsername());
+                contentService.addUpvotePost(
+                        chosenPost,
+                        appData.getLoggedUser().getUsername()
+                );
                 System.out.println("Vote added successfully!");
                 break;
             case "2":
-                votingService.downvotePost(chosenPost, users.getCurrUsername());
+                contentService.addDownvotePost(
+                        chosenPost,
+                        appData.getLoggedUser().getUsername()
+                );
                 System.out.println("Vote added successfully!");
                 break;
             default:
@@ -231,7 +215,11 @@ public class App {
     private void addCommentPrompt(Post chosenPost) {
         System.out.println("Text..:");
         String content = input.nextLine();
-        contentService.addComment(chosenPost, content, users.getCurrUsername());
+        contentService.addComment(
+                chosenPost,
+                content,
+                appData.getLoggedUser().getUsername()
+        );
         System.out.println("Comment added successfully!");
     }
 
@@ -243,7 +231,12 @@ public class App {
                 // ++check if id also exists
                 System.out.println("Text..:");
                 String content = input.nextLine();
-                contentService.addReply(chosenPost, id, content, users.getCurrUsername());
+                contentService.addReply(
+                        chosenPost,
+                        id,
+                        content,
+                        appData.getLoggedUser().getUsername()
+                );
                 break;
             }
             System.out.println("Invalid choice, try again");
@@ -256,11 +249,10 @@ public class App {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
                 // ++check if id also exists
-                if (id.length() == 1) {
-                    contentService.deleteComment(chosenPost, id);
-                } else {
-                    contentService.deleteReply(chosenPost, id);
-                }
+                contentService.deleteCommentOrReply(
+                        chosenPost,
+                        id
+                );
                 break;
             }
             System.out.println("Invalid choice, try again");
@@ -281,11 +273,19 @@ public class App {
                     String choice = input.nextLine();
                     switch (choice) {
                         case "1":
-                            votingService.upvoteCommentByPath(chosenPost, id, users.getCurrUsername());
+                            contentService.addUpvoteComment(
+                                    chosenPost,
+                                    id,
+                                    appData.getLoggedUser().getUsername()
+                            );
                             isVoted = true;
                             break;
                         case "2":
-                            votingService.downvoteCommentByPath(chosenPost, id, users.getCurrUsername());
+                            contentService.addDownvoteComment(
+                                    chosenPost,
+                                    id,
+                                    appData.getLoggedUser().getUsername()
+                            );
                             isVoted = true;
                             break;
                         default:
@@ -301,10 +301,10 @@ public class App {
 
 
     private void postPrompt(int id) {
-        Post chosenPost = posts.get(id);
+        Post chosenPost = appData.getLoadedPosts().get(id);
         boolean isGoingBackToFeed = false;
         while (!isGoingBackToFeed) {
-            System.out.println(PostRenderer.renderFullPost(chosenPost));
+            System.out.println(contentService.renderFullPost(chosenPost));
             System.out.println("1. Vote post");
             System.out.println("2. Add comment");
             System.out.println("3. Add reply");
