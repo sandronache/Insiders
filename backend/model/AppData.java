@@ -1,24 +1,24 @@
 package model;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 public class AppData {
-    private Map<String, User> registeredUsers;
+    private HashMap<String, User> registeredUsers;
     private User loggedUser;
     private Integer idNextPost;
-    private Map<Integer, Post> loadedPosts;
+    private TreeMap<Integer, Post> loadedPosts;
 
     // TODO change
-    public AppData() {
+    public AppData(TreeMap<Integer, Post> loadedPosts,
+                   Integer idNextPost) {
         registeredUsers = new HashMap<>();
         loggedUser = null;
-        idNextPost = 0;
-        loadedPosts = new TreeMap<>();
+        this.idNextPost = idNextPost;
+        this.loadedPosts = loadedPosts;
     }
 
-    public Map<String, User> getRegisteredUsers() {
+    public HashMap<String, User> getRegisteredUsers() {
         return registeredUsers;
     }
 
@@ -36,7 +36,7 @@ public class AppData {
         idNextPost = id;
     }
 
-    public Map<Integer, Post> getLoadedPosts() {
+    public TreeMap<Integer, Post> getLoadedPosts() {
         return loadedPosts;
     }
 }

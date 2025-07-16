@@ -1,13 +1,19 @@
 package service;
 
-import model.Post;
-import model.AppData;
-import model.User;
 import logger.LoggerFacade;
+import model.AppData;
+import model.Post;
+import model.User;
+import util.Helper;
+
+import java.util.TreeMap;
 
 public class AppDataService {
+    private final FilesService filesService;
     private final ContentService contentService;
-    public AppDataService(ContentService contentService) {
+    public AppDataService(FilesService filesService,
+                          ContentService contentService) {
+        this.filesService = filesService;
         this.contentService = contentService;
 
         LoggerFacade.debug("AppDataService initialized");
@@ -16,7 +22,19 @@ public class AppDataService {
     public AppData createAppData() {
         // TODO init db
         LoggerFacade.info("Creating new application data");
-        return new AppData();
+
+        TreeMap<Integer, Post> loadedPosts = filesService.loadPosts();
+
+        int idNextPost = 0;
+        if (!loadedPosts.isEmpty()) {
+            idNextPost = loadedPosts.lastKey() + 1;
+        }
+
+        return new AppData(loadedPosts, idNextPost);
+    }
+
+    public void writeAppData(AppData appData) {
+        filesService.writePosts(appData.getLoadedPosts());
     }
 
     public boolean register(AppData appData, String username, String email, String password) {
@@ -24,7 +42,7 @@ public class AppDataService {
             LoggerFacade.warning("Registration failed: Username '" + username + "' already exists");
             return false;
         }
-        User user = new User(username, email, password);
+        User user = new User(username, email, Helper.hashFunction(password));
         appData.setLoggedUser(user);
         appData.getRegisteredUsers().put(username, user);
         LoggerFacade.info("New user registered: " + username);
@@ -33,7 +51,7 @@ public class AppDataService {
 
     public boolean login(AppData appData, String username, String password) {
         User user = appData.getRegisteredUsers().get(username);
-        if (user != null && user.checkPassword(password)) {
+        if (user != null && Helper.checkPassword(password, user.getHashedPassword())) {
             appData.setLoggedUser(user);
             LoggerFacade.info("User logged in: " + username);
             return true;

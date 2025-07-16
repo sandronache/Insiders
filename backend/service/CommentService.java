@@ -2,9 +2,9 @@ package service;
 
 import logger.LoggerFacade;
 import model.Comment;
-import utils.Helper;
+import util.Helper;
 
-import java.util.Map;
+import java.util.TreeMap;
 
 public class CommentService {
     private final VotingService votingService;
@@ -22,7 +22,7 @@ public class CommentService {
     }
 
     public void addReply(Comment comment, String id, String content, String username) {
-        Map<Integer, Comment> replies = comment.getReplies();
+        TreeMap<Integer, Comment> replies = comment.getReplies();
         if (id.isEmpty()) {
             Comment reply = createComment(content, username);
 
@@ -53,7 +53,7 @@ public class CommentService {
             LoggerFacade.info("Comment marked as deleted");
             return;
         }
-        Map<Integer,Comment> replies = comment.getReplies();
+        TreeMap<Integer,Comment> replies = comment.getReplies();
 
         int idx = Helper.extractFirstLevel(id);
         if (!replies.containsKey(idx)) {
@@ -73,7 +73,7 @@ public class CommentService {
             LoggerFacade.info("Upvote added to comment by user: " + username);
             return;
         }
-        Map<Integer, Comment> replies = comment.getReplies();
+        TreeMap<Integer, Comment> replies = comment.getReplies();
 
         int idx = Helper.extractFirstLevel(id);
         if (!replies.containsKey(idx)) {
@@ -93,7 +93,7 @@ public class CommentService {
             LoggerFacade.info("Downvote added to comment by user: " + username);
             return;
         }
-        Map<Integer, Comment> replies = comment.getReplies();
+        TreeMap<Integer, Comment> replies = comment.getReplies();
 
         int idx = Helper.extractFirstLevel(id);
         if (!replies.containsKey(idx)) {

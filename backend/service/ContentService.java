@@ -1,11 +1,11 @@
 package service;
 
 import logger.LoggerFacade;
-import model.Post;
 import model.Comment;
-import utils.Helper;
+import model.Post;
+import util.Helper;
 
-import java.util.Map;
+import java.util.TreeMap;
 
 public class ContentService {
     private final VotingService votingService;
@@ -35,7 +35,7 @@ public class ContentService {
         LoggerFacade.info("Comment added to post by user: " + username);
     }
     public void deleteCommentOrReply(Post post, String id) {
-        Map<Integer, Comment> comments = post.getComments();
+        TreeMap<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
         if (!comments.containsKey(idx)) {
@@ -49,7 +49,7 @@ public class ContentService {
     }
 
     public void addReply(Post post, String id, String content, String username) {
-        Map<Integer, Comment> comments = post.getComments();
+        TreeMap<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
         if (!comments.containsKey(idx)) {
@@ -63,7 +63,7 @@ public class ContentService {
     }
 
     public void addUpvoteComment(Post post, String id, String username) {
-        Map<Integer, Comment> comments = post.getComments();
+        TreeMap<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
         if (!comments.containsKey(idx)) {
@@ -77,7 +77,7 @@ public class ContentService {
     }
 
     public void addDownvoteComment(Post post, String id, String username) {
-        Map<Integer, Comment> comments = post.getComments();
+        TreeMap<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
         if (!comments.containsKey(idx)) {

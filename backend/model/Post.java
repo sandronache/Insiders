@@ -1,6 +1,5 @@
 package model;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 public class Post {
@@ -8,7 +7,7 @@ public class Post {
     private String username;
     private Vote vote;
     private Integer idNextComment;
-    private final Map<Integer, Comment> comments;
+    private final TreeMap<Integer, Comment> comments;
 
     public Post(String content, String username, Vote vote) {
         this.content = content;
@@ -37,7 +36,7 @@ public class Post {
         this.idNextComment = id;
     }
 
-    public Map<Integer, Comment> getComments() {
+    public TreeMap<Integer, Comment> getComments() {
         return comments;
     }
 }

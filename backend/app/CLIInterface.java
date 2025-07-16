@@ -1,19 +1,20 @@
 package app;
 
+import logger.LoggerFacade;
 import model.AppData;
+import model.Post;
 import service.AppDataService;
 import service.ContentService;
-import utils.Helper;
-import model.Post;
-import logger.LoggerFacade;
+import util.Helper;
 
-import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 public class CLIInterface implements AppInterface {
     private ContentService contentService;
     private AppDataService appDataService;
     private AppData appData;
+    private boolean isAppOn;
     private final Scanner input = new Scanner(System.in);
 
     public CLIInterface(ContentService contentService,
@@ -21,6 +22,7 @@ public class CLIInterface implements AppInterface {
         this.contentService = contentService;
         this.appDataService = appDataService;
         appData = appDataService.createAppData();
+        isAppOn = true;
 
         LoggerFacade.debug("CLIInterface initialized");
     }
@@ -87,6 +89,7 @@ public class CLIInterface implements AppInterface {
         while(!doneAuthentication) {
             System.out.println("1. Register");
             System.out.println("2. Login");
+            System.out.println("3. Exit");
             System.out.println(">>>");
             String choice = input.nextLine();
             switch (choice) {
@@ -96,6 +99,10 @@ public class CLIInterface implements AppInterface {
                     break;
                 case "2":
                     loginPrompt();
+                    doneAuthentication = true;
+                    break;
+                case "3":
+                    isAppOn = false;
                     doneAuthentication = true;
                     break;
                 default:
@@ -152,7 +159,7 @@ public class CLIInterface implements AppInterface {
     }
 
     private int enterPostPrompt() {
-        Map<Integer, Post> posts = appData.getLoadedPosts();
+        TreeMap<Integer, Post> posts = appData.getLoadedPosts();
         if (posts.isEmpty()) {
             LoggerFacade.warning("User attempted to access posts when none are available");
             System.out.println("No post available");
@@ -182,6 +189,7 @@ public class CLIInterface implements AppInterface {
             System.out.println("3. Enter a post");
             System.out.println("4. Delete current user");
             System.out.println("5. Logout");
+            System.out.println("6. Exit");
             System.out.println(">>>");
             String choice = input.nextLine();
             switch (choice) {
@@ -214,6 +222,10 @@ public class CLIInterface implements AppInterface {
                     break;
                 case "5":
                     logoutPrompt();
+                    onFeed = false;
+                    break;
+                case "6":
+                    isAppOn = false;
                     onFeed = false;
                     break;
                 default:
@@ -426,7 +438,15 @@ public class CLIInterface implements AppInterface {
         LoggerFacade.info("Application interface started");
         while (true) {
             authenticationPrompt();
+            if (!isAppOn) {
+                appDataService.writeAppData(appData);
+                break;
+            }
             feedPrompt();
+            if (!isAppOn) {
+                appDataService.writeAppData(appData);
+                break;
+            }
         }
     }
 }

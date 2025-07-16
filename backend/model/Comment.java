@@ -1,6 +1,5 @@
 package model;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 public class Comment {
@@ -8,7 +7,7 @@ public class Comment {
     private final String username;
     private final Vote vote;
     private Integer idNextReply;
-    private final Map<Integer, Comment> replies;
+    private final TreeMap<Integer, Comment> replies;
     private boolean isDeleted;
 
     public Comment(String content, String username, Vote vote) {
@@ -40,7 +39,7 @@ public class Comment {
         this.idNextReply = id;
     }
 
-    public Map<Integer, Comment> getReplies() {
+    public TreeMap<Integer, Comment> getReplies() {
         return replies;
     }
 
