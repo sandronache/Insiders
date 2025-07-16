@@ -195,6 +195,12 @@ public class CLIInterface implements AppInterface {
         System.out.println("Enter the content of the post (or type 'exit' to return to feed):");
         String content = input.nextLine();
 
+        if (content.trim().isEmpty()) {
+            System.out.println("Post content cannot be empty.");
+            LoggerFacade.warning("User attempted to create an empty post");
+            return;
+        }
+
         if (content.equalsIgnoreCase("exit")) {
             System.out.println("Post creation cancelled.");
             LoggerFacade.info("Post creation cancelled by user: " + appData.getLoggedUser().getUsername());
@@ -361,6 +367,12 @@ public class CLIInterface implements AppInterface {
         System.out.println("Text..:");
         String content = input.nextLine();
 
+        if (content.trim().isEmpty()) {
+            System.out.println("Comment cannot be empty.");
+            LoggerFacade.warning("User attempted to add empty comment");
+            return;
+        }
+
         contentService.addComment(
                 chosenPost,
                 content,
@@ -388,6 +400,12 @@ public class CLIInterface implements AppInterface {
 
                 System.out.println("Text..:");
                 String content = input.nextLine();
+
+                if (content.trim().isEmpty()) {
+                    System.out.println("Reply cannot be empty.");
+                    LoggerFacade.warning("User attempted to add empty reply");
+                    return;
+                }
 
                 boolean success = contentService.addReply(
                         chosenPost,
