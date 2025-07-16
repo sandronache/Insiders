@@ -108,6 +108,19 @@ public class ContentService {
         return votingService.isEmoji(post.getVote());
     }
 
+    public boolean isCommentDeleted(Post post, String id) {
+        TreeMap<Integer, Comment> comments = post.getComments();
+
+        int idx = Helper.extractFirstLevel(id);
+        if (!comments.containsKey(idx)) {
+            LoggerFacade.warning("Failed to check comment status with invalid comment ID: " + id);
+            return true; // Consider non-existing comments as "deleted" for safety
+        }
+
+        String remaining_id = Helper.extractRemainingLevels(id);
+        return commentService.isCommentDeleted(comments.get(idx), remaining_id);
+    }
+
     // rendering functions
 
     public String renderFeedPost(Post post, String id) {

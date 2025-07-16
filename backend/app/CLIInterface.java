@@ -378,8 +378,13 @@ public class CLIInterface implements AppInterface {
         while(true) {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
-                // ++check if id also exists
                 LoggerFacade.debug("Reply to comment ID: " + id);
+
+                if (contentService.isCommentDeleted(chosenPost, id)) {
+                    System.out.println("Comment is deleted, cannot add reply.");
+                    LoggerFacade.warning("User attempted to add reply to deleted comment ID: " + id);
+                    break;
+                }
 
                 System.out.println("Text..:");
                 String content = input.nextLine();
@@ -395,7 +400,7 @@ public class CLIInterface implements AppInterface {
                     System.out.println("Reply added successfully!");
                     LoggerFacade.info("Reply added to comment ID: " + id + " by user: " + appData.getLoggedUser().getUsername());
                 } else {
-                    System.out.println("Nu se poate adauga un reply la un comentariu sters!");
+                    System.out.println("Failed to add reply. Comment may be deleted or invalid ID.");
                     LoggerFacade.warning("User attempted to add reply to deleted comment ID: " + id);
                 }
                 break;
@@ -412,7 +417,12 @@ public class CLIInterface implements AppInterface {
         while(true) {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
-                // ++check if id also exists
+                if (contentService.isCommentDeleted(chosenPost, id)) {
+                    System.out.println("Comment is already deleted, cannot delete again.");
+                    LoggerFacade.warning("User attempted to delete an already deleted comment ID: " + id);
+                    break;
+                }
+
                 LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " deleted comment with ID: " + id);
 
                 contentService.deleteCommentOrReply(
@@ -420,6 +430,7 @@ public class CLIInterface implements AppInterface {
                         id
                 );
 
+                System.out.println("Comment deleted successfully!");
                 break;
             }
             LoggerFacade.warning("Invalid comment ID format entered: " + id);
@@ -434,8 +445,13 @@ public class CLIInterface implements AppInterface {
         while(true) {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
-                // ++check if id also exists
                 LoggerFacade.debug("Valid comment ID entered: " + id);
+
+                if (contentService.isCommentDeleted(chosenPost, id)) {
+                    System.out.println("Comment is deleted, cannot vote on it.");
+                    LoggerFacade.warning("User " + appData.getLoggedUser().getUsername() + " attempted to vote on a deleted comment ID: " + id);
+                    break;
+                }
 
                 boolean isVoted = false;
                 while(!isVoted) {
@@ -452,6 +468,7 @@ public class CLIInterface implements AppInterface {
                             );
 
                             LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " upvoted comment ID: " + id);
+                            System.out.println("Upvote added successfully!");
                             isVoted = true;
                             break;
                         case "2":
@@ -462,6 +479,7 @@ public class CLIInterface implements AppInterface {
                             );
 
                             LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " downvoted comment ID: " + id);
+                            System.out.println("Downvote added successfully!");
                             isVoted = true;
                             break;
                         default:

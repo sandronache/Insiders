@@ -133,6 +133,23 @@ public class CommentService {
         return votingService.isEmoji(comment.getVote());
     }
 
+    public boolean isCommentDeleted(Comment comment, String id) {
+        if (id.isEmpty()) {
+            return comment.isDeleted();
+        }
+
+        TreeMap<Integer, Comment> replies = comment.getReplies();
+        int idx = Helper.extractFirstLevel(id);
+
+        if (!replies.containsKey(idx)) {
+            LoggerFacade.warning("Failed to check comment status with invalid ID: " + id);
+            return true; // Consider non-existing comments as "deleted" for safety
+        }
+
+        String remaining_id = Helper.extractRemainingLevels(id);
+        return isCommentDeleted(replies.get(idx), remaining_id);
+    }
+
     // rendering function
 
     public void renderComment(Comment comment, StringBuilder sb, int depth, String id) {
