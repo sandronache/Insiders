@@ -1,5 +1,6 @@
 package service;
 
+import logger.LoggerFacade;
 import model.Post;
 import model.Comment;
 import utils.Helper;
@@ -13,24 +14,30 @@ public class ContentService {
     public ContentService(VotingService votingService, CommentService commentService) {
         this.votingService = votingService;
         this.commentService = commentService;
+        LoggerFacade.debug("ContentService initialized");
     }
 
     public Post createPost(String content, String username) {
+        LoggerFacade.debug("Creating new post for user: " + username);
         return new Post(content, username, votingService.createVote());
     }
 
     public void addComment(Post post, String content, String username) {
         Comment newComment = commentService.createComment(content, username);
         post.addComment(newComment);
+        LoggerFacade.info("Comment added to post by user: " + username);
     }
     public void deleteCommentOrReply(Post post, String id) {
         Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (idx < 0 || idx >= comments.size()) return;
+        if (idx < 0 || idx >= comments.size()) {
+            LoggerFacade.warning("Failed to delete comment with invalid ID: " + id);
+            return;
+        }
 
         String remaining_id = Helper.extractRemainingLevels(id);
-
+        LoggerFacade.info("Deleting comment/reply with ID: " + id);
         commentService.deleteComment(comments.get(idx), remaining_id);
     }
 
@@ -38,10 +45,13 @@ public class ContentService {
         Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (!comments.containsKey(idx)) return;
+        if (idx < 0 || idx >= comments.size()) {
+            LoggerFacade.warning("Failed to add reply with invalid comment ID: " + id);
+            return;
+        }
 
         String remaining_id = Helper.extractRemainingLevels(id);
-
+        LoggerFacade.info("Adding reply to comment ID: " + id + " by user: " + username);
         commentService.addReply(comments.get(idx), remaining_id, content, username);
     }
 
@@ -49,10 +59,13 @@ public class ContentService {
         Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (!comments.containsKey(idx)) return;
+        if (!comments.containsKey(idx)) {
+            LoggerFacade.warning("Failed to add upvote with invalid comment ID: " + id);
+            return;
+        }
 
         String remaining_id = Helper.extractRemainingLevels(id);
-
+        LoggerFacade.info("Adding upvote to comment ID: " + id + " by user: " + username);
         commentService.addUpvote(comments.get(idx), remaining_id, username);
     }
 
@@ -60,10 +73,13 @@ public class ContentService {
         Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (!comments.containsKey(idx)) return;
+        if (!comments.containsKey(idx)) {
+            LoggerFacade.warning("Failed to add downvote with invalid comment ID: " + id);
+            return;
+        }
 
         String remaining_id = Helper.extractRemainingLevels(id);
-
+        LoggerFacade.info("Adding downvote to comment ID: " + id + " by user: " + username);
         commentService.addDownvote(comments.get(idx), remaining_id, username);
     }
 
