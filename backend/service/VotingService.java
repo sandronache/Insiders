@@ -6,8 +6,15 @@ import model.Vote;
 import java.util.Set;
 
 public class VotingService {
-    public VotingService() {
-        LoggerFacade.debug("VotingService initialized");
+    private static VotingService instance;
+
+    private VotingService() {}
+
+    public static VotingService getInstance() {
+        if (instance == null) {
+            instance = new VotingService();
+        }
+        return instance;
     }
 
     public Vote createVote() {

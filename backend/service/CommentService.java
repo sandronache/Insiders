@@ -7,12 +7,18 @@ import util.Helper;
 import java.util.TreeMap;
 
 public class CommentService {
+    private static CommentService instance;
     private final VotingService votingService;
 
-    public CommentService(VotingService votingService) {
+    private CommentService(VotingService votingService) {
         this.votingService = votingService;
+    }
 
-        LoggerFacade.debug("CommentService initialized");
+    public static CommentService getInstance() {
+        if (instance == null) {
+            instance = new CommentService(VotingService.getInstance());
+        }
+        return instance;
     }
 
     public Comment createComment(String content, String username) {

@@ -8,14 +8,22 @@ import util.Helper;
 import java.util.TreeMap;
 
 public class ContentService {
+    private static ContentService instance;
     private final VotingService votingService;
     private final CommentService commentService;
 
-    public ContentService(VotingService votingService, CommentService commentService) {
+    private ContentService(VotingService votingService,
+                            CommentService commentService) {
         this.votingService = votingService;
         this.commentService = commentService;
+    }
 
-        LoggerFacade.debug("ContentService initialized");
+    public static ContentService getInstance() {
+        if (instance == null) {
+            instance = new ContentService(VotingService.getInstance(),
+                                            CommentService.getInstance());
+        }
+        return instance;
     }
 
     public Post createPost(String content, String username) {
