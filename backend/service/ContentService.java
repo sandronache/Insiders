@@ -3,9 +3,8 @@ package service;
 import model.Post;
 import model.Comment;
 import utils.Helper;
-import logger.LoggerFacade;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 public class ContentService {
     private final VotingService votingService;
@@ -14,53 +13,43 @@ public class ContentService {
     public ContentService(VotingService votingService, CommentService commentService) {
         this.votingService = votingService;
         this.commentService = commentService;
-        LoggerFacade.debug("ContentService initialized");
     }
 
     public Post createPost(String content, String username) {
-        LoggerFacade.debug("Creating new post for user: " + username);
         return new Post(content, username, votingService.createVote());
     }
 
     public void addComment(Post post, String content, String username) {
         Comment newComment = commentService.createComment(content, username);
-        post.getComments().add(newComment);
-        LoggerFacade.info("Comment added to post by user: " + username);
+        post.addComment(newComment);
     }
-
     public void deleteCommentOrReply(Post post, String id) {
-        ArrayList<Comment> comments = post.getComments();
+        Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (idx < 0 || idx >= comments.size()) {
-            LoggerFacade.warning("Failed to delete comment with invalid ID: " + id);
-            return;
-        }
+        if (idx < 0 || idx >= comments.size()) return;
 
         String remaining_id = Helper.extractRemainingLevels(id);
-        LoggerFacade.info("Deleting comment/reply with ID: " + id);
+
         commentService.deleteComment(comments.get(idx), remaining_id);
     }
 
     public void addReply(Post post, String id, String content, String username) {
-        ArrayList<Comment> comments = post.getComments();
+        Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (idx < 0 || idx >= comments.size()) {
-            LoggerFacade.warning("Failed to add reply with invalid comment ID: " + id);
-            return;
-        }
+        if (!comments.containsKey(idx)) return;
 
         String remaining_id = Helper.extractRemainingLevels(id);
-        LoggerFacade.info("Adding reply to comment ID: " + id + " by user: " + username);
+
         commentService.addReply(comments.get(idx), remaining_id, content, username);
     }
 
     public void addUpvoteComment(Post post, String id, String username) {
-        ArrayList<Comment> comments = post.getComments();
+        Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (idx < 0 || idx >= comments.size()) return;
+        if (!comments.containsKey(idx)) return;
 
         String remaining_id = Helper.extractRemainingLevels(id);
 
@@ -68,10 +57,10 @@ public class ContentService {
     }
 
     public void addDownvoteComment(Post post, String id, String username) {
-        ArrayList<Comment> comments = post.getComments();
+        Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (idx < 0 || idx >= comments.size()) return;
+        if (!comments.containsKey(idx)) return;
 
         String remaining_id = Helper.extractRemainingLevels(id);
 
@@ -121,8 +110,10 @@ public class ContentService {
         sb.append(post.getContent()).append("\n\n");
         sb.append("upvotes = ").append(getUpvoteCount(post)).append("\n");
         sb.append("downvotes = ").append(getDownvoteCount(post)).append("\n\n\n");
-        for (int i = 0; i < post.getComments().size(); i++) {
-            commentService.renderComment(post.getComments().get(i), sb, 1, String.valueOf(i));
+        for (Map.Entry<Integer, Comment> entry : post.getComments().entrySet()) {
+            Integer id = entry.getKey();
+            Comment comment = entry.getValue();
+            commentService.renderComment(comment, sb, 1, id.toString());
         }
         return sb.toString();
     }

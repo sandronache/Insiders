@@ -1,19 +1,20 @@
 package model;
 
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class Comment {
     private final String content;
     private final String username;
     private final Vote vote;
-    private final ArrayList<Comment> replies;
+    private final Map<Integer, Comment> replies;
     private boolean isDeleted;
 
     public Comment(String content, String username, Vote vote) {
         this.content = content;
         this.username = username;
         this.vote = vote;
-        this.replies = new ArrayList<>();
+        this.replies = new LinkedHashMap<>();
         this.isDeleted = false;
     }
 
@@ -30,7 +31,7 @@ public class Comment {
         return vote;
     }
 
-    public ArrayList<Comment> getReplies() {
+    public Map<Integer, Comment> getReplies() {
         return replies;
     }
 
