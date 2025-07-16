@@ -27,9 +27,14 @@ public class CommentService {
         return new Comment(content, username, votingService.createVote());
     }
 
-    public void addReply(Comment comment, String id, String content, String username) {
+    public boolean addReply(Comment comment, String id, String content, String username) {
         TreeMap<Integer, Comment> replies = comment.getReplies();
         if (id.isEmpty()) {
+            if (comment.isDeleted()) {
+                LoggerFacade.warning("Cannot add reply to a deleted comment by user: " + username);
+                return false;
+            }
+
             Comment reply = createComment(content, username);
 
             Integer newId = comment.getIdNextReply();
@@ -38,18 +43,18 @@ public class CommentService {
             replies.put(newId, reply);
 
             LoggerFacade.info("Direct reply added to comment by user: " + username);
-            return;
+            return true;
         }
 
         int idx = Helper.extractFirstLevel(id);
         if (!replies.containsKey(idx)) {
             LoggerFacade.warning("Failed to add reply with invalid ID: " + id);
-            return;
+            return false;
         }
         LoggerFacade.debug("Adding nested reply to comment path: " + id);
 
         String remaining_id = Helper.extractRemainingLevels(id);
-        addReply(replies.get(idx), remaining_id, content, username);
+        return addReply(replies.get(idx), remaining_id, content, username);
     }
 
     public void deleteComment(Comment comment, String id) {
@@ -74,6 +79,11 @@ public class CommentService {
 
     public void addUpvote(Comment comment, String id, String username) {
         if (id.isEmpty()) {
+            if (comment.isDeleted()) {
+                LoggerFacade.warning("Cannot upvote a deleted comment by user: " + username);
+                return;
+            }
+
             votingService.addUpvote(comment.getVote(), username);
 
             LoggerFacade.info("Upvote added to comment by user: " + username);
@@ -94,6 +104,11 @@ public class CommentService {
 
     public void addDownvote(Comment comment, String id, String username) {
         if (id.isEmpty()) {
+            if (comment.isDeleted()) {
+                LoggerFacade.warning("Cannot downvote a deleted comment by user: " + username);
+                return;
+            }
+
             votingService.addDownvote(comment.getVote(), username);
 
             LoggerFacade.info("Downvote added to comment by user: " + username);
@@ -122,6 +137,23 @@ public class CommentService {
 
     public boolean isEmoji(Comment comment) {
         return votingService.isEmoji(comment.getVote());
+    }
+
+    public boolean isCommentDeleted(Comment comment, String id) {
+        if (id.isEmpty()) {
+            return comment.isDeleted();
+        }
+
+        TreeMap<Integer, Comment> replies = comment.getReplies();
+        int idx = Helper.extractFirstLevel(id);
+
+        if (!replies.containsKey(idx)) {
+            LoggerFacade.warning("Failed to check comment status with invalid ID: " + id);
+            return true; // Consider non-existing comments as "deleted" for safety
+        }
+
+        String remaining_id = Helper.extractRemainingLevels(id);
+        return isCommentDeleted(replies.get(idx), remaining_id);
     }
 
     // rendering function
