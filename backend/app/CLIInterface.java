@@ -38,12 +38,57 @@ public class CLIInterface implements AppInterface {
     private void registerPrompt() {
         LoggerFacade.debug("Registration process started");
 
-        System.out.println("Enter username: ");
+        System.out.println("Enter username (or type 'exit' to return): ");
         String username = input.nextLine();
-        System.out.println("Enter email: ");
-        String email = input.nextLine();
-        System.out.println("Enter password: ");
-        String password = input.nextLine();
+
+        if (username.equalsIgnoreCase("exit")) {
+            System.out.println("Registration cancelled.");
+            LoggerFacade.info("Registration cancelled by user");
+            authenticationPrompt();
+            return;
+        }
+
+        String email;
+        boolean validEmail = false;
+        do {
+            System.out.println("Enter email (or type 'exit' to return): ");
+            email = input.nextLine();
+
+            if (email.equalsIgnoreCase("exit")) {
+                System.out.println("Registration cancelled.");
+                LoggerFacade.info("Registration cancelled by user");
+                authenticationPrompt();
+                return;
+            }
+
+            if (email.contains("@")) {
+                validEmail = true;
+            } else {
+                System.out.println("Invalid email format. Email must contain '@'.");
+                LoggerFacade.warning("Invalid email format entered: " + email);
+            }
+        } while (!validEmail);
+
+        String password;
+        boolean validPassword = false;
+        do {
+            System.out.println("Enter password (or type 'exit' to return): ");
+            password = input.nextLine();
+
+            if (password.equalsIgnoreCase("exit")) {
+                System.out.println("Registration cancelled.");
+                LoggerFacade.info("Registration cancelled by user");
+                authenticationPrompt();
+                return;
+            }
+
+            if (password.length() >= 6) {
+                validPassword = true;
+            } else {
+                System.out.println("Password must be at least 6 characters long.");
+                LoggerFacade.warning("Password too short: " + password.length() + " characters");
+            }
+        } while (!validPassword);
 
         boolean isRegistered = appDataService.register(
                 appData,
@@ -54,19 +99,36 @@ public class CLIInterface implements AppInterface {
 
         if (isRegistered) {
             System.out.println("You have successfully registered!");
+            LoggerFacade.info("New user registered: " + username);
         } else {
             System.out.println("Username already exists!");
-            registerPrompt();
+            LoggerFacade.warning("Registration failed - username already exists: " + username);
+            authenticationPrompt();
         }
     }
 
     private void loginPrompt() {
         LoggerFacade.debug("Login process started");
 
-        System.out.println("Enter username: ");
+        System.out.println("Enter username (or type 'exit' to return): ");
         String username = input.nextLine();
-        System.out.println("Enter password: ");
+
+        if (username.equalsIgnoreCase("exit")) {
+            LoggerFacade.info("Login cancelled by user");
+            System.out.println("Login cancelled.");
+            authenticationPrompt();
+            return;
+        }
+
+        System.out.println("Enter password: (or type 'exit' to return): ");
         String password = input.nextLine();
+
+        if (password.equalsIgnoreCase("exit")) {
+            LoggerFacade.info("Login cancelled by user");
+            System.out.println("Login cancelled.");
+            authenticationPrompt();
+            return;
+        }
 
         boolean isLoggedIn = appDataService.login(
                 appData,
@@ -76,9 +138,11 @@ public class CLIInterface implements AppInterface {
 
         if (isLoggedIn) {
             System.out.println("You have successfully logged in!");
+            LoggerFacade.info("User logged in: " + username);
         } else {
             System.out.println("Wrong username or password!");
-            loginPrompt();
+            LoggerFacade.warning("Failed login attempt for username: " + username);
+            authenticationPrompt();
         }
     }
 
