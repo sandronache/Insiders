@@ -463,7 +463,14 @@ public class CLIInterface implements AppInterface {
             System.out.println(contentService.renderFullPost(chosenPost));
             System.out.println("1. Vote post");
             System.out.println("2. Add comment");
-            System.out.println("3. Add reply");
+
+            boolean hasComments = !chosenPost.getComments().isEmpty();
+            if (hasComments) {
+                System.out.println("3. Add reply");
+            } else {
+                System.out.println("3. Add reply (no comments available)");
+            }
+
             System.out.println("4. Delete comment or reply");
             System.out.println("5. Vote comment or reply");
             System.out.println("6. Go back to feed");
@@ -477,7 +484,12 @@ public class CLIInterface implements AppInterface {
                     addCommentPrompt(chosenPost);
                     break;
                 case "3":
-                    addReplyPrompt(chosenPost);
+                    if (hasComments) {
+                        addReplyPrompt(chosenPost);
+                    } else {
+                        System.out.println("No comments available to reply to. Add a comment first.");
+                        LoggerFacade.warning("User attempted to add reply when no comments exist");
+                    }
                     break;
                 case "4":
                     deleteCommentOrReplyPrompt(chosenPost);
