@@ -14,30 +14,37 @@ public class ContentService {
     public ContentService(VotingService votingService, CommentService commentService) {
         this.votingService = votingService;
         this.commentService = commentService;
+
         LoggerFacade.debug("ContentService initialized");
     }
 
     public Post createPost(String content, String username) {
         LoggerFacade.debug("Creating new post for user: " + username);
+
         return new Post(content, username, votingService.createVote());
     }
 
     public void addComment(Post post, String content, String username) {
-        Comment newComment = commentService.createComment(content, username);
-        post.addComment(newComment);
+        Comment comment = commentService.createComment(content, username);
+
+        Integer id = post.getIdNextComment();
+        post.setIdNextComment(id + 1);
+
+        post.getComments().put(id, comment);
+
         LoggerFacade.info("Comment added to post by user: " + username);
     }
     public void deleteCommentOrReply(Post post, String id) {
         Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (idx < 0 || idx >= comments.size()) {
+        if (!comments.containsKey(idx)) {
             LoggerFacade.warning("Failed to delete comment with invalid ID: " + id);
             return;
         }
+        LoggerFacade.info("Deleting comment/reply with ID: " + id);
 
         String remaining_id = Helper.extractRemainingLevels(id);
-        LoggerFacade.info("Deleting comment/reply with ID: " + id);
         commentService.deleteComment(comments.get(idx), remaining_id);
     }
 
@@ -45,13 +52,13 @@ public class ContentService {
         Map<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (idx < 0 || idx >= comments.size()) {
+        if (!comments.containsKey(idx)) {
             LoggerFacade.warning("Failed to add reply with invalid comment ID: " + id);
             return;
         }
+        LoggerFacade.info("Adding reply to comment ID: " + id + " by user: " + username);
 
         String remaining_id = Helper.extractRemainingLevels(id);
-        LoggerFacade.info("Adding reply to comment ID: " + id + " by user: " + username);
         commentService.addReply(comments.get(idx), remaining_id, content, username);
     }
 
@@ -63,9 +70,9 @@ public class ContentService {
             LoggerFacade.warning("Failed to add upvote with invalid comment ID: " + id);
             return;
         }
+        LoggerFacade.info("Adding upvote to comment ID: " + id + " by user: " + username);
 
         String remaining_id = Helper.extractRemainingLevels(id);
-        LoggerFacade.info("Adding upvote to comment ID: " + id + " by user: " + username);
         commentService.addUpvote(comments.get(idx), remaining_id, username);
     }
 
@@ -77,9 +84,9 @@ public class ContentService {
             LoggerFacade.warning("Failed to add downvote with invalid comment ID: " + id);
             return;
         }
+        LoggerFacade.info("Adding downvote to comment ID: " + id + " by user: " + username);
 
         String remaining_id = Helper.extractRemainingLevels(id);
-        LoggerFacade.info("Adding downvote to comment ID: " + id + " by user: " + username);
         commentService.addDownvote(comments.get(idx), remaining_id, username);
     }
 
@@ -126,131 +133,11 @@ public class ContentService {
         sb.append(post.getContent()).append("\n\n");
         sb.append("upvotes = ").append(getUpvoteCount(post)).append("\n");
         sb.append("downvotes = ").append(getDownvoteCount(post)).append("\n\n\n");
-        for (Map.Entry<Integer, Comment> entry : post.getComments().entrySet()) {
-            Integer id = entry.getKey();
-            Comment comment = entry.getValue();
-            commentService.renderComment(comment, sb, 1, id.toString());
-        }
+
+        post.getComments().forEach((id, comment) ->
+                commentService.renderComment(comment, sb, 1, id.toString())
+        );
+
         return sb.toString();
     }
-
-//    public void editPostContent(Post post, String newContent) {
-//        if (post == null) return;
-//        try {
-//            java.lang.reflect.Method method = Post.class.getMethod("editContent", String.class);
-//            method.invoke(post, newContent);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void addComment(Post post, String content, String username) {
-//        if (post == null) return;
-//        try {
-//            java.lang.reflect.Method method = Post.class.getMethod("addComment", String.class, String.class);
-//            method.invoke(post, content, username);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void deleteComment(Post post, String commentId) {
-//        if (post == null) return;
-//        try {
-//            java.lang.reflect.Method method = Post.class.getMethod("deleteComment", String.class);
-//            method.invoke(post, commentId);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void addReply(Post post, String commentId, String content, String username) {
-//        if (post == null) return;
-//        try {
-//            java.lang.reflect.Method method = Post.class.getMethod("addReply", String.class, String.class, String.class);
-//            method.invoke(post, commentId, content, username);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void deleteReply(Post post, String replyId) {
-//        if (post == null) return;
-//        try {
-//            java.lang.reflect.Method method = Post.class.getMethod("deleteReply", String.class);
-//            method.invoke(post, replyId);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public ArrayList<Comment> getComments(Post post) {
-//        if (post == null) return new ArrayList<>();
-//        try {
-//            java.lang.reflect.Method method = Post.class.getMethod("getComments");
-//            return (ArrayList<Comment>) method.invoke(post);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ArrayList<>();
-//        }
-//    }
-//
-//    public Comment findComment(Post post, String commentPath) {
-//        if (post == null || commentPath == null || commentPath.isEmpty()) {
-//            return null;
-//        }
-//
-//        try {
-//            int idx = utils.Helper.extractFirstLevel(commentPath);
-//            String remainingPath = utils.Helper.extractRemainingLevels(commentPath);
-//
-//            // Get top-level comments from the post
-//            ArrayList<Comment> comments = getComments(post);
-//
-//            if (idx < 0 || idx >= comments.size()) {
-//                return null;
-//            }
-//
-//            Comment targetComment = comments.get(idx);
-//
-//            // If there are no more levels to navigate, return the current comment
-//            if (remainingPath.isEmpty()) {
-//                return targetComment;
-//            }
-//
-//            // Otherwise, recursively navigate to the nested comment
-//            return findNestedComment(targetComment, remainingPath);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-//
-//    private Comment findNestedComment(Comment parentComment, String path) {
-//        if (parentComment == null || path == null || path.isEmpty()) {
-//            return parentComment;
-//        }
-//
-//        try {
-//            int idx = utils.Helper.extractFirstLevel(path);
-//            String remainingPath = utils.Helper.extractRemainingLevels(path);
-//
-//            ArrayList<Comment> replies = parentComment.getReplies();
-//
-//            if (idx < 0 || idx >= replies.size()) {
-//                return null;
-//            }
-//
-//            Comment targetComment = replies.get(idx);
-//
-//            if (remainingPath.isEmpty()) {
-//                return targetComment;
-//            }
-//
-//            return findNestedComment(targetComment, remainingPath);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
 }

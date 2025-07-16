@@ -1,12 +1,13 @@
 package model;
 
 import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
 public class Comment {
     private final String content;
     private final String username;
     private final Vote vote;
+    private Integer idNextReply;
     private final Map<Integer, Comment> replies;
     private boolean isDeleted;
 
@@ -14,7 +15,8 @@ public class Comment {
         this.content = content;
         this.username = username;
         this.vote = vote;
-        this.replies = new LinkedHashMap<>();
+        this.idNextReply = 0;
+        this.replies = new TreeMap<>();
         this.isDeleted = false;
     }
 
@@ -29,6 +31,13 @@ public class Comment {
 
     public Vote getVote() {
         return vote;
+    }
+
+    public Integer getIdNextReply() {
+        return idNextReply;
+    }
+    public void setIdNextReply(Integer id) {
+        this.idNextReply = id;
     }
 
     public Map<Integer, Comment> getReplies() {

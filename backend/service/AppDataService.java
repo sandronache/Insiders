@@ -9,6 +9,7 @@ public class AppDataService {
     private final ContentService contentService;
     public AppDataService(ContentService contentService) {
         this.contentService = contentService;
+
         LoggerFacade.debug("AppDataService initialized");
     }
 
@@ -56,14 +57,20 @@ public class AppDataService {
 
     public void addPost(AppData appData, String content) {
         String username = appData.getLoggedUser().getUsername();
-        Post newPost = contentService.createPost(content, username);
-        appData.getLoadedPosts().add(newPost);
+        Post post = contentService.createPost(content, username);
+
+        Integer id = appData.getIdNextPost();
+        appData.setIdNextPost(id + 1);
+
+        appData.getLoadedPosts().put(id, post);
+
         LoggerFacade.info("New post created by user: " + username);
     }
 
     public void deletePost(AppData appData, int idx) {
-        if (idx >= 0 && idx < appData.getLoadedPosts().size()) {
+        if (appData.getLoadedPosts().containsKey(idx)) {
             LoggerFacade.info("Post with index " + idx + " deleted");
+
             appData.getLoadedPosts().remove(idx);
         } else {
             LoggerFacade.warning("Attempt to delete non-existent post at index: " + idx);
@@ -73,71 +80,14 @@ public class AppDataService {
     // rendering function
 
     public String renderFeed(AppData appData) {
-        int idx = 0;
-        StringBuilder feed = new StringBuilder();
         LoggerFacade.debug("Rendering feed with " + appData.getLoadedPosts().size() + " posts");
-        for (Post post: appData.getLoadedPosts()) {
-            feed.append(contentService.renderFeedPost(post, String.valueOf(idx))).append("\n");
-            idx++;
-        }
+
+        StringBuilder feed = new StringBuilder();
+
+        appData.getLoadedPosts().forEach((id, post) ->
+                feed.append(contentService.renderFeedPost(post, id.toString()))
+                        .append("\n"));
+
         return feed.toString();
     }
 }
-
-// 0 content upvotes downvotes
-// 0.0 content upvotes downvotes
-// 0.1 content upvotes downvotes
-// 0.1.1 content upvotes downvotes
-// 0.2 content upvotes downvotes
-
-//public class UserService {
-//    private Map<String, User> users;
-//    private User currentUser;
-//
-//    public UserService() {
-//        this.users = new HashMap<>();
-//        this.currentUser = null;
-//    }
-//
-//    public boolean register(String username, String email, String password) {
-//        if (users.containsKey(username)) {
-//            return false;
-//        }
-//        currentUser = new User(username, email, password);
-//        users.put(username, currentUser);
-//        return true;
-//    }
-//
-//    public boolean login(String username, String password) {
-//        User user = users.get(username);
-//        if (user != null && user.checkPassword(password)) {
-//            currentUser = user;
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    public void logout() {
-//        currentUser = null;
-//    }
-//
-//    public String getCurrUsername() {
-//        return currentUser.getUsername();
-//    }
-//
-//    public User getCurrentUser() {
-//        return currentUser;
-//    }
-//
-//    public void addUser(String username, String email, int hashedPassword) {
-//        users.put(username, new User(username, email, hashedPassword));
-//    }
-//
-//    public void deleteUser() {
-//        users.remove(currentUser.getUsername());
-//    }
-//
-//    public boolean isLoggedIn() {
-//        return currentUser != null;
-//    }
-//}

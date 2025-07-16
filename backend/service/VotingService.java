@@ -38,11 +38,11 @@ public class VotingService {
     private void toggleVote(Vote vote, Set<String> first, Set<String> second, String username) {
         if (first.contains(username)) {
             first.remove(username);
-            LoggerFacade.debug("User " + username + " removed vote");
+            LoggerFacade.info("User " + username + " removed vote");
         } else {
             second.remove(username);
             first.add(username);
-            LoggerFacade.debug("User " + username + " changed vote");
+            LoggerFacade.info("User " + username + " added or changed vote");
         }
         checkEmoji(vote);
     }

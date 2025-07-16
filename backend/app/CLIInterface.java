@@ -7,7 +7,7 @@ import utils.Helper;
 import model.Post;
 import logger.LoggerFacade;
 
-import java.util.LinkedList;
+import java.util.Map;
 import java.util.Scanner;
 
 public class CLIInterface implements AppInterface {
@@ -21,11 +21,13 @@ public class CLIInterface implements AppInterface {
         this.contentService = contentService;
         this.appDataService = appDataService;
         appData = appDataService.createAppData();
+
         LoggerFacade.debug("CLIInterface initialized");
     }
 
     private void deleteCurrentUser() {
         LoggerFacade.info("User deletion initiated for: " + appData.getLoggedUser().getUsername());
+
         appDataService.deleteUser(appData);
         appDataService.logout(appData);
         // ++ erasing all posted content (posts, replies, comments)
@@ -33,6 +35,7 @@ public class CLIInterface implements AppInterface {
 
     private void registerPrompt() {
         LoggerFacade.debug("Registration process started");
+
         System.out.println("Enter username: ");
         String username = input.nextLine();
         System.out.println("Enter email: ");
@@ -57,6 +60,7 @@ public class CLIInterface implements AppInterface {
 
     private void loginPrompt() {
         LoggerFacade.debug("Login process started");
+
         System.out.println("Enter username: ");
         String username = input.nextLine();
         System.out.println("Enter password: ");
@@ -78,6 +82,7 @@ public class CLIInterface implements AppInterface {
 
     private void authenticationPrompt() {
         LoggerFacade.debug("Authentication menu displayed");
+
         boolean doneAuthentication = false;
         while(!doneAuthentication) {
             System.out.println("1. Register");
@@ -114,7 +119,8 @@ public class CLIInterface implements AppInterface {
     }
 
     private void addNewPostPrompt() {
-        LoggerFacade.debug("New post creation initiated by user: " + appData.getLoggedUser().getUsername());
+        LoggerFacade.info("New post creation initiated by user: " + appData.getLoggedUser().getUsername());
+
         System.out.println("Enter the content of the post");
         String content = input.nextLine();
 
@@ -123,11 +129,13 @@ public class CLIInterface implements AppInterface {
 
     private void deleteCurrentUserPrompt() {
         LoggerFacade.info("User deletion requested for: " + appData.getLoggedUser().getUsername());
+
         System.out.println("Are you sure you want to delete your account? Type 'yes' or 'no':");
         String confirmation = input.nextLine().trim().toLowerCase();
 
         if (confirmation.equals("yes")) {
             LoggerFacade.info("User deletion confirmed for: " + appData.getLoggedUser().getUsername());
+
             deleteCurrentUser();
             System.out.println("Deleted current user");
         } else {
@@ -138,22 +146,23 @@ public class CLIInterface implements AppInterface {
 
     private void logoutPrompt() {
         LoggerFacade.info("Logout initiated by user: " + appData.getLoggedUser().getUsername());
+
         appDataService.logout(appData);
         System.out.println("You have been logged out");
     }
 
     private int enterPostPrompt() {
-        LinkedList<Post> posts = appData.getLoadedPosts();
+        Map<Integer, Post> posts = appData.getLoadedPosts();
         if (posts.isEmpty()) {
             LoggerFacade.warning("User attempted to access posts when none are available");
             System.out.println("No post available");
             return -1;
         }
-        System.out.println("Insert post id (<" + posts.size() + "):");
+        System.out.println("Insert post id:");
         while (true) {
             int postNumber = Integer.parseInt(input.nextLine());
-            if (postNumber >= 0 && postNumber < posts.size()) {
-                LoggerFacade.debug("User selected post with ID: " + postNumber);
+            if (posts.containsKey(postNumber)) {
+                LoggerFacade.info("User selected post with ID: " + postNumber);
                 return postNumber;
             }
             LoggerFacade.warning("User entered invalid post ID: " + postNumber);
@@ -163,6 +172,7 @@ public class CLIInterface implements AppInterface {
 
     private void feedPrompt() {
         LoggerFacade.debug("Feed menu displayed");
+
         boolean onFeed = true;
         int postNumber;
         while(onFeed) {
@@ -182,6 +192,7 @@ public class CLIInterface implements AppInterface {
                     postNumber = enterPostPrompt();
                     if (postNumber != -1) {
                         LoggerFacade.info("User initiated post deletion for post ID: " + postNumber);
+
                         appDataService.deletePost(
                                 appData,
                                 postNumber
@@ -192,6 +203,7 @@ public class CLIInterface implements AppInterface {
                     postNumber = enterPostPrompt();
                     if (postNumber != -1) {
                         LoggerFacade.debug("User viewing post with ID: " + postNumber);
+
                         clearCLI();
                         postPrompt(postNumber);
                     }
@@ -215,6 +227,7 @@ public class CLIInterface implements AppInterface {
 
     private void votePostPrompt(Post chosenPost) {
         LoggerFacade.debug("Vote post menu displayed for post by: " + chosenPost.getUsername());
+
         System.out.println("1. Upvote");
         System.out.println("2. Downvote");
         System.out.println(">>>");
@@ -222,18 +235,22 @@ public class CLIInterface implements AppInterface {
         switch (choice) {
             case "1":
                 LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " upvoted a post by " + chosenPost.getUsername());
+
                 contentService.addUpvotePost(
                         chosenPost,
                         appData.getLoggedUser().getUsername()
                 );
+
                 System.out.println("Vote added successfully!");
                 break;
             case "2":
                 LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " downvoted a post by " + chosenPost.getUsername());
+
                 contentService.addDownvotePost(
                         chosenPost,
                         appData.getLoggedUser().getUsername()
                 );
+
                 System.out.println("Vote added successfully!");
                 break;
             default:
@@ -245,33 +262,40 @@ public class CLIInterface implements AppInterface {
 
     private void addCommentPrompt(Post chosenPost) {
         LoggerFacade.debug("User " + appData.getLoggedUser().getUsername() + " adding comment to post by " + chosenPost.getUsername());
+
         System.out.println("Text..:");
         String content = input.nextLine();
+
         contentService.addComment(
                 chosenPost,
                 content,
                 appData.getLoggedUser().getUsername()
         );
+
         LoggerFacade.info("Comment added by user: " + appData.getLoggedUser().getUsername());
         System.out.println("Comment added successfully!");
     }
 
     private void addReplyPrompt(Post chosenPost) {
         LoggerFacade.debug("User initiating reply to a comment");
+
         System.out.println("Insert comment id found between \"[]\":");
         while(true) {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
                 // ++check if id also exists
                 LoggerFacade.debug("Reply to comment ID: " + id);
+
                 System.out.println("Text..:");
                 String content = input.nextLine();
+
                 contentService.addReply(
                         chosenPost,
                         id,
                         content,
                         appData.getLoggedUser().getUsername()
                 );
+
                 LoggerFacade.info("Reply added to comment ID: " + id + " by user: " + appData.getLoggedUser().getUsername());
                 break;
             }
@@ -282,16 +306,19 @@ public class CLIInterface implements AppInterface {
 
     private void deleteCommentOrReplyPrompt(Post chosenPost) {
         LoggerFacade.debug("User initiating comment deletion");
+
         System.out.println("Insert comment or reply id found between \"[]\":");
         while(true) {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
                 // ++check if id also exists
                 LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " deleted comment with ID: " + id);
+
                 contentService.deleteCommentOrReply(
                         chosenPost,
                         id
                 );
+
                 break;
             }
             LoggerFacade.warning("Invalid comment ID format entered: " + id);
@@ -301,12 +328,14 @@ public class CLIInterface implements AppInterface {
 
     private void voteCommentOrReplyPrompt(Post chosenPost) {
         LoggerFacade.debug("User initiating comment voting");
+
         System.out.println("Insert comment or reply id found between \"[]\":");
         while(true) {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
                 // ++check if id also exists
                 LoggerFacade.debug("Valid comment ID entered: " + id);
+
                 boolean isVoted = false;
                 while(!isVoted) {
                     System.out.println("1. Upvote");
@@ -320,6 +349,7 @@ public class CLIInterface implements AppInterface {
                                     id,
                                     appData.getLoggedUser().getUsername()
                             );
+
                             LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " upvoted comment ID: " + id);
                             isVoted = true;
                             break;
@@ -329,6 +359,7 @@ public class CLIInterface implements AppInterface {
                                     id,
                                     appData.getLoggedUser().getUsername()
                             );
+
                             LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " downvoted comment ID: " + id);
                             isVoted = true;
                             break;
@@ -348,7 +379,9 @@ public class CLIInterface implements AppInterface {
 
     private void postPrompt(int id) {
         Post chosenPost = appData.getLoadedPosts().get(id);
-        LoggerFacade.info("User viewing post ID: " + id + " by " + chosenPost.getUsername());
+
+        LoggerFacade.debug("User viewing post ID: " + id + " by " + chosenPost.getUsername());
+
         boolean isGoingBackToFeed = false;
         while (!isGoingBackToFeed) {
             System.out.println(contentService.renderFullPost(chosenPost));

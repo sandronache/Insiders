@@ -1,19 +1,21 @@
 package model;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class AppData {
     private Map<String, User> registeredUsers;
     private User loggedUser;
-    private LinkedList<Post> loadedPosts;
+    private Integer idNextPost;
+    private Map<Integer, Post> loadedPosts;
 
     // TODO change
     public AppData() {
         registeredUsers = new HashMap<>();
         loggedUser = null;
-        loadedPosts = new LinkedList<>();
+        idNextPost = 0;
+        loadedPosts = new TreeMap<>();
     }
 
     public Map<String, User> getRegisteredUsers() {
@@ -23,12 +25,18 @@ public class AppData {
     public User getLoggedUser() {
         return loggedUser;
     }
-
     public void setLoggedUser(User loggedUser) {
         this.loggedUser = loggedUser;
     }
 
-    public LinkedList<Post> getLoadedPosts() {
+    public Integer getIdNextPost() {
+        return idNextPost;
+    }
+    public void setIdNextPost(Integer id) {
+        idNextPost = id;
+    }
+
+    public Map<Integer, Post> getLoadedPosts() {
         return loadedPosts;
     }
 }
