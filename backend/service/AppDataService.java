@@ -3,25 +3,30 @@ package service;
 import model.Post;
 import model.AppData;
 import model.User;
+import logger.LoggerFacade;
 
 public class AppDataService {
     private final ContentService contentService;
     public AppDataService(ContentService contentService) {
         this.contentService = contentService;
+        LoggerFacade.debug("AppDataService initialized");
     }
 
     public AppData createAppData() {
         // TODO init db
+        LoggerFacade.info("Creating new application data");
         return new AppData();
     }
 
     public boolean register(AppData appData, String username, String email, String password) {
         if (appData.getRegisteredUsers().containsKey(username)) {
+            LoggerFacade.warning("Registration failed: Username '" + username + "' already exists");
             return false;
         }
         User user = new User(username, email, password);
         appData.setLoggedUser(user);
         appData.getRegisteredUsers().put(username, user);
+        LoggerFacade.info("New user registered: " + username);
         return true;
     }
 
@@ -29,27 +34,40 @@ public class AppDataService {
         User user = appData.getRegisteredUsers().get(username);
         if (user != null && user.checkPassword(password)) {
             appData.setLoggedUser(user);
+            LoggerFacade.info("User logged in: " + username);
             return true;
         }
+        LoggerFacade.warning("Login failed for user: " + username);
         return false;
     }
 
     public void logout(AppData appData) {
+        if (appData.getLoggedUser() != null) {
+            LoggerFacade.info("User logged out: " + appData.getLoggedUser().getUsername());
+        }
         appData.setLoggedUser(null);
     }
 
     public void deleteUser(AppData appData) {
         String currUserUsername = appData.getLoggedUser().getUsername();
         appData.getRegisteredUsers().remove(currUserUsername);
+        LoggerFacade.info("User account deleted: " + currUserUsername);
     }
 
     public void addPost(AppData appData, String content) {
-        Post newPost = contentService.createPost(content, appData.getLoggedUser().getUsername());
+        String username = appData.getLoggedUser().getUsername();
+        Post newPost = contentService.createPost(content, username);
         appData.getLoadedPosts().add(newPost);
+        LoggerFacade.info("New post created by user: " + username);
     }
 
     public void deletePost(AppData appData, int idx) {
-        appData.getLoadedPosts().remove(idx);
+        if (idx >= 0 && idx < appData.getLoadedPosts().size()) {
+            LoggerFacade.info("Post with index " + idx + " deleted");
+            appData.getLoadedPosts().remove(idx);
+        } else {
+            LoggerFacade.warning("Attempt to delete non-existent post at index: " + idx);
+        }
     }
 
     // rendering function
@@ -57,6 +75,7 @@ public class AppDataService {
     public String renderFeed(AppData appData) {
         int idx = 0;
         StringBuilder feed = new StringBuilder();
+        LoggerFacade.debug("Rendering feed with " + appData.getLoadedPosts().size() + " posts");
         for (Post post: appData.getLoadedPosts()) {
             feed.append(contentService.renderFeedPost(post, String.valueOf(idx))).append("\n");
             idx++;

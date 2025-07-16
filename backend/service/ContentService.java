@@ -3,6 +3,7 @@ package service;
 import model.Post;
 import model.Comment;
 import utils.Helper;
+import logger.LoggerFacade;
 
 import java.util.ArrayList;
 
@@ -13,25 +14,31 @@ public class ContentService {
     public ContentService(VotingService votingService, CommentService commentService) {
         this.votingService = votingService;
         this.commentService = commentService;
+        LoggerFacade.debug("ContentService initialized");
     }
 
     public Post createPost(String content, String username) {
+        LoggerFacade.debug("Creating new post for user: " + username);
         return new Post(content, username, votingService.createVote());
     }
 
     public void addComment(Post post, String content, String username) {
         Comment newComment = commentService.createComment(content, username);
         post.getComments().add(newComment);
+        LoggerFacade.info("Comment added to post by user: " + username);
     }
 
     public void deleteCommentOrReply(Post post, String id) {
         ArrayList<Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (idx < 0 || idx >= comments.size()) return;
+        if (idx < 0 || idx >= comments.size()) {
+            LoggerFacade.warning("Failed to delete comment with invalid ID: " + id);
+            return;
+        }
 
         String remaining_id = Helper.extractRemainingLevels(id);
-
+        LoggerFacade.info("Deleting comment/reply with ID: " + id);
         commentService.deleteComment(comments.get(idx), remaining_id);
     }
 
@@ -39,10 +46,13 @@ public class ContentService {
         ArrayList<Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
-        if (idx < 0 || idx >= comments.size()) return;
+        if (idx < 0 || idx >= comments.size()) {
+            LoggerFacade.warning("Failed to add reply with invalid comment ID: " + id);
+            return;
+        }
 
         String remaining_id = Helper.extractRemainingLevels(id);
-
+        LoggerFacade.info("Adding reply to comment ID: " + id + " by user: " + username);
         commentService.addReply(comments.get(idx), remaining_id, content, username);
     }
 

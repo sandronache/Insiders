@@ -5,6 +5,7 @@ import service.AppDataService;
 import service.ContentService;
 import utils.Helper;
 import model.Post;
+import logger.LoggerFacade;
 
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -20,15 +21,18 @@ public class CLIInterface implements AppInterface {
         this.contentService = contentService;
         this.appDataService = appDataService;
         appData = appDataService.createAppData();
+        LoggerFacade.debug("CLIInterface initialized");
     }
 
     private void deleteCurrentUser() {
+        LoggerFacade.info("User deletion initiated for: " + appData.getLoggedUser().getUsername());
         appDataService.deleteUser(appData);
         appDataService.logout(appData);
         // ++ erasing all posted content (posts, replies, comments)
     }
 
     private void registerPrompt() {
+        LoggerFacade.debug("Registration process started");
         System.out.println("Enter username: ");
         String username = input.nextLine();
         System.out.println("Enter email: ");
@@ -52,6 +56,7 @@ public class CLIInterface implements AppInterface {
     }
 
     private void loginPrompt() {
+        LoggerFacade.debug("Login process started");
         System.out.println("Enter username: ");
         String username = input.nextLine();
         System.out.println("Enter password: ");
@@ -72,6 +77,7 @@ public class CLIInterface implements AppInterface {
     }
 
     private void authenticationPrompt() {
+        LoggerFacade.debug("Authentication menu displayed");
         boolean doneAuthentication = false;
         while(!doneAuthentication) {
             System.out.println("1. Register");
@@ -89,6 +95,7 @@ public class CLIInterface implements AppInterface {
                     break;
                 default:
                     System.out.println("Invalid choice");
+                    LoggerFacade.warning("Invalid authentication choice selected");
                     break;
             }
             clearCLI();
@@ -102,10 +109,12 @@ public class CLIInterface implements AppInterface {
     }
 
     private void showFeed() {
+        LoggerFacade.debug("Displaying feed with " + appData.getLoadedPosts().size() + " posts");
         System.out.println(appDataService.renderFeed(appData));
     }
 
     private void addNewPostPrompt() {
+        LoggerFacade.debug("New post creation initiated by user: " + appData.getLoggedUser().getUsername());
         System.out.println("Enter the content of the post");
         String content = input.nextLine();
 
@@ -113,11 +122,22 @@ public class CLIInterface implements AppInterface {
     }
 
     private void deleteCurrentUserPrompt() {
-        deleteCurrentUser();
-        System.out.println("Deleted current user");
+        LoggerFacade.info("User deletion requested for: " + appData.getLoggedUser().getUsername());
+        System.out.println("Are you sure you want to delete your account? Type 'yes' or 'no':");
+        String confirmation = input.nextLine().trim().toLowerCase();
+
+        if (confirmation.equals("yes")) {
+            LoggerFacade.info("User deletion confirmed for: " + appData.getLoggedUser().getUsername());
+            deleteCurrentUser();
+            System.out.println("Deleted current user");
+        } else {
+            LoggerFacade.info("User deletion cancelled by: " + appData.getLoggedUser().getUsername());
+            System.out.println("Account deletion cancelled");
+        }
     }
 
     private void logoutPrompt() {
+        LoggerFacade.info("Logout initiated by user: " + appData.getLoggedUser().getUsername());
         appDataService.logout(appData);
         System.out.println("You have been logged out");
     }
@@ -125,6 +145,7 @@ public class CLIInterface implements AppInterface {
     private int enterPostPrompt() {
         LinkedList<Post> posts = appData.getLoadedPosts();
         if (posts.isEmpty()) {
+            LoggerFacade.warning("User attempted to access posts when none are available");
             System.out.println("No post available");
             return -1;
         }
@@ -132,13 +153,16 @@ public class CLIInterface implements AppInterface {
         while (true) {
             int postNumber = Integer.parseInt(input.nextLine());
             if (postNumber >= 0 && postNumber < posts.size()) {
+                LoggerFacade.debug("User selected post with ID: " + postNumber);
                 return postNumber;
             }
+            LoggerFacade.warning("User entered invalid post ID: " + postNumber);
             System.out.println("Invalid choice, try again");
         }
     }
 
     private void feedPrompt() {
+        LoggerFacade.debug("Feed menu displayed");
         boolean onFeed = true;
         int postNumber;
         while(onFeed) {
@@ -157,6 +181,7 @@ public class CLIInterface implements AppInterface {
                 case "2":
                     postNumber = enterPostPrompt();
                     if (postNumber != -1) {
+                        LoggerFacade.info("User initiated post deletion for post ID: " + postNumber);
                         appDataService.deletePost(
                                 appData,
                                 postNumber
@@ -166,6 +191,7 @@ public class CLIInterface implements AppInterface {
                 case "3":
                     postNumber = enterPostPrompt();
                     if (postNumber != -1) {
+                        LoggerFacade.debug("User viewing post with ID: " + postNumber);
                         clearCLI();
                         postPrompt(postNumber);
                     }
@@ -180,6 +206,7 @@ public class CLIInterface implements AppInterface {
                     break;
                 default:
                     System.out.println("Invalid choice");
+                    LoggerFacade.warning("Invalid feed menu choice selected");
                     break;
             }
             clearCLI();
@@ -187,12 +214,14 @@ public class CLIInterface implements AppInterface {
     }
 
     private void votePostPrompt(Post chosenPost) {
+        LoggerFacade.debug("Vote post menu displayed for post by: " + chosenPost.getUsername());
         System.out.println("1. Upvote");
         System.out.println("2. Downvote");
         System.out.println(">>>");
         String choice = input.nextLine();
         switch (choice) {
             case "1":
+                LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " upvoted a post by " + chosenPost.getUsername());
                 contentService.addUpvotePost(
                         chosenPost,
                         appData.getLoggedUser().getUsername()
@@ -200,6 +229,7 @@ public class CLIInterface implements AppInterface {
                 System.out.println("Vote added successfully!");
                 break;
             case "2":
+                LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " downvoted a post by " + chosenPost.getUsername());
                 contentService.addDownvotePost(
                         chosenPost,
                         appData.getLoggedUser().getUsername()
@@ -208,11 +238,13 @@ public class CLIInterface implements AppInterface {
                 break;
             default:
                 System.out.println("Invalid choice");
+                LoggerFacade.warning("Invalid vote choice selected");
                 break;
         }
     }
 
     private void addCommentPrompt(Post chosenPost) {
+        LoggerFacade.debug("User " + appData.getLoggedUser().getUsername() + " adding comment to post by " + chosenPost.getUsername());
         System.out.println("Text..:");
         String content = input.nextLine();
         contentService.addComment(
@@ -220,15 +252,18 @@ public class CLIInterface implements AppInterface {
                 content,
                 appData.getLoggedUser().getUsername()
         );
+        LoggerFacade.info("Comment added by user: " + appData.getLoggedUser().getUsername());
         System.out.println("Comment added successfully!");
     }
 
     private void addReplyPrompt(Post chosenPost) {
+        LoggerFacade.debug("User initiating reply to a comment");
         System.out.println("Insert comment id found between \"[]\":");
         while(true) {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
                 // ++check if id also exists
+                LoggerFacade.debug("Reply to comment ID: " + id);
                 System.out.println("Text..:");
                 String content = input.nextLine();
                 contentService.addReply(
@@ -237,34 +272,41 @@ public class CLIInterface implements AppInterface {
                         content,
                         appData.getLoggedUser().getUsername()
                 );
+                LoggerFacade.info("Reply added to comment ID: " + id + " by user: " + appData.getLoggedUser().getUsername());
                 break;
             }
+            LoggerFacade.warning("Invalid comment ID format entered: " + id);
             System.out.println("Invalid choice, try again");
         }
     }
 
     private void deleteCommentOrReplyPrompt(Post chosenPost) {
+        LoggerFacade.debug("User initiating comment deletion");
         System.out.println("Insert comment or reply id found between \"[]\":");
         while(true) {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
                 // ++check if id also exists
+                LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " deleted comment with ID: " + id);
                 contentService.deleteCommentOrReply(
                         chosenPost,
                         id
                 );
                 break;
             }
+            LoggerFacade.warning("Invalid comment ID format entered: " + id);
             System.out.println("Invalid choice, try again");
         }
     }
 
     private void voteCommentOrReplyPrompt(Post chosenPost) {
+        LoggerFacade.debug("User initiating comment voting");
         System.out.println("Insert comment or reply id found between \"[]\":");
         while(true) {
             String id = input.nextLine();
             if (Helper.isCommentIdValid(id)) {
                 // ++check if id also exists
+                LoggerFacade.debug("Valid comment ID entered: " + id);
                 boolean isVoted = false;
                 while(!isVoted) {
                     System.out.println("1. Upvote");
@@ -278,6 +320,7 @@ public class CLIInterface implements AppInterface {
                                     id,
                                     appData.getLoggedUser().getUsername()
                             );
+                            LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " upvoted comment ID: " + id);
                             isVoted = true;
                             break;
                         case "2":
@@ -286,15 +329,18 @@ public class CLIInterface implements AppInterface {
                                     id,
                                     appData.getLoggedUser().getUsername()
                             );
+                            LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " downvoted comment ID: " + id);
                             isVoted = true;
                             break;
                         default:
                             System.out.println("Invalid choice");
+                            LoggerFacade.warning("Invalid vote choice selected");
                             break;
                     }
                 }
                 break;
             }
+            LoggerFacade.warning("Invalid comment ID format entered: " + id);
             System.out.println("Invalid choice, try again");
         }
     }
@@ -302,6 +348,7 @@ public class CLIInterface implements AppInterface {
 
     private void postPrompt(int id) {
         Post chosenPost = appData.getLoadedPosts().get(id);
+        LoggerFacade.info("User viewing post ID: " + id + " by " + chosenPost.getUsername());
         boolean isGoingBackToFeed = false;
         while (!isGoingBackToFeed) {
             System.out.println(contentService.renderFullPost(chosenPost));
@@ -330,10 +377,12 @@ public class CLIInterface implements AppInterface {
                     voteCommentOrReplyPrompt(chosenPost);
                     break;
                 case "6":
+                    LoggerFacade.debug("User returning to feed from post view");
                     isGoingBackToFeed = true;
                     break;
                 default:
                     System.out.println("Invalid choice");
+                    LoggerFacade.warning("Invalid post menu choice selected");
                     break;
             }
             clearCLI();
@@ -341,6 +390,7 @@ public class CLIInterface implements AppInterface {
     }
 
     public void run(){
+        LoggerFacade.info("Application interface started");
         while (true) {
             authenticationPrompt();
             feedPrompt();

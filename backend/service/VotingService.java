@@ -1,13 +1,17 @@
 package service;
 
 import model.Vote;
+import logger.LoggerFacade;
 
 import java.util.Set;
 
 public class VotingService {
-    public VotingService() {}
+    public VotingService() {
+        LoggerFacade.debug("VotingService initialized");
+    }
 
     public Vote createVote() {
+        LoggerFacade.debug("New vote object created");
         return new Vote();
     }
 
@@ -21,24 +25,35 @@ public class VotingService {
     public void checkEmoji(Vote vote) {
         int upvotesSize = getUpvoteCount(vote);
         int downvotesSize = getDownvoteCount(vote);
+        boolean wasEmoji = vote.isEmoji();
         vote.setEmoji(upvotesSize - downvotesSize >= 10);
+
+        if (!wasEmoji && vote.isEmoji()) {
+            LoggerFacade.info("Content achieved emoji status with score: " + (upvotesSize - downvotesSize));
+        } else if (wasEmoji && !vote.isEmoji()) {
+            LoggerFacade.info("Content lost emoji status with score: " + (upvotesSize - downvotesSize));
+        }
     }
 
     private void toggleVote(Vote vote, Set<String> first, Set<String> second, String username) {
         if (first.contains(username)) {
             first.remove(username);
+            LoggerFacade.debug("User " + username + " removed vote");
         } else {
             second.remove(username);
             first.add(username);
+            LoggerFacade.debug("User " + username + " changed vote");
         }
         checkEmoji(vote);
     }
 
     public void addUpvote(Vote vote, String username) {
+        LoggerFacade.debug("User " + username + " is upvoting content");
         toggleVote(vote, vote.getUpvote(), vote.getDownvote(), username);
     }
 
     public void addDownvote(Vote vote, String username) {
+        LoggerFacade.debug("User " + username + " is downvoting content");
         toggleVote(vote, vote.getDownvote(), vote.getUpvote(), username);
     }
 
