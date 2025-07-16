@@ -192,8 +192,14 @@ public class CLIInterface implements AppInterface {
     private void addNewPostPrompt() {
         LoggerFacade.info("New post creation initiated by user: " + appData.getLoggedUser().getUsername());
 
-        System.out.println("Enter the content of the post");
+        System.out.println("Enter the content of the post (or type 'exit' to return to feed):");
         String content = input.nextLine();
+
+        if (content.equalsIgnoreCase("exit")) {
+            System.out.println("Post creation cancelled.");
+            LoggerFacade.info("Post creation cancelled by user: " + appData.getLoggedUser().getUsername());
+            return;
+        }
 
         appDataService.addPost(appData, content);
     }
@@ -229,15 +235,28 @@ public class CLIInterface implements AppInterface {
             System.out.println("No post available");
             return -1;
         }
-        System.out.println("Insert post id:");
+        System.out.println("Insert post id (or type 'exit' to return to feed):");
         while (true) {
-            int postNumber = Integer.parseInt(input.nextLine());
-            if (posts.containsKey(postNumber)) {
-                LoggerFacade.info("User selected post with ID: " + postNumber);
-                return postNumber;
+            String input = this.input.nextLine();
+
+            if (input.equalsIgnoreCase("exit")) {
+                System.out.println("Operation cancelled.");
+                LoggerFacade.info("Post operation cancelled by user: " + appData.getLoggedUser().getUsername());
+                return -1;
             }
-            LoggerFacade.warning("User entered invalid post ID: " + postNumber);
-            System.out.println("Invalid choice, try again");
+
+            try {
+                int postNumber = Integer.parseInt(input);
+                if (posts.containsKey(postNumber)) {
+                    LoggerFacade.info("User selected post with ID: " + postNumber);
+                    return postNumber;
+                }
+                LoggerFacade.warning("User entered invalid post ID: " + postNumber);
+                System.out.println("Invalid choice, try again");
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number, or 'exit' to return to feed");
+                LoggerFacade.warning("User entered invalid input for post ID: " + input);
+            }
         }
     }
 
@@ -365,14 +384,20 @@ public class CLIInterface implements AppInterface {
                 System.out.println("Text..:");
                 String content = input.nextLine();
 
-                contentService.addReply(
+                boolean success = contentService.addReply(
                         chosenPost,
                         id,
                         content,
                         appData.getLoggedUser().getUsername()
                 );
 
-                LoggerFacade.info("Reply added to comment ID: " + id + " by user: " + appData.getLoggedUser().getUsername());
+                if (success) {
+                    System.out.println("Reply added successfully!");
+                    LoggerFacade.info("Reply added to comment ID: " + id + " by user: " + appData.getLoggedUser().getUsername());
+                } else {
+                    System.out.println("Nu se poate adauga un reply la un comentariu sters!");
+                    LoggerFacade.warning("User attempted to add reply to deleted comment ID: " + id);
+                }
                 break;
             }
             LoggerFacade.warning("Invalid comment ID format entered: " + id);
@@ -471,8 +496,14 @@ public class CLIInterface implements AppInterface {
                 System.out.println("3. Add reply (no comments available)");
             }
 
-            System.out.println("4. Delete comment or reply");
-            System.out.println("5. Vote comment or reply");
+            if (hasComments) {
+                System.out.println("4. Delete comment or reply");
+                System.out.println("5. Vote comment or reply");
+            } else {
+                System.out.println("4. Delete comment or reply (no comments available)");
+                System.out.println("5. Vote comment or reply (no comments available)");
+            }
+
             System.out.println("6. Go back to feed");
             System.out.println(">>>");
             String choice = input.nextLine();
@@ -492,10 +523,20 @@ public class CLIInterface implements AppInterface {
                     }
                     break;
                 case "4":
-                    deleteCommentOrReplyPrompt(chosenPost);
+                    if (hasComments) {
+                        deleteCommentOrReplyPrompt(chosenPost);
+                    } else {
+                        System.out.println("No comments available to delete. Add a comment first.");
+                        LoggerFacade.warning("User attempted to delete comment when no comments exist");
+                    }
                     break;
                 case "5":
-                    voteCommentOrReplyPrompt(chosenPost);
+                    if (hasComments) {
+                        voteCommentOrReplyPrompt(chosenPost);
+                    } else {
+                        System.out.println("No comments available to vote on. Add a comment first.");
+                        LoggerFacade.warning("User attempted to vote on comment when no comments exist");
+                    }
                     break;
                 case "6":
                     LoggerFacade.debug("User returning to feed from post view");
