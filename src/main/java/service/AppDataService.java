@@ -1,10 +1,10 @@
-package service;
+package main.java.service;
 
-import logger.LoggerFacade;
-import model.AppData;
-import model.Post;
-import model.User;
-import util.Helper;
+import main.java.logger.LoggerFacade;
+import main.java.model.AppData;
+import main.java.model.Post;
+import main.java.model.User;
+import main.java.util.Helper;
 
 import java.util.HashMap;
 import java.util.TreeMap;

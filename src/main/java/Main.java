@@ -1,9 +1,11 @@
-import app.AppInterface;
-import app.CLIInterface;
-import logger.FileLogger;
-import logger.ILogger;
-import logger.LoggerFacade;
-import service.*;
+package main.java;
+
+import main.java.app.AppInterface;
+import main.java.app.CLIInterface;
+import main.java.logger.FileLogger;
+import main.java.logger.ILogger;
+import main.java.logger.LoggerFacade;
+import main.java.service.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,9 +18,9 @@ public class Main {
 
         LoggerFacade.info("Application starting up");
 
-        FilesService filesService = FilesService.getInstance();
-        VotingService votingService = VotingService.getInstance();
-        CommentService commentService = CommentService.getInstance();
+        FilesService.getInstance();
+        VotingService.getInstance();
+        CommentService.getInstance();
         ContentService contentService = ContentService.getInstance();
         AppDataService appDataService = AppDataService.getInstance();
 

@@ -1,4 +1,4 @@
-package logger;
+package main.java.logger;
 
 import java.util.ArrayList;
 import java.util.List;

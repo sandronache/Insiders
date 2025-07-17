@@ -1,7 +1,7 @@
-package service;
+package main.java.service;
 
-import logger.LoggerFacade;
-import model.Vote;
+import main.java.logger.LoggerFacade;
+import main.java.model.Vote;
 
 import java.util.Set;
 

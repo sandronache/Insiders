@@ -1,4 +1,4 @@
-package logger;
+package main.java.logger;
 
 public interface ILogger {
 

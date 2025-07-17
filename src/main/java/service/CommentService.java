@@ -1,8 +1,8 @@
-package service;
+package main.java.service;
 
-import logger.LoggerFacade;
-import model.Comment;
-import util.Helper;
+import main.java.logger.LoggerFacade;
+import main.java.model.Comment;
+import main.java.util.Helper;
 
 import java.util.TreeMap;
 

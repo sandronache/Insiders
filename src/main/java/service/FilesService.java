@@ -1,11 +1,11 @@
-package service;
+package main.java.service;
 
-import logger.LoggerFacade;
-import model.Comment;
-import model.Post;
-import model.User;
-import model.Vote;
-import util.Constants;
+import main.java.logger.LoggerFacade;
+import main.java.model.Comment;
+import main.java.model.Post;
+import main.java.model.User;
+import main.java.model.Vote;
+import main.java.util.Constants;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

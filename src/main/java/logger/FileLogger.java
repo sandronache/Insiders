@@ -1,10 +1,11 @@
-package logger;
+package main.java.logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
 
 public class FileLogger implements ILogger {
     private final String logFile;

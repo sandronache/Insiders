@@ -1,11 +1,11 @@
-package app;
+package main.java.app;
 
-import logger.LoggerFacade;
-import model.AppData;
-import model.Post;
-import service.AppDataService;
-import service.ContentService;
-import util.Helper;
+import main.java.logger.LoggerFacade;
+import main.java.model.AppData;
+import main.java.model.Post;
+import main.java.service.AppDataService;
+import main.java.service.ContentService;
+import main.java.util.Helper;
 
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -32,7 +32,6 @@ public class CLIInterface implements AppInterface {
 
         appDataService.deleteUser(appData);
         appDataService.logout(appData);
-        // ++ erasing all posted content (posts, replies, comments)
     }
 
     private void registerPrompt() {
