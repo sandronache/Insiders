@@ -210,7 +210,7 @@ public class CLIInterface implements AppInterface {
         appDataService.addPost(appData, content);
     }
 
-    private void deleteCurrentUserPrompt() {
+    private boolean deleteCurrentUserPrompt() {
         LoggerFacade.info("User deletion requested for: " + appData.getLoggedUser().getUsername());
 
         System.out.println("Are you sure you want to delete your account? Type 'yes' or 'no':");
@@ -221,9 +221,11 @@ public class CLIInterface implements AppInterface {
 
             deleteCurrentUser();
             System.out.println("Deleted current user");
+            return true;
         } else {
             LoggerFacade.info("User deletion cancelled by: " + appData.getLoggedUser().getUsername());
             System.out.println("Account deletion cancelled");
+            return false;
         }
     }
 
@@ -306,8 +308,10 @@ public class CLIInterface implements AppInterface {
                     }
                     break;
                 case "4":
-                    deleteCurrentUserPrompt();
-                    onFeed = false;
+                    boolean userDeleted = deleteCurrentUserPrompt();
+                    if (userDeleted) {
+                        onFeed = false;
+                    }
                     break;
                 case "5":
                     logoutPrompt();
