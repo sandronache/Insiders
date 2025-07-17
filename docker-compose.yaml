@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  insiders-app:
+    image: insiders-app:latest
+    container_name: insiders-app
+    environment:
+      discovery.type: single-node
+    volumes:
+      - ${local_path_to_jar}:/app/app.jar
+      - ${local_path_to_resources}:/mnt/resources
+    stdin_open: true
+    tty: true
+
