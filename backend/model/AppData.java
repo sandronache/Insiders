@@ -9,10 +9,10 @@ public class AppData {
     private Integer idNextPost;
     private TreeMap<Integer, Post> loadedPosts;
 
-    // TODO change
     public AppData(TreeMap<Integer, Post> loadedPosts,
-                   Integer idNextPost) {
-        registeredUsers = new HashMap<>();
+                   Integer idNextPost,
+                   HashMap<String, User> registeredUsers) {
+        this.registeredUsers = registeredUsers;
         loggedUser = null;
         this.idNextPost = idNextPost;
         this.loadedPosts = loadedPosts;

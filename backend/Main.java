@@ -16,11 +16,11 @@ public class Main {
 
         LoggerFacade.info("Application starting up");
 
-        FilesService filesService = new FilesService();
-        VotingService votingService = new VotingService();
-        CommentService commentService = new CommentService(votingService);
-        ContentService contentService = new ContentService(votingService, commentService);
-        AppDataService appDataService = new AppDataService(filesService, contentService);
+        FilesService filesService = FilesService.getInstance();
+        VotingService votingService = VotingService.getInstance();
+        CommentService commentService = CommentService.getInstance();
+        ContentService contentService = ContentService.getInstance();
+        AppDataService appDataService = AppDataService.getInstance();
 
         AppInterface app = new CLIInterface(contentService, appDataService);
         LoggerFacade.info("Starting application interface");

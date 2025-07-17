@@ -6,21 +6,29 @@ import model.Post;
 import model.User;
 import util.Helper;
 
+import java.util.HashMap;
 import java.util.TreeMap;
 
 public class AppDataService {
+    private static AppDataService instance;
     private final FilesService filesService;
     private final ContentService contentService;
-    public AppDataService(FilesService filesService,
-                          ContentService contentService) {
+
+    private AppDataService(FilesService filesService,
+                           ContentService contentService) {
         this.filesService = filesService;
         this.contentService = contentService;
+    }
 
-        LoggerFacade.debug("AppDataService initialized");
+    public static AppDataService getInstance() {
+        if (instance == null) {
+            instance = new AppDataService(FilesService.getInstance(),
+                                            ContentService.getInstance());
+        }
+        return instance;
     }
 
     public AppData createAppData() {
-        // TODO init db
         LoggerFacade.info("Creating new application data");
 
         TreeMap<Integer, Post> loadedPosts = filesService.loadPosts();
@@ -30,11 +38,14 @@ public class AppDataService {
             idNextPost = loadedPosts.lastKey() + 1;
         }
 
-        return new AppData(loadedPosts, idNextPost);
+        HashMap<String, User> registeredUsers = filesService.loadUsers();
+
+        return new AppData(loadedPosts, idNextPost, registeredUsers);
     }
 
     public void writeAppData(AppData appData) {
         filesService.writePosts(appData.getLoadedPosts());
+        filesService.writeUsers(appData.getRegisteredUsers());
     }
 
     public boolean register(AppData appData, String username, String email, String password) {

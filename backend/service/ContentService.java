@@ -8,14 +8,22 @@ import util.Helper;
 import java.util.TreeMap;
 
 public class ContentService {
+    private static ContentService instance;
     private final VotingService votingService;
     private final CommentService commentService;
 
-    public ContentService(VotingService votingService, CommentService commentService) {
+    private ContentService(VotingService votingService,
+                            CommentService commentService) {
         this.votingService = votingService;
         this.commentService = commentService;
+    }
 
-        LoggerFacade.debug("ContentService initialized");
+    public static ContentService getInstance() {
+        if (instance == null) {
+            instance = new ContentService(VotingService.getInstance(),
+                                            CommentService.getInstance());
+        }
+        return instance;
     }
 
     public Post createPost(String content, String username) {
@@ -48,18 +56,18 @@ public class ContentService {
         commentService.deleteComment(comments.get(idx), remaining_id);
     }
 
-    public void addReply(Post post, String id, String content, String username) {
+    public boolean addReply(Post post, String id, String content, String username) {
         TreeMap<Integer, Comment> comments = post.getComments();
 
         int idx = Helper.extractFirstLevel(id);
         if (!comments.containsKey(idx)) {
             LoggerFacade.warning("Failed to add reply with invalid comment ID: " + id);
-            return;
+            return false;
         }
         LoggerFacade.info("Adding reply to comment ID: " + id + " by user: " + username);
 
         String remaining_id = Helper.extractRemainingLevels(id);
-        commentService.addReply(comments.get(idx), remaining_id, content, username);
+        return commentService.addReply(comments.get(idx), remaining_id, content, username);
     }
 
     public void addUpvoteComment(Post post, String id, String username) {
@@ -106,6 +114,19 @@ public class ContentService {
 
     public boolean isEmoji(Post post) {
         return votingService.isEmoji(post.getVote());
+    }
+
+    public boolean isCommentDeleted(Post post, String id) {
+        TreeMap<Integer, Comment> comments = post.getComments();
+
+        int idx = Helper.extractFirstLevel(id);
+        if (!comments.containsKey(idx)) {
+            LoggerFacade.warning("Failed to check comment status with invalid comment ID: " + id);
+            return true; // Consider non-existing comments as "deleted" for safety
+        }
+
+        String remaining_id = Helper.extractRemainingLevels(id);
+        return commentService.isCommentDeleted(comments.get(idx), remaining_id);
     }
 
     // rendering functions

@@ -3,6 +3,7 @@ package service;
 import logger.LoggerFacade;
 import model.Comment;
 import model.Post;
+import model.User;
 import model.Vote;
 import util.Constants;
 
@@ -10,9 +11,21 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 public class FilesService {
+
+    private static FilesService instance;
+
+    private FilesService() {}
+
+    public static FilesService getInstance() {
+        if (instance == null) {
+            instance = new FilesService();
+        }
+        return instance;
+    }
 
     // posts
 
@@ -61,7 +74,6 @@ public class FilesService {
         } else {
             comment.setIdNextReply(0);
         }
-
         return comment;
     }
 
@@ -108,7 +120,6 @@ public class FilesService {
         } catch (Exception e) {
             LoggerFacade.fatal("File reading error: " + e.getMessage());
         }
-
         return posts;
     }
 
@@ -155,6 +166,52 @@ public class FilesService {
                     pw.println(idComment);
                     writeComment(pw, comment);
                 });
+            });
+
+            if (pw.checkError()) {
+                LoggerFacade.fatal("File writing error");
+            }
+        } catch (Exception e) {
+            LoggerFacade.fatal("File writing error: " + e.getMessage());
+        }
+    }
+
+    // users
+
+    public HashMap<String, User> loadUsers() {
+        HashMap<String, User> users = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(Constants.USERS_FILE_PATH))) {
+            String line = reader.readLine();
+            if (line == null || line.isBlank()) {
+                LoggerFacade.info("File is empty, start from scratch");
+                return users;
+            }
+
+            int nrUsers = Integer.parseInt(line);
+
+            for (int i = 0; i < nrUsers; i++) {
+                String username = reader.readLine();
+                String email = reader.readLine();
+                int hash = Integer.parseInt(reader.readLine());
+
+                users.put(username, new User(username, email, hash));
+            }
+
+        } catch (Exception e) {
+            LoggerFacade.fatal("File reading error: " + e.getMessage());
+        }
+        return users;
+    }
+
+    public void writeUsers(HashMap<String, User> users) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(Constants.USERS_FILE_PATH))) {
+            pw.println(users.size());
+
+            users.forEach((username, user) -> {
+                pw.println(user.getUsername());
+                pw.println(user.getEmail());
+                pw.println(user.getHashedPassword());
             });
 
             if (pw.checkError()) {

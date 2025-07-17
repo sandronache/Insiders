@@ -32,4 +32,3 @@ public class Helper {
         return password.hashCode();
     }
 }
-    // TODO helpers for db interact
