@@ -367,8 +367,14 @@ public class CLIInterface implements AppInterface {
     private void addCommentPrompt(Post chosenPost) {
         LoggerFacade.debug("User " + appData.getLoggedUser().getUsername() + " adding comment to post by " + chosenPost.getUsername());
 
-        System.out.println("Text..:");
+        System.out.println("Text... (or type 'exit' to cancel):");
         String content = input.nextLine();
+
+        if (content.equalsIgnoreCase("exit")) {
+            LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " cancelled comment addition");
+            System.out.println("Comment cancelled.");
+            return;
+        }
 
         if (content.trim().isEmpty()) {
             System.out.println("Comment cannot be empty.");
@@ -389,9 +395,16 @@ public class CLIInterface implements AppInterface {
     private void addReplyPrompt(Post chosenPost) {
         LoggerFacade.debug("User initiating reply to a comment");
 
-        System.out.println("Insert comment id found between \"[]\":");
+        System.out.println("Insert comment id found between \"[]\" (or type 'exit' to return):");
         while(true) {
             String id = input.nextLine();
+
+            if (id.equalsIgnoreCase("exit")) {
+                LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " cancelled reply addition");
+                System.out.println("Reply cancelled.");
+                break;
+            }
+
             if (Helper.isCommentIdValid(id)) {
                 LoggerFacade.debug("Reply to comment ID: " + id);
 
@@ -401,8 +414,14 @@ public class CLIInterface implements AppInterface {
                     break;
                 }
 
-                System.out.println("Text..:");
+                System.out.println("Text... (or type 'exit' to cancel):");
                 String content = input.nextLine();
+
+                if (content.equalsIgnoreCase("exit")) {
+                    LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " cancelled reply after selecting comment");
+                    System.out.println("Reply cancelled.");
+                    break;
+                }
 
                 if (content.trim().isEmpty()) {
                     System.out.println("Reply cannot be empty.");
@@ -462,9 +481,16 @@ public class CLIInterface implements AppInterface {
     private void voteCommentOrReplyPrompt(Post chosenPost) {
         LoggerFacade.debug("User initiating comment voting");
 
-        System.out.println("Insert comment or reply id found between \"[]\":");
+        System.out.println("Insert comment or reply id found between \"[]\" (or type 'exit' to cancel):");
         while(true) {
             String id = input.nextLine();
+
+            if (id.equalsIgnoreCase("exit")) {
+                LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " cancelled comment voting");
+                System.out.println("Voting cancelled.");
+                break;
+            }
+
             if (Helper.isCommentIdValid(id)) {
                 LoggerFacade.debug("Valid comment ID entered: " + id);
 
@@ -478,6 +504,7 @@ public class CLIInterface implements AppInterface {
                 while(!isVoted) {
                     System.out.println("1. Upvote");
                     System.out.println("2. Downvote");
+                    System.out.println("3. Exit");
                     System.out.println(">>>");
                     String choice = input.nextLine();
                     switch (choice) {
@@ -501,6 +528,11 @@ public class CLIInterface implements AppInterface {
 
                             LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " downvoted comment ID: " + id);
                             System.out.println("Downvote added successfully!");
+                            isVoted = true;
+                            break;
+                        case "3":
+                            LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " exited comment voting for ID: " + id);
+                            System.out.println("Exiting vote menu.");
                             isVoted = true;
                             break;
                         default:
