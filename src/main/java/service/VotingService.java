@@ -2,6 +2,7 @@ package main.java.service;
 
 import main.java.logger.LoggerFacade;
 import main.java.model.Vote;
+import main.java.repository.VoteRepository;
 
 import java.util.Set;
 
@@ -39,6 +40,80 @@ public class VotingService {
             LoggerFacade.info("Content achieved emoji status with score: " + (upvotesSize - downvotesSize));
         } else if (wasEmoji && !vote.isEmoji()) {
             LoggerFacade.info("Content lost emoji status with score: " + (upvotesSize - downvotesSize));
+        }
+    }
+
+    // New method to check emoji and sync with database for posts
+    public void checkEmojiForPost(Vote vote, Integer postId) {
+        int upvotesSize = getUpvoteCount(vote);
+        int downvotesSize = getDownvoteCount(vote);
+        boolean wasEmoji = vote.isEmoji();
+        boolean shouldBeEmoji = upvotesSize - downvotesSize >= 10;
+
+        vote.setEmoji(shouldBeEmoji);
+
+        // Save to database if we have a post ID
+        if (postId != null) {
+            try {
+                VoteRepository voteRepository = new VoteRepository();
+                voteRepository.setPostEmojiFlag(postId, shouldBeEmoji);
+            } catch (Exception e) {
+                LoggerFacade.warning("Could not save post emoji flag to database: " + e.getMessage());
+            }
+        }
+
+        if (!wasEmoji && vote.isEmoji()) {
+            LoggerFacade.info("Post achieved emoji status with score: " + (upvotesSize - downvotesSize));
+        } else if (wasEmoji && !vote.isEmoji()) {
+            LoggerFacade.info("Post lost emoji status with score: " + (upvotesSize - downvotesSize));
+        }
+    }
+
+    // New method to check emoji and sync with database for comments
+    public void checkEmojiForComment(Vote vote, Integer commentId) {
+        int upvotesSize = getUpvoteCount(vote);
+        int downvotesSize = getDownvoteCount(vote);
+        boolean wasEmoji = vote.isEmoji();
+        boolean shouldBeEmoji = upvotesSize - downvotesSize >= 10;
+
+        vote.setEmoji(shouldBeEmoji);
+
+        // Save to database if we have a comment ID
+        if (commentId != null) {
+            try {
+                VoteRepository voteRepository = new VoteRepository();
+                voteRepository.setCommentEmojiFlag(commentId, shouldBeEmoji);
+            } catch (Exception e) {
+                LoggerFacade.warning("Could not save comment emoji flag to database: " + e.getMessage());
+            }
+        }
+
+        if (!wasEmoji && vote.isEmoji()) {
+            LoggerFacade.info("Comment achieved emoji status with score: " + (upvotesSize - downvotesSize));
+        } else if (wasEmoji && !vote.isEmoji()) {
+            LoggerFacade.info("Comment lost emoji status with score: " + (upvotesSize - downvotesSize));
+        }
+    }
+
+    // Load emoji status from database into memory
+    public void loadEmojiFromDatabase(Vote vote, Integer postId, Integer commentId) {
+        try {
+            VoteRepository voteRepository = new VoteRepository();
+            boolean databaseEmoji = false;
+
+            if (postId != null) {
+                databaseEmoji = voteRepository.getPostEmojiFlag(postId);
+            } else if (commentId != null) {
+                databaseEmoji = voteRepository.getCommentEmojiFlag(commentId);
+            }
+
+            vote.setEmoji(databaseEmoji);
+            LoggerFacade.debug("Loaded emoji status from database: " + databaseEmoji);
+
+        } catch (Exception e) {
+            LoggerFacade.warning("Could not load emoji status from database: " + e.getMessage());
+            // Fallback to calculation based on votes
+            checkEmoji(vote);
         }
     }
 

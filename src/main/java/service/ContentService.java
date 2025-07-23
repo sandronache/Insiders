@@ -278,11 +278,15 @@ public class ContentService {
         // Add upvote in memory
         votingService.addUpvote(post.getVote(), username);
 
-        // Also save to database
+        // Also save to database and update emoji status
         Integer postId = findPostIdByContent(post.getContent());
         if (postId != null) {
             VoteRepository voteRepository = new VoteRepository();
             voteRepository.addPostUpvote(postId, username);
+
+            // Check and save emoji status to database
+            votingService.checkEmojiForPost(post.getVote(), postId);
+
             LoggerFacade.info("Post upvote saved to database for post ID: " + postId + " by user: " + username);
         } else {
             LoggerFacade.warning("Could not find post ID to save upvote to database");
@@ -293,11 +297,15 @@ public class ContentService {
         // Add downvote in memory
         votingService.addDownvote(post.getVote(), username);
 
-        // Also save to database
+        // Also save to database and update emoji status
         Integer postId = findPostIdByContent(post.getContent());
         if (postId != null) {
             VoteRepository voteRepository = new VoteRepository();
             voteRepository.addPostDownvote(postId, username);
+
+            // Check and save emoji status to database
+            votingService.checkEmojiForPost(post.getVote(), postId);
+
             LoggerFacade.info("Post downvote saved to database for post ID: " + postId + " by user: " + username);
         } else {
             LoggerFacade.warning("Could not find post ID to save downvote to database");

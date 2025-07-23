@@ -257,4 +257,87 @@ public class VoteRepository {
 
         return downvotes;
     }
+
+    // Emoji persistence methods
+    public void setPostEmojiFlag(Integer postId, boolean isEmoji) {
+        String sql = "INSERT INTO post_emoji_flags (post_id, is_emoji) VALUES (?, ?) " +
+                    "ON CONFLICT (post_id) DO UPDATE SET is_emoji = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, postId);
+            stmt.setBoolean(2, isEmoji);
+            stmt.setBoolean(3, isEmoji);
+            stmt.executeUpdate();
+
+            LoggerFacade.debug("Post emoji flag set to " + isEmoji + " for post ID: " + postId);
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error setting post emoji flag: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setCommentEmojiFlag(Integer commentId, boolean isEmoji) {
+        String sql = "INSERT INTO comment_emoji_flags (comment_id, is_emoji) VALUES (?, ?) " +
+                    "ON CONFLICT (comment_id) DO UPDATE SET is_emoji = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, commentId);
+            stmt.setBoolean(2, isEmoji);
+            stmt.setBoolean(3, isEmoji);
+            stmt.executeUpdate();
+
+            LoggerFacade.debug("Comment emoji flag set to " + isEmoji + " for comment ID: " + commentId);
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error setting comment emoji flag: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean getPostEmojiFlag(Integer postId) {
+        String sql = "SELECT is_emoji FROM post_emoji_flags WHERE post_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, postId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getBoolean("is_emoji");
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error getting post emoji flag: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return false; // Default to false if no record exists
+    }
+
+    public boolean getCommentEmojiFlag(Integer commentId) {
+        String sql = "SELECT is_emoji FROM comment_emoji_flags WHERE comment_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, commentId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getBoolean("is_emoji");
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error getting comment emoji flag: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return false; // Default to false if no record exists
+    }
 }

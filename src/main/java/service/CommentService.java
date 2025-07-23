@@ -99,6 +99,10 @@ public class CommentService {
             if (commentDatabaseId != null) {
                 VoteRepository voteRepository = new VoteRepository();
                 voteRepository.addCommentUpvote(commentDatabaseId, username);
+
+                // Check and save emoji status to database
+                votingService.checkEmojiForComment(comment.getVote(), commentDatabaseId);
+
                 LoggerFacade.info("Comment upvote saved to database for comment ID: " + commentDatabaseId + " by user: " + username);
             }
 
@@ -133,6 +137,10 @@ public class CommentService {
             if (commentDatabaseId != null) {
                 VoteRepository voteRepository = new VoteRepository();
                 voteRepository.addCommentDownvote(commentDatabaseId, username);
+
+                // Check and save emoji status to database
+                votingService.checkEmojiForComment(comment.getVote(), commentDatabaseId);
+
                 LoggerFacade.info("Comment downvote saved to database for comment ID: " + commentDatabaseId + " by user: " + username);
             }
 
@@ -299,9 +307,9 @@ public class CommentService {
                 vote.getDownvote().add(username);
             }
 
-            // Update emoji status based on loaded votes
+            // Load emoji status from database
             VotingService votingService = VotingService.getInstance();
-            votingService.checkEmoji(vote);
+            votingService.loadEmojiFromDatabase(vote, null, comment.getDatabaseId());
 
             LoggerFacade.debug("Loaded " + upvotes.size() + " upvotes and " + downvotes.size() + " downvotes for comment");
 
