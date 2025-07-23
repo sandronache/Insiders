@@ -5,6 +5,8 @@ import main.java.util.DBConnection;
 import main.java.logger.LoggerFacade;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class UserRepository {
@@ -133,6 +135,31 @@ public class UserRepository {
             LoggerFacade.fatal("Error deleting user: " + e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    public List<User> findAll() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT username, email, hashed_password FROM users ORDER BY created_at";
+
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                User user = new User(
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getInt("hashed_password")
+                );
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error finding all users: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return users;
     }
 
 }
