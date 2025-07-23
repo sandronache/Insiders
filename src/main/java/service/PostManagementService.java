@@ -101,12 +101,21 @@ public class PostManagementService {
     }
 
     public void deletePost(AppData appData, int idx) {
-        if (appData.getLoadedPosts().containsKey(idx)) {
-            LoggerFacade.info("Post with index " + idx + " deleted");
-            appData.getLoadedPosts().remove(idx);
-        } else {
-            LoggerFacade.warning("Attempt to delete non-existent post at index: " + idx);
+        Post post = appData.getLoadedPosts().get(idx);
+        String currentUser = appData.getLoggedUser().getUsername();
+
+        if (post == null) {
+            LoggerFacade.warning("No post at index " + idx);
+            return;
         }
+
+        if (!post.getUsername().equals(currentUser)) {
+            LoggerFacade.warning("Unauthorized deletion attempt by " + currentUser);
+            return;
+        }
+
+        appData.getLoadedPosts().remove(idx);
+        LoggerFacade.info("Post " + idx + " deleted by owner " + currentUser);
     }
 
     private boolean postExistsInDatabase(String content, String username) {

@@ -24,19 +24,19 @@ public class Main {
         // Initialize database instead of FilesService
         DatabaseInitService databaseInitService = DatabaseInitService.getInstance();
 
-        // Test database connection and initialize schema
-        if (!databaseInitService.testConnection()) {
-            LoggerFacade.fatal("Cannot connect to database. Application shutting down.");
-            System.exit(1);
-        }
-
-        try {
-            databaseInitService.initializeDatabase();
-            LoggerFacade.info("Database initialized successfully");
-        } catch (Exception e) {
-            LoggerFacade.fatal("Database initialization failed: " + e.getMessage());
-            System.exit(1);
-        }
+//        // Test database connection and initialize schema
+//        if (!databaseInitService.testConnection()) {
+//            LoggerFacade.fatal("Cannot connect to database. Application shutting down.");
+//            System.exit(1);
+//        }
+//
+//        try {
+//            databaseInitService.initializeDatabase();
+//            LoggerFacade.info("Database initialized successfully");
+//        } catch (Exception e) {
+//            LoggerFacade.fatal("Database initialization failed: " + e.getMessage());
+//            System.exit(1);
+//        }
 
         // Initialize services - they now use repositories instead of files
         VotingService.getInstance();
