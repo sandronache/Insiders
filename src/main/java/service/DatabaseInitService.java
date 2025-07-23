@@ -66,7 +66,7 @@ public class DatabaseInitService {
     private String loadSchemaFromResources() {
         StringBuilder schema = new StringBuilder();
 
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("schema.sql")) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("resources/schema.sql")) {
             if (inputStream == null) {
                 LoggerFacade.error("Schema file 'schema.sql' not found in resources");
                 return null;
