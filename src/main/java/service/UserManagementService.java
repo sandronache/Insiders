@@ -1,0 +1,143 @@
+package main.java.service;
+
+import main.java.logger.LoggerFacade;
+import main.java.model.AppData;
+import main.java.model.User;
+import main.java.repository.UserRepository;
+import main.java.util.Helper;
+
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Service responsible for user management operations
+ */
+public class UserManagementService {
+    private static UserManagementService instance;
+    private final UserRepository userRepository;
+
+    private UserManagementService() {
+        this.userRepository = new UserRepository();
+    }
+
+    public static UserManagementService getInstance() {
+        if (instance == null) {
+            instance = new UserManagementService();
+        }
+        return instance;
+    }
+
+    public HashMap<String, User> loadUsersFromDatabase() {
+        HashMap<String, User> users = new HashMap<>();
+
+        try {
+            List<User> userList = userRepository.findAll();
+
+            for (User user : userList) {
+                users.put(user.getUsername(), user);
+            }
+
+            LoggerFacade.info("Loaded " + userList.size() + " users from database");
+        } catch (Exception e) {
+            LoggerFacade.warning("Could not load users from database: " + e.getMessage());
+            LoggerFacade.info("Starting with empty user list");
+        }
+
+        return users;
+    }
+
+    public boolean register(AppData appData, String username, String email, String password) {
+        // Check in database first
+        try {
+            if (userRepository.existsByUsername(username)) {
+                LoggerFacade.warning("Registration failed: Username '" + username + "' already exists");
+                return false;
+            }
+
+            if (userRepository.existsByEmail(email)) {
+                LoggerFacade.warning("Registration failed: Email '" + email + "' already exists");
+                return false;
+            }
+        } catch (Exception e) {
+            LoggerFacade.warning("Database check failed, checking in memory: " + e.getMessage());
+            // Fallback to in-memory check
+            if (appData.getRegisteredUsers().containsKey(username)) {
+                LoggerFacade.warning("Registration failed: Username '" + username + "' already exists");
+                return false;
+            }
+        }
+
+        User user = new User(username, email, Helper.hashFunction(password));
+
+        // Try to save to database
+        try {
+            userRepository.save(user);
+            LoggerFacade.info("User saved to database: " + username);
+        } catch (Exception e) {
+            LoggerFacade.warning("Could not save user to database: " + e.getMessage());
+        }
+
+        // Update in-memory data
+        appData.setLoggedUser(user);
+        appData.getRegisteredUsers().put(username, user);
+
+        LoggerFacade.info("New user registered: " + username);
+        return true;
+    }
+
+    public boolean login(AppData appData, String username, String password) {
+        User user = null;
+
+        // Try to find user in database first
+        try {
+            var userOpt = userRepository.findByUsername(username);
+            if (userOpt.isPresent()) {
+                user = userOpt.get();
+                // Update in-memory data as well
+                appData.getRegisteredUsers().put(username, user);
+            }
+        } catch (Exception e) {
+            LoggerFacade.warning("Database lookup failed, checking in memory: " + e.getMessage());
+        }
+
+        // Fallback to in-memory data if database is not available
+        if (user == null) {
+            user = appData.getRegisteredUsers().get(username);
+        }
+
+        if (user != null && Helper.checkPassword(password, user.getHashedPassword())) {
+            appData.setLoggedUser(user);
+            LoggerFacade.info("User logged in: " + username);
+            return true;
+        }
+
+        LoggerFacade.warning("Login failed for user: " + username);
+        return false;
+    }
+
+    public void logout(AppData appData) {
+        if (appData.getLoggedUser() != null) {
+            LoggerFacade.info("User logged out: " + appData.getLoggedUser().getUsername());
+        }
+        appData.setLoggedUser(null);
+    }
+
+    public void deleteUser(AppData appData) {
+        String currUserUsername = appData.getLoggedUser().getUsername();
+        appData.getRegisteredUsers().remove(currUserUsername);
+        LoggerFacade.info("User account deleted: " + currUserUsername);
+    }
+
+    public void saveUsersToDatabase(AppData appData) {
+        try {
+            for (User user : appData.getRegisteredUsers().values()) {
+                if (!userRepository.existsByUsername(user.getUsername())) {
+                    userRepository.save(user);
+                }
+            }
+            LoggerFacade.info("Users saved to database successfully");
+        } catch (Exception e) {
+            LoggerFacade.warning("Could not save users to database: " + e.getMessage());
+        }
+    }
+}
