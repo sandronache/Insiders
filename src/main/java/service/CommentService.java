@@ -213,7 +213,7 @@ public class CommentService {
                 renderComment(reply, sb, depth + 1, id + '.' + idReply));
     }
 
-    public void loadCommentsForPost(Post post, Integer databasePostId, Integer postIndex) {
+    public void loadCommentsForPost(Post post, Integer databasePostId) {
         LoggerFacade.debug("Loading comments for post ID: " + databasePostId);
 
         try {
@@ -227,7 +227,7 @@ public class CommentService {
             for (Comment comment : dbComments) {
                 comments.put(commentIndex, comment);
 
-                loadDirectRepliesForComment(comment, databasePostId, commentIndex);
+                loadDirectRepliesForComment(comment, databasePostId);
 
                 commentIndex++;
             }
@@ -242,9 +242,9 @@ public class CommentService {
         }
     }
 
-    private void loadDirectRepliesForComment(Comment parentComment, Integer postId, Integer commentIndex) {
+    private void loadDirectRepliesForComment(Comment parentComment, Integer commentIndex) {
         try {
-            loadAllRepliesForPost(postId, parentComment);
+            loadAllRepliesForPost(parentComment);
 
             LoggerFacade.debug("Loaded replies for comment at index: " + commentIndex);
 
@@ -253,7 +253,7 @@ public class CommentService {
         }
     }
 
-    private void loadAllRepliesForPost(Integer postId, Comment rootComment) {
+    private void loadAllRepliesForPost(Comment rootComment) {
         try {
             // Get the database ID if it exists
             Integer parentDatabaseId = rootComment.getDatabaseId();
@@ -270,7 +270,7 @@ public class CommentService {
                     replyMap.put(replyIndex, reply);
 
                     // Recursively load replies for this reply
-                    loadAllRepliesForPost(postId, reply);
+                    loadAllRepliesForPost(reply);
 
                     replyIndex++;
                 }

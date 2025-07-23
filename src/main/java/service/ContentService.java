@@ -45,7 +45,7 @@ public class ContentService {
 
         // Find the post ID from database by content (since Post model doesn't have ID)
         Optional<Post> dbPost = postRepository.findByContent(post.getContent());
-        if (!dbPost.isPresent()) {
+        if (dbPost.isEmpty()) {
             LoggerFacade.warning("Post not found in database, cannot add comment");
             return;
         }

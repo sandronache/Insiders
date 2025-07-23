@@ -46,7 +46,7 @@ public class PostManagementService {
 
                 // Load comments for this post
                 CommentService commentService = CommentService.getInstance();
-                commentService.loadCommentsForPost(post, databaseId, index);
+                commentService.loadCommentsForPost(post, databaseId);
 
                 index++;
             }

@@ -240,23 +240,6 @@ public class PostRepository {
         return 1; // Default to 1 if no posts exist
     }
 
-    public boolean existsById(Integer id) {
-        String sql = "SELECT 1 FROM posts WHERE id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next();
-
-        } catch (SQLException e) {
-            LoggerFacade.fatal("Error checking if post exists: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-
     // Helper class to carry both database ID and Post object
     public static class PostWithId {
         private final Integer databaseId;

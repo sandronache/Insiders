@@ -8,7 +8,6 @@ import main.java.logger.LoggerFacade;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class CommentRepository {
 
@@ -43,36 +42,6 @@ public class CommentRepository {
         }
 
         return null;
-    }
-
-    public Optional<Comment> findById(Integer id) {
-        String sql = "SELECT id, post_id, parent_comment_id, content, username, id_next_reply, is_deleted, created_at " +
-                    "FROM comments WHERE id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                Vote vote = new Vote(); // Will be populated by VoteRepository
-                Comment comment = new Comment(
-                    rs.getString("content"),
-                    rs.getString("username"),
-                    vote
-                );
-                comment.setIdNextReply(rs.getInt("id_next_reply"));
-                comment.setIsDeleted(rs.getBoolean("is_deleted"));
-                return Optional.of(comment);
-            }
-
-        } catch (SQLException e) {
-            LoggerFacade.fatal("Error finding comment by ID: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        return Optional.empty();
     }
 
     public List<Comment> findByPostId(Integer postId) {
@@ -183,48 +152,6 @@ public class CommentRepository {
             LoggerFacade.fatal("Error updating comment: " + e.getMessage());
             throw new RuntimeException(e);
         }
-    }
-
-    public Integer getNextCommentId(Integer postId) {
-        String sql = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM comments WHERE post_id = ? AND parent_comment_id IS NULL";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, postId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("next_id");
-            }
-
-        } catch (SQLException e) {
-            LoggerFacade.fatal("Error getting next comment ID: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        return 1; // Default to 1 if no comments exist
-    }
-
-    public Integer getNextReplyId(Integer commentId) {
-        String sql = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM comments WHERE parent_comment_id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, commentId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("next_id");
-            }
-
-        } catch (SQLException e) {
-            LoggerFacade.fatal("Error getting next reply ID: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        return 1; // Default to 1 if no replies exist
     }
 
     public boolean existsById(Integer id) {
