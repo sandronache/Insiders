@@ -2,12 +2,16 @@ package main.java.service;
 
 import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
+import main.java.model.Comment;
+import main.java.model.Post;
 import main.java.model.User;
 import main.java.repository.UserRepository;
 import main.java.util.Helper;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service responsible for user management operations
@@ -121,13 +125,37 @@ public class UserManagementService {
         }
         appData.setLoggedUser(null);
     }
-
+    //TODO: ask mentor runtime vs database
     public void deleteUser(AppData appData) {
         String currUserUsername = appData.getLoggedUser().getUsername();
         appData.getRegisteredUsers().remove(currUserUsername);
+        userRepository.deleteByUsername(currUserUsername);
         LoggerFacade.info("User account deleted: " + currUserUsername);
-    }
+        Iterator<Map.Entry<Integer, Post>> iterator = appData.getLoadedPosts().entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, Post> entry = iterator.next();
+            Post post = entry.getValue();
+            if (post.getUsername().equals(currUserUsername)) {
+                iterator.remove();
+                LoggerFacade.info("Deleted post with id " + entry.getKey() + " by user " + currUserUsername);
+            }
+        }
 
+        for (Post post : appData.getLoadedPosts().values()) {
+            for (Comment comment : post.getComments().values()) {
+                deleteComment(comment, currUserUsername);
+            }
+        }
+
+        for (Post post : appData.getLoadedPosts().values()) {
+            post.getVote().getUpvote().remove(currUserUsername);
+            post.getVote().getDownvote().remove(currUserUsername);
+
+            for (Comment comment : post.getComments().values()) {
+                removeVote(comment, currUserUsername);
+            }
+        }
+    }
     public void saveUsersToDatabase(AppData appData) {
         try {
             for (User user : appData.getRegisteredUsers().values()) {
@@ -138,6 +166,22 @@ public class UserManagementService {
             LoggerFacade.info("Users saved to database successfully");
         } catch (Exception e) {
             LoggerFacade.warning("Could not save users to database: " + e.getMessage());
+        }
+    }
+    private void deleteComment(Comment comment, String username) {
+        if (comment.getUsername().equals(username)) {
+            comment.setIsDeleted(true); // contentul devine "[deleted]"
+        }
+        for (Comment reply : comment.getReplies().values()) {
+            deleteComment(reply, username);
+        }
+    }
+
+    private void removeVote(Comment comment, String username) {
+        comment.getVote().getUpvote().remove(username);
+        comment.getVote().getDownvote().remove(username);
+        for (Comment reply : comment.getReplies().values()) {
+            removeVote(reply, username);
         }
     }
 }

@@ -2,6 +2,7 @@ package main.java.app;
 
 import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
+import main.java.model.Comment;
 import main.java.model.Post;
 import main.java.service.AppDataService;
 import main.java.service.ContentService;
@@ -462,9 +463,16 @@ public class CLIInterface implements AppInterface {
     private void deleteCommentOrReplyPrompt(Post chosenPost) {
         LoggerFacade.debug("User initiating comment deletion");
 
-        System.out.println("Insert comment or reply id found between \"[]\":");
+        System.out.println("Insert comment or reply id found between \"[]\" (or type 'exit' to cancel):");
         while(true) {
             String id = input.nextLine();
+
+            if (id.equalsIgnoreCase("exit")) {
+                LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " cancelled comment insertion");
+                System.out.println("Comment cancelled.");
+                break;
+            }
+
             if (Helper.isCommentIdValid(id)) {
                 if (contentService.isCommentDeleted(chosenPost, id)) {
                     System.out.println("Comment is already deleted, cannot delete again.");
@@ -473,7 +481,17 @@ public class CLIInterface implements AppInterface {
                 }
 
                 LoggerFacade.info("User " + appData.getLoggedUser().getUsername() + " deleted comment with ID: " + id);
+                Comment target = Helper.findCommentById(chosenPost, id);
+                String currentUser = appData.getLoggedUser().getUsername();
 
+                if (target == null) {
+                    System.out.println("Comentariul nu există.");
+                    return;
+                }
+                if (!target.getUsername().equals(currentUser)) {
+                    System.out.println("Nu poți șterge comentariul altui utilizator.");
+                    return;
+                }
                 contentService.deleteCommentOrReply(
                         chosenPost,
                         id

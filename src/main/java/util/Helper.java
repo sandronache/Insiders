@@ -1,4 +1,6 @@
 package main.java.util;
+import main.java.model.Comment;
+import main.java.model.Post;
 
 public class Helper {
     // indexes
@@ -30,5 +32,25 @@ public class Helper {
 
     public static int hashFunction(String password) {
         return password.hashCode();
+    }
+
+    public static Comment findCommentById(Post post, String id) {
+        int topLevelIndex = extractFirstLevel(id);
+        Comment comment = post.getComments().get(topLevelIndex);
+        if (comment == null) return null;
+
+        String rest = extractRemainingLevels(id);
+        if (rest.isEmpty()) return comment;
+
+        return findCommentByIdRecursive(comment, rest);
+    }
+
+    private static Comment findCommentByIdRecursive(Comment comment, String id) {
+        int idx = extractFirstLevel(id);
+        Comment reply = comment.getReplies().get(idx);
+        if (reply == null) return null;
+
+        String rest = extractRemainingLevels(id);
+        return rest.isEmpty() ? reply : findCommentByIdRecursive(reply, rest);
     }
 }
