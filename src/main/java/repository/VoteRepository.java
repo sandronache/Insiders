@@ -168,4 +168,93 @@ public class VoteRepository {
 
         return 0;
     }
+
+    // Methods to get vote lists (needed for loading votes into memory)
+    public java.util.List<String> getPostUpvotes(Integer postId) {
+        java.util.List<String> upvotes = new java.util.ArrayList<>();
+        String sql = "SELECT username FROM post_votes WHERE post_id = ? AND is_upvote = true";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, postId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                upvotes.add(rs.getString("username"));
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error getting post upvotes: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return upvotes;
+    }
+
+    public java.util.List<String> getPostDownvotes(Integer postId) {
+        java.util.List<String> downvotes = new java.util.ArrayList<>();
+        String sql = "SELECT username FROM post_votes WHERE post_id = ? AND is_upvote = false";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, postId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                downvotes.add(rs.getString("username"));
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error getting post downvotes: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return downvotes;
+    }
+
+    public java.util.List<String> getCommentUpvotes(Integer commentId) {
+        java.util.List<String> upvotes = new java.util.ArrayList<>();
+        String sql = "SELECT username FROM comment_votes WHERE comment_id = ? AND is_upvote = true";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, commentId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                upvotes.add(rs.getString("username"));
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error getting comment upvotes: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return upvotes;
+    }
+
+    public java.util.List<String> getCommentDownvotes(Integer commentId) {
+        java.util.List<String> downvotes = new java.util.ArrayList<>();
+        String sql = "SELECT username FROM comment_votes WHERE comment_id = ? AND is_upvote = false";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, commentId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                downvotes.add(rs.getString("username"));
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error getting comment downvotes: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return downvotes;
+    }
 }

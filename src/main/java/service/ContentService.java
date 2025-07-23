@@ -3,13 +3,15 @@ package main.java.service;
 import main.java.logger.LoggerFacade;
 import main.java.model.Comment;
 import main.java.model.Post;
+import main.java.model.Vote;
 import main.java.repository.CommentRepository;
 import main.java.repository.PostRepository;
 import main.java.repository.VoteRepository;
 import main.java.util.Helper;
 
-import java.util.TreeMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 
 public class ContentService {
     private static ContentService instance;
@@ -303,23 +305,13 @@ public class ContentService {
     }
 
     public int getUpvoteCount(Post post) {
-        // Get from database instead of just memory
-        Integer postId = findPostIdByContent(post.getContent());
-        if (postId != null) {
-            VoteRepository voteRepository = new VoteRepository();
-            return voteRepository.getPostUpvoteCount(postId);
-        }
-        // Fallback to memory if post ID not found
+        // Use memory-based voting for better performance
+        // Votes are loaded and synchronized when posts are loaded from database
         return votingService.getUpvoteCount(post.getVote());
     }
     public int getDownvoteCount(Post post) {
-        // Get from database instead of just memory
-        Integer postId = findPostIdByContent(post.getContent());
-        if (postId != null) {
-            VoteRepository voteRepository = new VoteRepository();
-            return voteRepository.getPostDownvoteCount(postId);
-        }
-        // Fallback to memory if post ID not found
+        // Use memory-based voting for better performance
+        // Votes are loaded and synchronized when posts are loaded from database
         return votingService.getDownvoteCount(post.getVote());
     }
 
@@ -371,6 +363,35 @@ public class ContentService {
         );
 
         return sb.toString();
+    }
+
+    // Load votes from database into memory objects
+    public void loadVotesForPost(Post post, Integer postId) {
+        try {
+            VoteRepository voteRepository = new VoteRepository();
+
+            // Get upvotes from database
+            List<String> upvotes = voteRepository.getPostUpvotes(postId);
+            // Get downvotes from database
+            List<String> downvotes = voteRepository.getPostDownvotes(postId);
+
+            // Load votes into the post's Vote object in memory
+            Vote vote = post.getVote();
+            for (String username : upvotes) {
+                vote.getUpvote().add(username);
+            }
+            for (String username : downvotes) {
+                vote.getDownvote().add(username);
+            }
+
+            // Update emoji status based on loaded votes
+            votingService.checkEmoji(vote);
+
+            LoggerFacade.debug("Loaded " + upvotes.size() + " upvotes and " + downvotes.size() + " downvotes for post");
+
+        } catch (Exception e) {
+            LoggerFacade.warning("Error loading votes for post: " + e.getMessage());
+        }
     }
 
     private Integer findNestedCommentId(Integer parentCommentId, String remainingPath) {

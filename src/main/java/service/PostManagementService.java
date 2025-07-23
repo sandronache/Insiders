@@ -48,6 +48,15 @@ public class PostManagementService {
                 CommentService commentService = CommentService.getInstance();
                 commentService.loadCommentsForPost(post, databaseId);
 
+                // Load votes for this post
+                ContentService contentService = ContentService.getInstance();
+                contentService.loadVotesForPost(post, databaseId);
+
+                // Load votes for all comments in this post
+                post.getComments().forEach((commentId, comment) -> {
+                    commentService.loadVotesForComment(comment);
+                });
+
                 index++;
             }
 

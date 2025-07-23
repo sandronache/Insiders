@@ -3,6 +3,7 @@ package main.java.service;
 import main.java.logger.LoggerFacade;
 import main.java.model.Comment;
 import main.java.model.Post;
+import main.java.model.Vote;
 import main.java.repository.CommentRepository;
 import main.java.repository.VoteRepository;
 import main.java.util.Helper;
@@ -152,24 +153,14 @@ public class CommentService {
     }
 
     public int getUpvoteCount(Comment comment) {
-        // Try to get from database first if comment has database ID
-        Integer commentDatabaseId = comment.getDatabaseId();
-        if (commentDatabaseId != null) {
-            VoteRepository voteRepository = new VoteRepository();
-            return voteRepository.getCommentUpvoteCount(commentDatabaseId);
-        }
-        // Fallback to memory if no database ID
+        // Use memory-based voting for better performance
+        // Votes are loaded and synchronized when comments are loaded from database
         return votingService.getUpvoteCount(comment.getVote());
     }
 
     public int getDownvoteCount(Comment comment) {
-        // Try to get from database first if comment has database ID
-        Integer commentDatabaseId = comment.getDatabaseId();
-        if (commentDatabaseId != null) {
-            VoteRepository voteRepository = new VoteRepository();
-            return voteRepository.getCommentDownvoteCount(commentDatabaseId);
-        }
-        // Fallback to memory if no database ID
+        // Use memory-based voting for better performance
+        // Votes are loaded and synchronized when comments are loaded from database
         return votingService.getDownvoteCount(comment.getVote());
     }
 
@@ -283,6 +274,42 @@ public class CommentService {
 
         } catch (Exception e) {
             LoggerFacade.warning("Error loading replies: " + e.getMessage());
+        }
+    }
+
+    // Load votes from database into memory objects for comments
+    public void loadVotesForComment(Comment comment) {
+        if (comment.getDatabaseId() == null) {
+            return; // Skip if no database ID
+        }
+
+        try {
+            VoteRepository voteRepository = new VoteRepository();
+
+            // Get upvotes and downvotes from database
+            java.util.List<String> upvotes = voteRepository.getCommentUpvotes(comment.getDatabaseId());
+            java.util.List<String> downvotes = voteRepository.getCommentDownvotes(comment.getDatabaseId());
+
+            // Load votes into the comment's Vote object in memory
+            Vote vote = comment.getVote();
+            for (String username : upvotes) {
+                vote.getUpvote().add(username);
+            }
+            for (String username : downvotes) {
+                vote.getDownvote().add(username);
+            }
+
+            // Update emoji status based on loaded votes
+            VotingService votingService = VotingService.getInstance();
+            votingService.checkEmoji(vote);
+
+            LoggerFacade.debug("Loaded " + upvotes.size() + " upvotes and " + downvotes.size() + " downvotes for comment");
+
+            // Recursively load votes for all replies
+            comment.getReplies().forEach((id, reply) -> loadVotesForComment(reply));
+
+        } catch (Exception e) {
+            LoggerFacade.warning("Error loading votes for comment: " + e.getMessage());
         }
     }
 
