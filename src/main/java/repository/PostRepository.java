@@ -92,7 +92,7 @@ public class PostRepository {
 
     public List<Post> findAllOrderedByDate() {
         List<Post> posts = new ArrayList<>();
-        String sql = "SELECT id, content, username, id_next_comment, created_at FROM posts ORDER BY created_at DESC";
+        String sql = "SELECT id, content, username, id_next_comment, created_at FROM posts ORDER BY created_at ASC";
 
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
