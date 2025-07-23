@@ -9,9 +9,6 @@ import main.java.util.Helper;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-/**
- * Main application data service - orchestrates other specialized services
- */
 public class AppDataService {
     private static AppDataService instance;
     private final UserManagementService userService;
