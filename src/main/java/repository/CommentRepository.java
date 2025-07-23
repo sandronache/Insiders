@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class CommentRepository {
 
-    public void save(Comment comment, Integer postId, Integer parentCommentId) {
+    public Integer save(Comment comment, Integer postId, Integer parentCommentId) {
         String sql = "INSERT INTO comments (post_id, parent_comment_id, content, username, id_next_reply, is_deleted) " +
                     "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
@@ -34,12 +34,15 @@ public class CommentRepository {
             if (rs.next()) {
                 int generatedId = rs.getInt("id");
                 LoggerFacade.info("Comment saved with ID: " + generatedId + " by user: " + comment.getUsername());
+                return generatedId;
             }
 
         } catch (SQLException e) {
             LoggerFacade.fatal("Error saving comment: " + e.getMessage());
             throw new RuntimeException(e);
         }
+
+        return null;
     }
 
     public Optional<Comment> findById(Integer id) {
@@ -92,6 +95,7 @@ public class CommentRepository {
                 );
                 comment.setIdNextReply(rs.getInt("id_next_reply"));
                 comment.setIsDeleted(rs.getBoolean("is_deleted"));
+                comment.setDatabaseId(rs.getInt("id")); // Set the database ID
                 comments.add(comment);
             }
 
@@ -123,6 +127,7 @@ public class CommentRepository {
                 );
                 comment.setIdNextReply(rs.getInt("id_next_reply"));
                 comment.setIsDeleted(rs.getBoolean("is_deleted"));
+                comment.setDatabaseId(rs.getInt("id")); // Set the database ID for replies too
                 replies.add(comment);
             }
 
@@ -264,6 +269,38 @@ public class CommentRepository {
 
         } catch (SQLException e) {
             LoggerFacade.fatal("Error finding comments by username: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return comments;
+    }
+
+    public List<Comment> findAllByPostId(Integer postId) {
+        List<Comment> comments = new ArrayList<>();
+        String sql = "SELECT id, post_id, parent_comment_id, content, username, id_next_reply, is_deleted, created_at " +
+                    "FROM comments WHERE post_id = ? ORDER BY created_at";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, postId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Vote vote = new Vote(); // Will be populated by VoteRepository
+                Comment comment = new Comment(
+                    rs.getString("content"),
+                    rs.getString("username"),
+                    vote
+                );
+                comment.setIdNextReply(rs.getInt("id_next_reply"));
+                comment.setIsDeleted(rs.getBoolean("is_deleted"));
+                comment.setDatabaseId(rs.getInt("id")); // Store the database ID
+                comments.add(comment);
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error finding all comments by post ID: " + e.getMessage());
             throw new RuntimeException(e);
         }
 

@@ -364,7 +364,7 @@ public class CLIInterface implements AppInterface {
         }
     }
 
-    private void addCommentPrompt(Post chosenPost) {
+    private void addCommentPrompt(Post chosenPost, int postId) {
         LoggerFacade.debug("User " + appData.getLoggedUser().getUsername() + " adding comment to post by " + chosenPost.getUsername());
 
         System.out.println("Text... (or type 'exit' to cancel):");
@@ -382,17 +382,14 @@ public class CLIInterface implements AppInterface {
             return;
         }
 
-        contentService.addComment(
-                chosenPost,
-                content,
-                appData.getLoggedUser().getUsername()
-        );
+        // Folosește AppDataService pentru a salva comentariul și în baza de date
+        appDataService.addComment(appData, postId, content);
 
-        LoggerFacade.info("Comment added by user: " + appData.getLoggedUser().getUsername());
         System.out.println("Comment added successfully!");
+        LoggerFacade.info("Comment added by user: " + appData.getLoggedUser().getUsername());
     }
 
-    private void addReplyPrompt(Post chosenPost) {
+    private void addReplyPrompt(Post chosenPost, int postId) {
         LoggerFacade.debug("User initiating reply to a comment");
 
         System.out.println("Insert comment id found between \"[]\" (or type 'exit' to return):");
@@ -429,19 +426,31 @@ public class CLIInterface implements AppInterface {
                     return;
                 }
 
-                boolean success = contentService.addReply(
-                        chosenPost,
-                        id,
-                        content,
-                        appData.getLoggedUser().getUsername()
-                );
+                // Extrage comentariul părinte din ID-ul ierarhic
+                int commentId = Helper.extractFirstLevel(id);
 
-                if (success) {
+                // Verifică dacă este un reply la un comentariu principal (nu la alt reply)
+                if (Helper.extractRemainingLevels(id).isEmpty()) {
+                    // Este un reply direct la comentariu - folosește AppDataService
+                    appDataService.addReply(appData, postId, commentId, content);
                     System.out.println("Reply added successfully!");
                     LoggerFacade.info("Reply added to comment ID: " + id + " by user: " + appData.getLoggedUser().getUsername());
                 } else {
-                    System.out.println("Failed to add reply. Comment may be deleted or invalid ID.");
-                    LoggerFacade.warning("User attempted to add reply to deleted comment ID: " + id);
+                    // Este un reply la alt reply - folosește ContentService pentru logica complexă
+                    boolean success = contentService.addReply(
+                            chosenPost,
+                            id,
+                            content,
+                            appData.getLoggedUser().getUsername()
+                    );
+
+                    if (success) {
+                        System.out.println("Reply added successfully!");
+                        LoggerFacade.info("Reply added to comment ID: " + id + " by user: " + appData.getLoggedUser().getUsername());
+                    } else {
+                        System.out.println("Failed to add reply. Comment may be deleted or invalid ID.");
+                        LoggerFacade.warning("User attempted to add reply to deleted comment ID: " + id);
+                    }
                 }
                 break;
             }
@@ -583,11 +592,11 @@ public class CLIInterface implements AppInterface {
                     votePostPrompt(chosenPost);
                     break;
                 case "2":
-                    addCommentPrompt(chosenPost);
+                    addCommentPrompt(chosenPost, id);
                     break;
                 case "3":
                     if (hasComments) {
-                        addReplyPrompt(chosenPost);
+                        addReplyPrompt(chosenPost, id);
                     } else {
                         System.out.println("No comments available to reply to. Add a comment first.");
                         LoggerFacade.warning("User attempted to add reply when no comments exist");

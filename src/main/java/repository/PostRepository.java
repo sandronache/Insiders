@@ -117,6 +117,36 @@ public class PostRepository {
         return posts;
     }
 
+    // New method to get posts with their database IDs
+    public List<PostWithId> findAllOrderedByDateWithIds() {
+        List<PostWithId> postsWithIds = new ArrayList<>();
+        String sql = "SELECT id, content, username, id_next_comment, created_at FROM posts ORDER BY created_at ASC";
+
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Vote vote = new Vote(); // Will be populated by VoteRepository
+                Post post = new Post(
+                    rs.getString("content"),
+                    rs.getString("username"),
+                    vote
+                );
+                post.setIdNextComment(rs.getInt("id_next_comment"));
+
+                PostWithId postWithId = new PostWithId(rs.getInt("id"), post);
+                postsWithIds.add(postWithId);
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error finding all posts with IDs: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return postsWithIds;
+    }
+
     public List<Post> findByUsername(String username) {
         List<Post> posts = new ArrayList<>();
         String sql = "SELECT id, content, username, id_next_comment, created_at FROM posts WHERE username = ? ORDER BY created_at DESC";
@@ -224,6 +254,25 @@ public class PostRepository {
         } catch (SQLException e) {
             LoggerFacade.fatal("Error checking if post exists: " + e.getMessage());
             throw new RuntimeException(e);
+        }
+    }
+
+    // Helper class to carry both database ID and Post object
+    public static class PostWithId {
+        private final Integer databaseId;
+        private final Post post;
+
+        public PostWithId(Integer databaseId, Post post) {
+            this.databaseId = databaseId;
+            this.post = post;
+        }
+
+        public Integer getDatabaseId() {
+            return databaseId;
+        }
+
+        public Post getPost() {
+            return post;
         }
     }
 }

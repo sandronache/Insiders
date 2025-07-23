@@ -3,6 +3,7 @@ package main.java.model;
 import java.util.TreeMap;
 
 public class Comment {
+    private Integer databaseId; // ID-ul din baza de date
     private final String content;
     private final String username;
     private final Vote vote;
@@ -11,12 +12,22 @@ public class Comment {
     private boolean isDeleted;
 
     public Comment(String content, String username, Vote vote) {
+        this.databaseId = null; // Va fi setat când se salvează/încarcă din DB
         this.content = content;
         this.username = username;
         this.vote = vote;
         this.idNextReply = 0;
         this.replies = new TreeMap<>();
         this.isDeleted = false;
+    }
+
+    // Getter și setter pentru database ID
+    public Integer getDatabaseId() {
+        return databaseId;
+    }
+
+    public void setDatabaseId(Integer databaseId) {
+        this.databaseId = databaseId;
     }
 
     public String getContent() {

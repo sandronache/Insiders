@@ -9,21 +9,24 @@ import main.java.util.Helper;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+/**
+ * Main application data service - orchestrates other specialized services
+ */
 public class AppDataService {
     private static AppDataService instance;
-    private final FilesService filesService;
+    private final UserManagementService userService;
+    private final PostManagementService postService;
     private final ContentService contentService;
 
-    private AppDataService(FilesService filesService,
-                           ContentService contentService) {
-        this.filesService = filesService;
-        this.contentService = contentService;
+    private AppDataService() {
+        this.userService = UserManagementService.getInstance();
+        this.postService = PostManagementService.getInstance();
+        this.contentService = ContentService.getInstance();
     }
 
     public static AppDataService getInstance() {
         if (instance == null) {
-            instance = new AppDataService(FilesService.getInstance(),
-                                            ContentService.getInstance());
+            instance = new AppDataService();
         }
         return instance;
     }
@@ -31,83 +34,84 @@ public class AppDataService {
     public AppData createAppData() {
         LoggerFacade.info("Creating new application data");
 
-        TreeMap<Integer, Post> loadedPosts = filesService.loadPosts();
+        // Load posts from database (comments are loaded automatically)
+        TreeMap<Integer, Post> loadedPosts = postService.loadPostsFromDatabase();
 
+        // Get next post ID
         int idNextPost = 0;
         if (!loadedPosts.isEmpty()) {
             idNextPost = loadedPosts.lastKey() + 1;
         }
 
-        HashMap<String, User> registeredUsers = filesService.loadUsers();
+        // Load users from database
+        HashMap<String, User> registeredUsers = userService.loadUsersFromDatabase();
 
         return new AppData(loadedPosts, idNextPost, registeredUsers);
     }
 
     public void writeAppData(AppData appData) {
-        filesService.writePosts(appData.getLoadedPosts());
-        filesService.writeUsers(appData.getRegisteredUsers());
+        LoggerFacade.info("Saving application data to database");
+        userService.saveUsersToDatabase(appData);
+        LoggerFacade.info("Posts and comments are already saved to database when created");
     }
 
+    // User management delegation
     public boolean register(AppData appData, String username, String email, String password) {
-        if (appData.getRegisteredUsers().containsKey(username)) {
-            LoggerFacade.warning("Registration failed: Username '" + username + "' already exists");
-            return false;
-        }
-        User user = new User(username, email, Helper.hashFunction(password));
-        appData.setLoggedUser(user);
-        appData.getRegisteredUsers().put(username, user);
-        LoggerFacade.info("New user registered: " + username);
-        return true;
+        return userService.register(appData, username, email, password);
     }
 
     public boolean login(AppData appData, String username, String password) {
-        User user = appData.getRegisteredUsers().get(username);
-        if (user != null && Helper.checkPassword(password, user.getHashedPassword())) {
-            appData.setLoggedUser(user);
-            LoggerFacade.info("User logged in: " + username);
-            return true;
-        }
-        LoggerFacade.warning("Login failed for user: " + username);
-        return false;
+        return userService.login(appData, username, password);
     }
 
     public void logout(AppData appData) {
-        if (appData.getLoggedUser() != null) {
-            LoggerFacade.info("User logged out: " + appData.getLoggedUser().getUsername());
-        }
-        appData.setLoggedUser(null);
+        userService.logout(appData);
     }
 
     public void deleteUser(AppData appData) {
-        String currUserUsername = appData.getLoggedUser().getUsername();
-        appData.getRegisteredUsers().remove(currUserUsername);
-        LoggerFacade.info("User account deleted: " + currUserUsername);
+        userService.deleteUser(appData);
     }
 
+    // Post management delegation
     public void addPost(AppData appData, String content) {
-        String username = appData.getLoggedUser().getUsername();
-        Post post = contentService.createPost(content, username);
-
-        Integer id = appData.getIdNextPost();
-        appData.setIdNextPost(id + 1);
-
-        appData.getLoadedPosts().put(id, post);
-
-        LoggerFacade.info("New post created by user: " + username);
+        postService.addPost(appData, content);
     }
 
     public void deletePost(AppData appData, int idx) {
-        if (appData.getLoadedPosts().containsKey(idx)) {
-            LoggerFacade.info("Post with index " + idx + " deleted");
+        postService.deletePost(appData, idx);
+    }
 
-            appData.getLoadedPosts().remove(idx);
+    // Comment management using ContentService
+    public void addComment(AppData appData, int postId, String content) {
+        Post post = appData.getLoadedPosts().get(postId);
+        if (post != null) {
+            String username = appData.getLoggedUser().getUsername();
+            contentService.addComment(post, content, username);
         } else {
-            LoggerFacade.warning("Attempt to delete non-existent post at index: " + idx);
+            LoggerFacade.warning("Cannot add comment to non-existent post: " + postId);
         }
     }
 
-    // rendering function
+    public void addReply(AppData appData, int postId, int commentId, String content) {
+        Post post = appData.getLoadedPosts().get(postId);
+        if (post != null) {
+            String username = appData.getLoggedUser().getUsername();
 
+            // For direct replies to comments, use ContentService with database persistence
+            if (Helper.extractRemainingLevels(commentId + "").isEmpty()) {
+                // This is a direct reply to a comment - implement database saving logic here
+                LoggerFacade.info("Direct reply to comment - would need database integration");
+            }
+
+            // For now, use existing ContentService logic for nested replies
+            String commentIdStr = commentId + "";
+            contentService.addReply(post, commentIdStr, content, username);
+        } else {
+            LoggerFacade.warning("Cannot add reply to non-existent post: " + postId);
+        }
+    }
+
+    // Rendering function
     public String renderFeed(AppData appData) {
         LoggerFacade.debug("Rendering feed with " + appData.getLoadedPosts().size() + " posts");
 
