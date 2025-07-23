@@ -221,25 +221,6 @@ public class PostRepository {
         }
     }
 
-    public Integer getNextId() {
-        String sql = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM posts";
-
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            if (rs.next()) {
-                return rs.getInt("next_id");
-            }
-
-        } catch (SQLException e) {
-            LoggerFacade.fatal("Error getting next post ID: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        return 1; // Default to 1 if no posts exist
-    }
-
     // Helper class to carry both database ID and Post object
     public static class PostWithId {
         private final Integer databaseId;

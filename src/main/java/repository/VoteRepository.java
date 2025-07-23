@@ -46,48 +46,6 @@ public class VoteRepository {
         }
     }
 
-    public int getPostUpvoteCount(Integer postId) {
-        String sql = "SELECT COUNT(*) FROM post_votes WHERE post_id = ? AND is_upvote = true";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, postId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-
-        } catch (SQLException e) {
-            LoggerFacade.fatal("Error getting post upvote count: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        return 0;
-    }
-
-    public int getPostDownvoteCount(Integer postId) {
-        String sql = "SELECT COUNT(*) FROM post_votes WHERE post_id = ? AND is_upvote = false";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, postId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-
-        } catch (SQLException e) {
-            LoggerFacade.fatal("Error getting post downvote count: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        return 0;
-    }
-
     // Comment voting methods
     public void addCommentUpvote(Integer commentId, String username) {
         String sql = "INSERT INTO comment_votes (comment_id, username, is_upvote) VALUES (?, ?, true) " +
@@ -125,48 +83,6 @@ public class VoteRepository {
             LoggerFacade.fatal("Error adding comment downvote: " + e.getMessage());
             throw new RuntimeException(e);
         }
-    }
-
-    public int getCommentUpvoteCount(Integer commentId) {
-        String sql = "SELECT COUNT(*) FROM comment_votes WHERE comment_id = ? AND is_upvote = true";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, commentId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-
-        } catch (SQLException e) {
-            LoggerFacade.fatal("Error getting comment upvote count: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        return 0;
-    }
-
-    public int getCommentDownvoteCount(Integer commentId) {
-        String sql = "SELECT COUNT(*) FROM comment_votes WHERE comment_id = ? AND is_upvote = false";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, commentId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-
-        } catch (SQLException e) {
-            LoggerFacade.fatal("Error getting comment downvote count: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        return 0;
     }
 
     // Methods to get vote lists (needed for loading votes into memory)
