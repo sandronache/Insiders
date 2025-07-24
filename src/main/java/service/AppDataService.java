@@ -5,28 +5,31 @@ import main.java.model.AppData;
 import main.java.model.Post;
 import main.java.model.User;
 import main.java.util.Helper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import main.java.repository.UserRepository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeMap;
 
+@Service
 public class AppDataService {
     private static AppDataService instance;
-    private final UserManagementService userService;
     private final PostManagementService postService;
     private final ContentService contentService;
+    private final AppData appData;
+    private final UserRepository userRepository;
 
-    private AppDataService() {
-        this.userService = UserManagementService.getInstance();
+    @Autowired
+    private AppDataService(UserRepository userRepository) {
+        this.userRepository = userRepository;
         this.postService = PostManagementService.getInstance();
         this.contentService = ContentService.getInstance();
+        this.appData = createAppData();
     }
 
-    public static AppDataService getInstance() {
-        if (instance == null) {
-            instance = new AppDataService();
-        }
-        return instance;
-    }
+    public AppData getAppData() { return this.appData; }
 
     public AppData createAppData() {
         LoggerFacade.info("Creating new application data");
@@ -41,33 +44,30 @@ public class AppDataService {
         }
 
         // Load users from database
-        HashMap<String, User> registeredUsers = userService.loadUsersFromDatabase();
+        HashMap<String, User> registeredUsers = loadUsersFromDatabase();
 
         return new AppData(loadedPosts, idNextPost, registeredUsers);
     }
 
-    public void writeAppData(AppData appData) {
-        LoggerFacade.info("Saving application data to database");
-        userService.saveUsersToDatabase(appData);
-        LoggerFacade.info("Posts and comments are already saved to database when created");
+    private HashMap<String, User> loadUsersFromDatabase() {
+        HashMap<String, User> users = new HashMap<>();
+
+        try {
+            List<User> userList = userRepository.findAll();
+
+            for (User user : userList) {
+                users.put(user.getUsername(), user);
+            }
+
+            LoggerFacade.info("Loaded " + userList.size() + " users from database");
+        } catch (Exception e) {
+            LoggerFacade.warning("Could not load users from database: " + e.getMessage());
+            LoggerFacade.info("Starting with empty user list");
+        }
+
+        return users;
     }
 
-    // User management delegation
-    public boolean register(AppData appData, String username, String email, String password) {
-        return userService.register(appData, username, email, password);
-    }
-
-    public boolean login(AppData appData, String username, String password) {
-        return userService.login(appData, username, password);
-    }
-
-    public void logout(AppData appData) {
-        userService.logout(appData);
-    }
-
-    public void deleteUser(AppData appData) {
-        userService.deleteUser(appData);
-    }
 
     // Post management delegation
     public void addPost(AppData appData, String content) {

@@ -1,12 +1,14 @@
 package main.java.service;
 
 import main.java.logger.LoggerFacade;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 
 /**
  * Service responsible for managing mappings between interface IDs and database IDs
  */
+@Service
 public class DatabaseMappingService {
     private static DatabaseMappingService instance;
 

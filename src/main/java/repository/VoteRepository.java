@@ -4,7 +4,9 @@ import main.java.util.DBConnection;
 import main.java.logger.LoggerFacade;
 
 import java.sql.*;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class VoteRepository {
 
     // Post voting methods

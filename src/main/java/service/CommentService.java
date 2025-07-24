@@ -7,10 +7,12 @@ import main.java.model.Vote;
 import main.java.repository.CommentRepository;
 import main.java.repository.VoteRepository;
 import main.java.util.Helper;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.TreeMap;
 
+@Service
 public class CommentService {
     private static CommentService instance;
     private final VotingService votingService;

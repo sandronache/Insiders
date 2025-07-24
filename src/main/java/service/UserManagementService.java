@@ -7,48 +7,27 @@ import main.java.model.Post;
 import main.java.model.User;
 import main.java.repository.UserRepository;
 import main.java.util.Helper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Service responsible for user management operations
  */
-public class UserManagementService {
-    private static UserManagementService instance;
-    private final UserRepository userRepository;
 
-    private UserManagementService() {
+@Service
+public class UserManagementService {
+    private final UserRepository userRepository;
+    private final AppDataService appDataService;
+
+    @Autowired
+    private UserManagementService(AppDataService appDataService) {
+        this.appDataService = appDataService;
         this.userRepository = new UserRepository();
     }
 
-    public static UserManagementService getInstance() {
-        if (instance == null) {
-            instance = new UserManagementService();
-        }
-        return instance;
-    }
-
-    public HashMap<String, User> loadUsersFromDatabase() {
-        HashMap<String, User> users = new HashMap<>();
-
-        try {
-            List<User> userList = userRepository.findAll();
-
-            for (User user : userList) {
-                users.put(user.getUsername(), user);
-            }
-
-            LoggerFacade.info("Loaded " + userList.size() + " users from database");
-        } catch (Exception e) {
-            LoggerFacade.warning("Could not load users from database: " + e.getMessage());
-            LoggerFacade.info("Starting with empty user list");
-        }
-
-        return users;
-    }
 
     public boolean register(AppData appData, String username, String email, String password) {
         // Check in database first
@@ -125,7 +104,7 @@ public class UserManagementService {
         }
         appData.setLoggedUser(null);
     }
-    //TODO: ask mentor runtime vs database
+    //TODO: userdummy (com and posts appear deleted instead of being deleted properly) -> all references to dummy
     public void deleteUser(AppData appData) {
         String currUserUsername = appData.getLoggedUser().getUsername();
         appData.getRegisteredUsers().remove(currUserUsername);
@@ -156,18 +135,7 @@ public class UserManagementService {
             }
         }
     }
-    public void saveUsersToDatabase(AppData appData) {
-        try {
-            for (User user : appData.getRegisteredUsers().values()) {
-                if (!userRepository.existsByUsername(user.getUsername())) {
-                    userRepository.save(user);
-                }
-            }
-            LoggerFacade.info("Users saved to database successfully");
-        } catch (Exception e) {
-            LoggerFacade.warning("Could not save users to database: " + e.getMessage());
-        }
-    }
+
     private void deleteComment(Comment comment, String username) {
         if (comment.getUsername().equals(username)) {
             comment.setIsDeleted(true); // contentul devine "[deleted]"
@@ -185,3 +153,4 @@ public class UserManagementService {
         }
     }
 }
+

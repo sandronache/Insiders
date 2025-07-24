@@ -8,11 +8,13 @@ import main.java.repository.CommentRepository;
 import main.java.repository.PostRepository;
 import main.java.repository.VoteRepository;
 import main.java.util.Helper;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
 
+@Service
 public class ContentService {
     private static ContentService instance;
     private final VotingService votingService;

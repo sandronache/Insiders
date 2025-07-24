@@ -3,9 +3,11 @@ package main.java.service;
 import main.java.logger.LoggerFacade;
 import main.java.model.Vote;
 import main.java.repository.VoteRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+@Service
 public class VotingService {
     private static VotingService instance;
 

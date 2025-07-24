@@ -1,17 +1,21 @@
 package main.java;
 
-import main.java.app.AppInterface;
-import main.java.app.CLIInterface;
+// import main.java.app.AppInterface;
+//  main.java.app.CLIInterface;
 import main.java.logger.FileLogger;
 import main.java.logger.ILogger;
 import main.java.logger.LoggerFacade;
 import main.java.service.*;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringApplication;
 
 import java.util.Objects;
 
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        final String loggerLocation = Objects.isNull(System.getenv("IS_DEV"))? "/mnt/resources/application.log" : "resources/application.log";
+        SpringApplication.run(Main.class, args);
+        final String loggerLocation = Objects.isNull(System.getenv("IS_DEV"))? "/mnt/resources/application.log" : "src/main/resources/application.log";
 
         //ILogger consoleLogger = new ConsoleLogger();
         ILogger fileLogger = new FileLogger(loggerLocation);
@@ -42,11 +46,10 @@ public class Main {
         VotingService.getInstance();
         CommentService.getInstance();
         ContentService contentService = ContentService.getInstance();
-        AppDataService appDataService = AppDataService.getInstance();
 
-        AppInterface app = new CLIInterface(contentService, appDataService);
-        LoggerFacade.info("Starting application interface");
-        app.run();
-        LoggerFacade.info("Application shutting down");
+        // AppInterface app = new CLIInterface(contentService, appDataService);
+        // LoggerFacade.info("Starting application interface");
+        // app.run();
+        // LoggerFacade.info("Application shutting down");
     }
 }

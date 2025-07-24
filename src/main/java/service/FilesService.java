@@ -6,6 +6,7 @@ import main.java.model.Post;
 import main.java.model.User;
 import main.java.model.Vote;
 import main.java.util.Constants;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -14,6 +15,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+@Service
 public class FilesService {
 
     private static FilesService instance;

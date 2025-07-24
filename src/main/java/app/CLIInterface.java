@@ -1,3 +1,4 @@
+/*
 package main.java.app;
 
 import main.java.logger.LoggerFacade;
@@ -14,7 +15,6 @@ import java.util.TreeMap;
 public class CLIInterface implements AppInterface {
     private ContentService contentService;
     private AppDataService appDataService;
-    private AppData appData;
     private boolean isAppOn;
     private final Scanner input = new Scanner(System.in);
 
@@ -22,14 +22,13 @@ public class CLIInterface implements AppInterface {
                         AppDataService appDataService) {
         this.contentService = contentService;
         this.appDataService = appDataService;
-        appData = appDataService.createAppData();
         isAppOn = true;
 
         LoggerFacade.debug("CLIInterface initialized");
     }
 
     private void deleteCurrentUser() {
-        LoggerFacade.info("User deletion initiated for: " + appData.getLoggedUser().getUsername());
+        LoggerFacade.info("User deletion initiated for: " + appDataService.getAppData().getUsername());
 
         appDataService.deleteUser(appData);
         appDataService.logout(appData);
@@ -665,3 +664,4 @@ public class CLIInterface implements AppInterface {
         }
     }
 }
+*/

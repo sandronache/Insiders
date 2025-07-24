@@ -4,11 +4,13 @@ import main.java.model.Comment;
 import main.java.model.Vote;
 import main.java.util.DBConnection;
 import main.java.logger.LoggerFacade;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class CommentRepository {
 
     public Integer save(Comment comment, Integer postId, Integer parentCommentId) {

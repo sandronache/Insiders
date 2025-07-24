@@ -2,6 +2,7 @@ package main.java.service;
 
 import main.java.util.DBConnection;
 import main.java.logger.LoggerFacade;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+@Service
 public class DatabaseInitService {
 
     private static DatabaseInitService instance;

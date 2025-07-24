@@ -4,6 +4,7 @@ import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
 import main.java.model.Post;
 import main.java.repository.PostRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -11,6 +12,8 @@ import java.util.TreeMap;
 /**
  * Service responsible for post management operations
  */
+
+@Service
 public class PostManagementService {
     private static PostManagementService instance;
     private final PostRepository postRepository;
