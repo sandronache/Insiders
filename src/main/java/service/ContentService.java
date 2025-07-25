@@ -45,12 +45,6 @@ public class ContentService {
         return new Post(defaultTitle, content, username, defaultSubreddit);
     }
 
-    // New method for creating posts with all required fields
-    public Post createPost(String title, String content, String username, String subreddit) {
-        LoggerFacade.debug("Creating new post for user: " + username + " in subreddit: " + subreddit);
-
-        return new Post(title, content, username, subreddit);
-    }
 
     private UUID findPostIdByContent(String content) {
         // This is a helper method to find post ID by content
