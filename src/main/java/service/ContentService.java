@@ -5,14 +5,13 @@ import main.java.model.Comment;
 import main.java.model.Post;
 import main.java.model.Vote;
 import main.java.repository.CommentRepository;
-import main.java.repository.PostRepository;
 import main.java.repository.VoteRepository;
 import main.java.util.Helper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.TreeMap;
+import java.util.UUID;
 
 @Service
 public class ContentService {
@@ -20,14 +19,12 @@ public class ContentService {
     private final VotingService votingService;
     private final CommentService commentService;
     private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
 
     private ContentService(VotingService votingService,
                             CommentService commentService) {
         this.votingService = votingService;
         this.commentService = commentService;
         this.commentRepository = new CommentRepository();
-        this.postRepository = new PostRepository();
     }
 
     public static ContentService getInstance() {
@@ -41,46 +38,21 @@ public class ContentService {
     public Post createPost(String content, String username) {
         LoggerFacade.debug("Creating new post for user: " + username);
 
-        return new Post(content, username, votingService.createVote());
+        // For legacy compatibility, use default values for new fields
+        String defaultTitle = content.length() > 50 ? content.substring(0, 50) + "..." : content;
+        String defaultSubreddit = "general";
+
+        return new Post(defaultTitle, content, username, defaultSubreddit);
     }
 
-    public void addComment(Post post, String content, String username) {
-        LoggerFacade.debug("Adding comment to post by user: " + username);
+    // New method for creating posts with all required fields
+    public Post createPost(String title, String content, String username, String subreddit) {
+        LoggerFacade.debug("Creating new post for user: " + username + " in subreddit: " + subreddit);
 
-        // Find the post ID from database by content (since Post model doesn't have ID)
-        Optional<Post> dbPost = postRepository.findByContent(post.getContent());
-        if (dbPost.isEmpty()) {
-            LoggerFacade.warning("Post not found in database, cannot add comment");
-            return;
-        }
-
-        // Create the comment
-        Comment comment = commentService.createComment(content, username);
-
-        // Get the post ID from database - we need to add a method to get the ID
-        // For now, let's assume we can get it somehow. In a real scenario, Post should have an ID field
-        Integer postId = findPostIdByContent(post.getContent());
-        if (postId == null) {
-            LoggerFacade.warning("Could not determine post ID for adding comment");
-            return;
-        }
-
-        // Save comment to database (null for parentCommentId since this is a top-level comment)
-        Integer commentId = commentRepository.save(comment, postId, null);
-
-        if (commentId != null) {
-            // Also update the in-memory structure for consistency
-            Integer id = post.getIdNextComment();
-            post.setIdNextComment(id + 1);
-            post.getComments().put(id, comment);
-
-            LoggerFacade.info("Comment added successfully with ID: " + commentId);
-        } else {
-            LoggerFacade.error("Failed to save comment to database");
-        }
+        return new Post(title, content, username, subreddit);
     }
 
-    private Integer findPostIdByContent(String content) {
+    private UUID findPostIdByContent(String content) {
         // This is a helper method to find post ID by content
         // In a real application, Post should have an ID field
         String sql = "SELECT id FROM posts WHERE content = ?";
@@ -92,7 +64,7 @@ public class ContentService {
             java.sql.ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                return rs.getInt("id");
+                return (UUID) rs.getObject("id");
             }
 
         } catch (java.sql.SQLException e) {
@@ -106,7 +78,7 @@ public class ContentService {
         LoggerFacade.info("Deleting comment/reply with ID: " + id);
 
         // Get post ID from database
-        Integer postId = findPostIdByContent(post.getContent());
+        UUID postId = findPostIdByContent(post.getContent());
         if (postId == null) {
             LoggerFacade.warning("Could not determine post ID for deleting comment");
             return;
@@ -143,7 +115,7 @@ public class ContentService {
         LoggerFacade.info("Adding reply to comment ID: " + id + " by user: " + username);
 
         // Get post ID from database
-        Integer postId = findPostIdByContent(post.getContent());
+        UUID postId = findPostIdByContent(post.getContent());
         if (postId == null) {
             LoggerFacade.warning("Could not determine post ID for adding reply");
             return false;
@@ -225,7 +197,7 @@ public class ContentService {
         }
     }
 
-    private Integer findCommentIdByIndex(Integer postId, Integer commentIndex) {
+    private Integer findCommentIdByIndex(UUID postId, Integer commentIndex) {
         // Helper method to find the database comment ID by post ID and comment index
         // This is a workaround since we're using TreeMap indices in memory
         String sql = "SELECT id FROM comments WHERE post_id = ? AND parent_comment_id IS NULL ORDER BY created_at LIMIT 1 OFFSET ?";
@@ -233,7 +205,7 @@ public class ContentService {
         try (java.sql.Connection conn = main.java.util.DBConnection.getConnection();
              java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             stmt.setInt(2, commentIndex);
             java.sql.ResultSet rs = stmt.executeQuery();
 
@@ -281,7 +253,7 @@ public class ContentService {
         votingService.addUpvote(post.getVote(), username);
 
         // Also save to database and update emoji status
-        Integer postId = findPostIdByContent(post.getContent());
+        UUID postId = findPostIdByContent(post.getContent());
         if (postId != null) {
             VoteRepository voteRepository = new VoteRepository();
             voteRepository.addPostUpvote(postId, username);
@@ -300,7 +272,7 @@ public class ContentService {
         votingService.addDownvote(post.getVote(), username);
 
         // Also save to database and update emoji status
-        Integer postId = findPostIdByContent(post.getContent());
+        UUID postId = findPostIdByContent(post.getContent());
         if (postId != null) {
             VoteRepository voteRepository = new VoteRepository();
             voteRepository.addPostDownvote(postId, username);
@@ -376,7 +348,7 @@ public class ContentService {
     }
 
     // Load votes from database into memory objects
-    public void loadVotesForPost(Post post, Integer postId) {
+    public void loadVotesForPost(Post post, UUID postId) {
         try {
             VoteRepository voteRepository = new VoteRepository();
 

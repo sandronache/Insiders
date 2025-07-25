@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Service responsible for user management operations
@@ -110,9 +111,9 @@ public class UserManagementService {
         appData.getRegisteredUsers().remove(currUserUsername);
         userRepository.deleteByUsername(currUserUsername);
         LoggerFacade.info("User account deleted: " + currUserUsername);
-        Iterator<Map.Entry<Integer, Post>> iterator = appData.getLoadedPosts().entrySet().iterator();
+        Iterator<Map.Entry<UUID, Post>> iterator = appData.getLoadedPosts().entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<Integer, Post> entry = iterator.next();
+            Map.Entry<UUID, Post> entry = iterator.next();
             Post post = entry.getValue();
             if (post.getUsername().equals(currUserUsername)) {
                 iterator.remove();

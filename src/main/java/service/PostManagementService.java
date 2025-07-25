@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.TreeMap;
+import java.util.UUID;
 
 /**
  * Service responsible for post management operations
@@ -29,35 +30,32 @@ public class PostManagementService {
         this.commentService = commentService;
     }
 
-    public TreeMap<Integer, Post> loadPostsFromDatabase() {
-        TreeMap<Integer, Post> posts = new TreeMap<>();
+    public TreeMap<UUID, Post> loadPostsFromDatabase() {
+        TreeMap<UUID, Post> posts = new TreeMap<>();
 
         try {
-            List<PostRepository.PostWithId> postsWithIds = postRepository.findAllOrderedByDateWithIds();
+            // Use the new JPA method to get all posts ordered by creation date
+            List<Post> allPosts = postRepository.findAllByOrderByCreatedAtDesc();
 
-            int index = 0;
-            for (PostRepository.PostWithId postWithId : postsWithIds) {
-                Post post = postWithId.getPost();
-                Integer databaseId = postWithId.getDatabaseId();
+            for (Post post : allPosts) {
+                posts.put(post.getId(), post);
 
-                posts.put(index, post);
-                mappingService.storePostMapping(index, databaseId);
+                // Store mapping using the post's UUID (optional, if needed)
+                mappingService.storePostMapping(post.getId(), post.getId());
 
                 // Load comments for this post
-                commentService.loadCommentsForPost(post, databaseId);
+                commentService.loadCommentsForPost(post, post.getId());
 
                 // Load votes for this post
-                contentService.loadVotesForPost(post, databaseId);
+                contentService.loadVotesForPost(post, post.getId());
 
                 // Load votes for all comments in this post
-                post.getComments().forEach((commentId, comment) -> {
-                    commentService.loadVotesForComment(comment);
-                });
-
-                index++;
+                post.getComments().forEach((commentId, comment) ->
+                        commentService.loadVotesForComment(comment)
+                );
             }
 
-            LoggerFacade.info("Loaded " + postsWithIds.size() + " posts from database");
+            LoggerFacade.info("Loaded " + allPosts.size() + " posts from database");
         } catch (Exception e) {
             LoggerFacade.warning("Could not load posts from database: " + e.getMessage());
             LoggerFacade.info("Starting with empty posts list");
@@ -79,17 +77,16 @@ public class PostManagementService {
             LoggerFacade.warning("Could not check for duplicate posts: " + e.getMessage());
         }
 
+        // Create post using the legacy method (with default title and subreddit)
         Post post = contentService.createPost(content, username);
-        Integer id = appData.getIdNextPost();
-        appData.setIdNextPost(id + 1);
 
         // Add to in-memory data
-        appData.getLoadedPosts().put(id, post);
+        appData.getLoadedPosts().put(post.getId(), post);
 
         // Save to database immediately
         try {
             postRepository.save(post);
-            LoggerFacade.info("Post saved to database immediately: " + id);
+            LoggerFacade.info("Post saved to database immediately: " + post.getId());
         } catch (Exception e) {
             LoggerFacade.warning("Could not save post to database immediately: " + e.getMessage());
         }
@@ -97,7 +94,36 @@ public class PostManagementService {
         LoggerFacade.info("New post created by user: " + username);
     }
 
-    public void deletePost(AppData appData, int idx) {
+    // New method for creating posts with all fields (for API compatibility)
+    public void addPost(AppData appData, String title, String content, String username, String subreddit) {
+        // Check for duplicates
+        try {
+            if (postExistsInDatabase(content, username)) {
+                LoggerFacade.warning("Post with same content already exists, skipping save");
+                return;
+            }
+        } catch (Exception e) {
+            LoggerFacade.warning("Could not check for duplicate posts: " + e.getMessage());
+        }
+
+        // Create post using the new method with all fields
+        Post post = contentService.createPost(title, content, username, subreddit);
+
+        // Add to in-memory data
+        appData.getLoadedPosts().put(post.getId(), post);
+
+        // Save to database immediately
+        try {
+            postRepository.save(post);
+            LoggerFacade.info("Post saved to database immediately: " + post.getId());
+        } catch (Exception e) {
+            LoggerFacade.warning("Could not save post to database immediately: " + e.getMessage());
+        }
+
+        LoggerFacade.info("New post created by user: " + username + " in subreddit: " + subreddit);
+    }
+
+    public void deletePost(AppData appData, UUID idx) {
         Post post = appData.getLoadedPosts().get(idx);
         String currentUser = appData.getLoggedUser().getUsername();
 
@@ -117,7 +143,7 @@ public class PostManagementService {
 
     private boolean postExistsInDatabase(String content, String username) {
         try {
-            List<Post> existingPosts = postRepository.findByUsername(username);
+            List<Post> existingPosts = postRepository.findByUsernameOrderByCreatedAtDesc(username);
             return existingPosts.stream()
                     .anyMatch(post -> post.getContent().equals(content));
         } catch (Exception e) {

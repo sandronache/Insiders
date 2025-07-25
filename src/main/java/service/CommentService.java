@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.TreeMap;
+import java.util.UUID;
 
 @Service
 public class CommentService {
@@ -214,7 +215,7 @@ public class CommentService {
                 renderComment(reply, sb, depth + 1, id + '.' + idReply));
     }
 
-    public void loadCommentsForPost(Post post, Integer databasePostId) {
+    public void loadCommentsForPost(Post post, UUID databasePostId) {
         LoggerFacade.debug("Loading comments for post ID: " + databasePostId);
 
         try {
@@ -228,7 +229,7 @@ public class CommentService {
             for (Comment comment : dbComments) {
                 comments.put(commentIndex, comment);
 
-                loadDirectRepliesForComment(comment, databasePostId);
+                loadDirectRepliesForComment(comment, comment.getDatabaseId());
 
                 commentIndex++;
             }
@@ -243,11 +244,11 @@ public class CommentService {
         }
     }
 
-    private void loadDirectRepliesForComment(Comment parentComment, Integer commentIndex) {
+    private void loadDirectRepliesForComment(Comment parentComment, Integer commentDatabaseId) {
         try {
             loadAllRepliesForPost(parentComment);
 
-            LoggerFacade.debug("Loaded replies for comment at index: " + commentIndex);
+            LoggerFacade.debug("Loaded replies for comment at index: " + commentDatabaseId);
 
         } catch (Exception e) {
             LoggerFacade.warning("Could not load replies for comment: " + e.getMessage());

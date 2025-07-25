@@ -12,6 +12,7 @@ import main.java.repository.UserRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.UUID;
 
 @Service
 public class AppDataService {
@@ -34,13 +35,10 @@ public class AppDataService {
         LoggerFacade.info("Creating new application data");
 
         // Load posts from database (comments are loaded automatically)
-        TreeMap<Integer, Post> loadedPosts = postService.loadPostsFromDatabase();
+        TreeMap<UUID, Post> loadedPosts = postService.loadPostsFromDatabase();
 
-        // Get next post ID
+        // idNextPost nu mai este relevant cu UUID, setăm la 0 sau null
         int idNextPost = 0;
-        if (!loadedPosts.isEmpty()) {
-            idNextPost = loadedPosts.lastKey() + 1;
-        }
 
         // Load users from database
         HashMap<String, User> registeredUsers = loadUsersFromDatabase();

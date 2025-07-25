@@ -2,14 +2,15 @@ package main.java.model;
 
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 public class AppData {
     private HashMap<String, User> registeredUsers;
     private User loggedUser;
     private Integer idNextPost;
-    private TreeMap<Integer, Post> loadedPosts;
+    private TreeMap<UUID, Post> loadedPosts;
 
-    public AppData(TreeMap<Integer, Post> loadedPosts,
+    public AppData(TreeMap<UUID, Post> loadedPosts,
                    Integer idNextPost,
                    HashMap<String, User> registeredUsers) {
         this.registeredUsers = registeredUsers;
@@ -36,7 +37,7 @@ public class AppData {
         idNextPost = id;
     }
 
-    public TreeMap<Integer, Post> getLoadedPosts() {
+    public TreeMap<UUID, Post> getLoadedPosts() {
         return loadedPosts;
     }
 }
