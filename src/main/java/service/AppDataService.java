@@ -15,17 +15,16 @@ import java.util.TreeMap;
 
 @Service
 public class AppDataService {
-    private static AppDataService instance;
     private final PostManagementService postService;
     private final ContentService contentService;
     private final AppData appData;
     private final UserRepository userRepository;
 
     @Autowired
-    private AppDataService(UserRepository userRepository) {
+    private AppDataService(UserRepository userRepository, PostManagementService postService, ContentService contentService) {
         this.userRepository = userRepository;
-        this.postService = PostManagementService.getInstance();
-        this.contentService = ContentService.getInstance();
+        this.postService = postService;
+        this.contentService = contentService;
         this.appData = createAppData();
     }
 
@@ -68,7 +67,8 @@ public class AppDataService {
         return users;
     }
 
-
+    // FOR CLI INTERFACE
+/*
     // Post management delegation
     public void addPost(AppData appData, String content) {
         postService.addPost(appData, content);
@@ -120,4 +120,5 @@ public class AppDataService {
 
         return feed.toString();
     }
+    */
 }

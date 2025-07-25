@@ -3,6 +3,7 @@ package main.java.controller;
 import main.java.model.Post;
 import main.java.repository.PostRepository;
 import main.java.service.PostManagementService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,29 +13,31 @@ import java.util.Optional;
 @RequestMapping("/api/posts")
 public class PostController {
 
-    private final PostRepository postRepository = new PostRepository();
-    private final PostManagementService postManagementService = PostManagementService.getInstance();
+    private final PostRepository postRepository;
+    private final PostManagementService postManagementService;
 
-    // Get all posts ordered by date
+    @Autowired
+    public PostController(PostRepository postRepository, PostManagementService postManagementService) {
+        this.postRepository = postRepository;
+        this.postManagementService = postManagementService;
+    }
+
     @GetMapping
     public List<Post> getAllPosts() {
         return postRepository.findAllOrderedByDate();
     }
 
-    // Create a new post
     @PostMapping
     public Post createPost(@RequestBody Post post) {
         postRepository.save(post);
         return post;
     }
 
-    // Delete a post by its database ID
     @DeleteMapping("/{postId}")
     public void deletePost(@PathVariable Integer postId) {
         postRepository.deleteById(postId);
     }
 
-    // Get a post by its database ID
     @GetMapping("/{postId}")
     public Post getPostById(@PathVariable Integer postId) {
         Optional<Post> post = postRepository.findById(postId);

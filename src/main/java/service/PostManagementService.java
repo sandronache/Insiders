@@ -4,6 +4,7 @@ import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
 import main.java.model.Post;
 import main.java.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,22 +16,17 @@ import java.util.TreeMap;
 
 @Service
 public class PostManagementService {
-    private static PostManagementService instance;
     private final PostRepository postRepository;
     private final ContentService contentService;
     private final DatabaseMappingService mappingService;
+    private final CommentService commentService;
 
-    private PostManagementService() {
-        this.postRepository = new PostRepository();
-        this.contentService = ContentService.getInstance();
-        this.mappingService = DatabaseMappingService.getInstance();
-    }
-
-    public static PostManagementService getInstance() {
-        if (instance == null) {
-            instance = new PostManagementService();
-        }
-        return instance;
+    @Autowired
+    public PostManagementService(PostRepository postRepository, ContentService contentService, DatabaseMappingService mappingService, CommentService commentService) {
+        this.postRepository = postRepository;
+        this.contentService = contentService;
+        this.mappingService = mappingService;
+        this.commentService = commentService;
     }
 
     public TreeMap<Integer, Post> loadPostsFromDatabase() {
@@ -48,11 +44,9 @@ public class PostManagementService {
                 mappingService.storePostMapping(index, databaseId);
 
                 // Load comments for this post
-                CommentService commentService = CommentService.getInstance();
                 commentService.loadCommentsForPost(post, databaseId);
 
                 // Load votes for this post
-                ContentService contentService = ContentService.getInstance();
                 contentService.loadVotesForPost(post, databaseId);
 
                 // Load votes for all comments in this post
