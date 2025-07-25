@@ -1,46 +1,51 @@
 package main.java.controller;
 
 import main.java.model.Post;
-import main.java.repository.PostRepository;
+import main.java.service.AppDataService;
 import main.java.service.PostManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
 
-    private final PostRepository postRepository;
     private final PostManagementService postManagementService;
+    private final AppDataService appDataService;
 
     @Autowired
-    public PostController(PostRepository postRepository, PostManagementService postManagementService) {
-        this.postRepository = postRepository;
+    public PostController(PostManagementService postManagementService, AppDataService appDataService) {
         this.postManagementService = postManagementService;
+        this.appDataService = appDataService;
     }
 
     @GetMapping
     public List<Post> getAllPosts() {
-        return postRepository.findAllOrderedByDate();
+        return appDataService.getAppData().getLoadedPosts().values().stream().toList();
     }
 
     @PostMapping
-    public Post createPost(@RequestBody Post post) {
-        postRepository.save(post);
-        return post;
+    public String createPost(@RequestParam String content) {
+        if (appDataService.getAppData().getLoggedUser() == null) {
+            return "No user logged in";
+        }
+        postManagementService.addPost(appDataService.getAppData(), content);
+        return "Post created successfully";
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@PathVariable Integer postId) {
-        postRepository.deleteById(postId);
+    public String deletePost(@PathVariable Integer postId) {
+        if (appDataService.getAppData().getLoggedUser() == null) {
+            return "No user logged in";
+        }
+        postManagementService.deletePost(appDataService.getAppData(), postId);
+        return "Post deleted successfully";
     }
 
     @GetMapping("/{postId}")
     public Post getPostById(@PathVariable Integer postId) {
-        Optional<Post> post = postRepository.findById(postId);
-        return post.orElse(null);
+        return appDataService.getAppData().getLoadedPosts().get(postId);
     }
 }
