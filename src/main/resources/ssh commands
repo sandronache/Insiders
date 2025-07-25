@@ -1,0 +1,11 @@
+1. For database (Mihnea) and storage:
+
+Use insiders2025.pem
+
+ssh -i "insiders2025.pem" ec2-user@ec2-63-176-52-116.eu-central-1.compute.amazonaws.com
+
+2. For backend (Cristi):
+
+Use insiders2025.pem
+
+ssh -i "insiders2.pem" ubuntu@ec2-3-74-161-90.eu-central-1.compute.amazonaws.com
