@@ -30,13 +30,6 @@ public class AppData {
         this.loggedUser = loggedUser;
     }
 
-    public Integer getIdNextPost() {
-        return idNextPost;
-    }
-    public void setIdNextPost(Integer id) {
-        idNextPost = id;
-    }
-
     public TreeMap<UUID, Post> getLoadedPosts() {
         return loadedPosts;
     }

@@ -4,7 +4,6 @@ import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
 import main.java.model.Post;
 import main.java.model.User;
-import main.java.util.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import main.java.repository.UserRepository;

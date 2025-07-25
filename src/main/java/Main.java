@@ -30,7 +30,7 @@ public class Main {
         SpringApplication.run(Main.class, args);
 
         // Initialize database instead of FilesService
-        DatabaseInitService databaseInitService = DatabaseInitService.getInstance();
+        //DatabaseInitService databaseInitService = DatabaseInitService.getInstance();
 
 //        // Test database connection and initialize schema
 //        if (!databaseInitService.testConnection()) {

@@ -94,53 +94,6 @@ public class PostManagementService {
         LoggerFacade.info("New post created by user: " + username);
     }
 
-    // New method for creating posts with all fields (for API compatibility)
-    public void addPost(AppData appData, String title, String content, String username, String subreddit) {
-        // Check for duplicates
-        try {
-            if (postExistsInDatabase(content, username)) {
-                LoggerFacade.warning("Post with same content already exists, skipping save");
-                return;
-            }
-        } catch (Exception e) {
-            LoggerFacade.warning("Could not check for duplicate posts: " + e.getMessage());
-        }
-
-        // Create post using the new method with all fields
-        Post post = contentService.createPost(title, content, username, subreddit);
-
-        // Add to in-memory data
-        appData.getLoadedPosts().put(post.getId(), post);
-
-        // Save to database immediately
-        try {
-            postRepository.save(post);
-            LoggerFacade.info("Post saved to database immediately: " + post.getId());
-        } catch (Exception e) {
-            LoggerFacade.warning("Could not save post to database immediately: " + e.getMessage());
-        }
-
-        LoggerFacade.info("New post created by user: " + username + " in subreddit: " + subreddit);
-    }
-
-    public void deletePost(AppData appData, UUID idx) {
-        Post post = appData.getLoadedPosts().get(idx);
-        String currentUser = appData.getLoggedUser().getUsername();
-
-        if (post == null) {
-            LoggerFacade.warning("No post at index " + idx);
-            return;
-        }
-
-        if (!post.getUsername().equals(currentUser)) {
-            LoggerFacade.warning("Unauthorized deletion attempt by " + currentUser);
-            return;
-        }
-
-        appData.getLoadedPosts().remove(idx);
-        LoggerFacade.info("Post " + idx + " deleted by owner " + currentUser);
-    }
-
     private boolean postExistsInDatabase(String content, String username) {
         try {
             List<Post> existingPosts = postRepository.findByUsernameOrderByCreatedAtDesc(username);

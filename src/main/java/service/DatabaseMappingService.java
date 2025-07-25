@@ -18,25 +18,10 @@ public class DatabaseMappingService {
 
     private DatabaseMappingService() {}
 
-    public static DatabaseMappingService getInstance() {
-        if (instance == null) {
-            instance = new DatabaseMappingService();
-        }
-        return instance;
-    }
-
     // Post mapping methods
     public void storePostMapping(UUID interfaceId, UUID databaseId) {
         postInterfaceToDbIdMap.put(interfaceId, databaseId);
         LoggerFacade.debug("Post mapping stored: " + interfaceId + " -> " + databaseId);
     }
 
-    public UUID getPostDatabaseId(UUID interfaceId) {
-        return postInterfaceToDbIdMap.get(interfaceId);
-    }
-
-    public void removePostMapping(UUID interfaceId) {
-        postInterfaceToDbIdMap.remove(interfaceId);
-        LoggerFacade.debug("Post mapping removed: " + interfaceId);
-    }
 }
