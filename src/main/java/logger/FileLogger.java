@@ -11,6 +11,11 @@ public class FileLogger implements ILogger {
     private final String logFile;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    @Override
+    public void log(String message) {
+        writeToFile("INFO", message);
+    }
+
     public FileLogger(String logFile) {
         this.logFile = logFile;
     }

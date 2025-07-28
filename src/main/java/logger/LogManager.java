@@ -1,12 +1,15 @@
 package main.java.logger;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 
 public class LogManager {
     private static final LogManager instance = new LogManager();
-
-    private final List<ILogger> loggers = new ArrayList<>();
+    private final List<ILogger> loggers = new CopyOnWriteArrayList<>();
+    private final LoggerThread loggerThread = new LoggerThread();
+    private LogManager() {
+        loggerThread.start();
+    }
 
     public static LogManager getInstance() {
         return instance;
@@ -20,33 +23,19 @@ public class LogManager {
         loggers.remove(logger);
     }
 
-    public void logDebug(String message) {
+    private void log(String level, String message) {
+        String formatted = "[" + level + "] " + message;
+        loggerThread.log(formatted);
+        // multiple logging outputs (file, console)
         for (ILogger logger : loggers) {
-            logger.logDebug(message);
+            logger.log(formatted);
         }
     }
 
-    public void logInfo(String message) {
-        for (ILogger logger : loggers) {
-            logger.logInfo(message);
-        }
-    }
-
-    public void logWarning(String message) {
-        for (ILogger logger : loggers) {
-            logger.logWarning(message);
-        }
-    }
-
-    public void logError(String message) {
-        for (ILogger logger : loggers) {
-            logger.logError(message);
-        }
-    }
-
-    public void logFatal(String message) {
-        for (ILogger logger : loggers) {
-            logger.logFatal(message);
-        }
-    }
+    public void logDebug(String message) { log("DEBUG", message); }
+    public void logInfo(String message) { log("INFO", message); }
+    public void logWarning(String message) { log("WARNING", message); }
+    public void logError(String message) { log("ERROR", message); }
+    public void logFatal(String message) { log("FATAL", message); }
+    public void shutdown() { loggerThread.shutdown(); }
 }
