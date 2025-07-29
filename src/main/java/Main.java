@@ -55,5 +55,7 @@ public class Main {
         // LoggerFacade.info("Starting application interface");
         // app.run();
         // LoggerFacade.info("Application shutting down");
+
+        LoggerFacade.shutdown();
     }
 }
