@@ -1,6 +1,10 @@
 package main.java.service;
 
+import main.java.dto.post.PostResponseDto;
+import main.java.dto.post.PostUpdateRequestDto;
+import main.java.exceptions.PostNotFoundException;
 import main.java.logger.LoggerFacade;
+import main.java.mapper.PostMapper;
 import main.java.model.AppData;
 import main.java.model.Post;
 import main.java.repository.PostRepository;
@@ -8,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -111,5 +116,42 @@ public class PostManagementService {
         }
         return postRepository.findAllByOrderByCreatedAtDesc();
     }
+
+    public Post createPost(String title, String content, String author, String subreddit) {
+        Post post = new Post(title, content, author, subreddit);
+        return postRepository.save(post);
+    }
+
+    public PostResponseDto updatePost(UUID id, PostUpdateRequestDto requestDto) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + id + " nu a fost gasita."));
+
+        if (requestDto.title() != null && !requestDto.title().isBlank()) {
+            post.setTitle(requestDto.title());
+        }
+
+        if (requestDto.content() != null && !requestDto.content().isBlank()) {
+            post.setContent(requestDto.content());
+        }
+
+        postRepository.save(post);
+        return PostMapper.postToDto(post);
+    }
+
+
+    public void deletePostById(UUID postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new PostNotFoundException("Postarea nu a fost gasita");
+        }
+
+        postRepository.deleteById(postId);
+        LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
+    }
+
+    public Post getPostById(UUID postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost găsită"));
+    }
+
 
 }
