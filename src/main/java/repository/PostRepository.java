@@ -15,6 +15,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
     // Find all posts ordered by creation date
     List<Post> findAllByOrderByCreatedAtDesc();
+    List<Post> findBySubredditOrderByCreatedAtDesc(String subreddit);
 
 
     @Query ("SELECT p FROM Post p WHERE p.username = :username ORDER BY p.createdAt DESC")

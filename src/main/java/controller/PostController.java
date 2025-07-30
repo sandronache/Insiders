@@ -1,6 +1,8 @@
 package main.java.controller;
 
+import main.java.dto.post.PostResponseDto;
 import main.java.logger.LoggerFacade;
+import main.java.mapper.PostMapper;
 import main.java.model.Post;
 import main.java.service.AppDataService;
 import main.java.service.PostManagementService;
@@ -36,15 +38,18 @@ public class PostController {
         LoggerFacade.info("- POST /api/posts/test-simple");
     }
 
-    @GetMapping("/posts")
-    public List<Post> getAllPosts() {
-        LoggerFacade.info("GET /api/posts called");
-        return postRepository.findAllByOrderByCreatedAtDesc();
-    }// Alternative mapping with trailing slash for GET
-    @GetMapping("/posts/")
-    public List<Post> getAllPostsWithSlash() {
-        LoggerFacade.info("GET /api/posts/ called (with trailing slash)");
-        return getAllPosts();
+    @GetMapping()
+    public ResponseEntity<Map<String, Object>> getAllPosts(@RequestParam(required = false) String subreddit) {
+        LoggerFacade.info("GET /posts called");
+
+        List<Post> posts = postManagementService.getAllPosts(subreddit);
+        List<PostResponseDto> dtos = posts.stream().map(PostMapper::postToDto).toList();
+        Map<String, Object> response = new HashMap<>();
+        response.put("succes",true);
+        response.put("data",dtos);
+
+        return ResponseEntity.ok(response);
+
     }
 
     // New endpoint matching frontend API specification - simplified version

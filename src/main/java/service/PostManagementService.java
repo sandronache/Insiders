@@ -104,4 +104,12 @@ public class PostManagementService {
             return false;
         }
     }
+
+    public List<Post> getAllPosts(String subreddit) {
+        if (subreddit != null && !subreddit.trim().isEmpty()) {
+            return postRepository.findBySubredditOrderByCreatedAtDesc(subreddit.trim());
+        }
+        return postRepository.findAllByOrderByCreatedAtDesc();
+    }
+
 }
