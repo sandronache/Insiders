@@ -1,5 +1,6 @@
 main\java\logger\ILogger.class
 main\java\repository\PostRepository$PostWithId.class
+main\java\exceptions\PostNotFoundException.class
 main\java\repository\VoteRepository.class
 main\java\Main.class
 main\java\controller\WelcomeController.class
@@ -18,9 +19,9 @@ main\java\service\VotingService.class
 main\java\logger\LoggerFacade.class
 main\java\service\ContentService.class
 main\java\mapper\PostMapper.class
-main\java\controller\PostController$PostCreateRequest.class
 main\java\dto\post\PostResponseDto.class
 main\java\dto\post\PostCreateRequestDto.class
+main\java\dto\post\PostUpdateRequestDto.class
 main\java\app\AppInterface.class
 main\java\logger\AsyncLogManager.class
 main\java\repository\PostRepository.class

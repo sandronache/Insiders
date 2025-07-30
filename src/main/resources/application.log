@@ -94,3 +94,48 @@
 2025-07-29 00:56:20 INFO: - POST /api/post/{postId}/downvote
 2025-07-29 00:56:20 INFO: - POST /api/comment/{commentId}/upvote
 2025-07-29 00:56:20 INFO: - POST /api/comment/{commentId}/downvote
+2025-07-30 16:20:32 INFO: new version
+2025-07-30 16:20:32 INFO: Application starting up
+2025-07-30 16:20:39 INFO: Creating new application data
+2025-07-30 16:20:39 DEBUG: Post mapping stored: be89748d-7683-4035-87d0-59a157a1e84c -> be89748d-7683-4035-87d0-59a157a1e84c
+2025-07-30 16:20:39 DEBUG: Loading comments for post ID: be89748d-7683-4035-87d0-59a157a1e84c
+2025-07-30 16:20:39 INFO: Loaded 0 comments for post
+2025-07-30 16:20:40 WARNING: Error loading votes for post: Cannot invoke "main.java.model.Vote.getUpvote()" because "vote" is null
+2025-07-30 16:20:40 DEBUG: Post mapping stored: 94cae80b-6223-4803-beda-9b564e3e1191 -> 94cae80b-6223-4803-beda-9b564e3e1191
+2025-07-30 16:20:40 DEBUG: Loading comments for post ID: 94cae80b-6223-4803-beda-9b564e3e1191
+2025-07-30 16:20:40 INFO: Loaded 0 comments for post
+2025-07-30 16:20:41 WARNING: Error loading votes for post: Cannot invoke "main.java.model.Vote.getUpvote()" because "vote" is null
+2025-07-30 16:20:41 DEBUG: Post mapping stored: d8c15dec-f46d-4ba8-9cd7-c8a72b787ad4 -> d8c15dec-f46d-4ba8-9cd7-c8a72b787ad4
+2025-07-30 16:20:41 DEBUG: Loading comments for post ID: d8c15dec-f46d-4ba8-9cd7-c8a72b787ad4
+2025-07-30 16:20:41 INFO: Loaded 0 comments for post
+2025-07-30 16:20:42 WARNING: Error loading votes for post: Cannot invoke "main.java.model.Vote.getUpvote()" because "vote" is null
+2025-07-30 16:20:42 DEBUG: Post mapping stored: a0c8e1a9-05e0-436a-8a0d-6d0ac498a00d -> a0c8e1a9-05e0-436a-8a0d-6d0ac498a00d
+2025-07-30 16:20:42 DEBUG: Loading comments for post ID: a0c8e1a9-05e0-436a-8a0d-6d0ac498a00d
+2025-07-30 16:20:43 INFO: Loaded 0 comments for post
+2025-07-30 16:20:43 WARNING: Error loading votes for post: Cannot invoke "main.java.model.Vote.getUpvote()" because "vote" is null
+2025-07-30 16:20:43 DEBUG: Post mapping stored: ae027fa3-736c-49de-84c3-1f37292390f6 -> ae027fa3-736c-49de-84c3-1f37292390f6
+2025-07-30 16:20:43 DEBUG: Loading comments for post ID: ae027fa3-736c-49de-84c3-1f37292390f6
+2025-07-30 16:20:44 INFO: Loaded 0 comments for post
+2025-07-30 16:20:44 WARNING: Error loading votes for post: Cannot invoke "main.java.model.Vote.getUpvote()" because "vote" is null
+2025-07-30 16:20:44 DEBUG: Post mapping stored: dc0c4f19-25a6-4b36-b076-b8df4d36bf65 -> dc0c4f19-25a6-4b36-b076-b8df4d36bf65
+2025-07-30 16:20:44 DEBUG: Loading comments for post ID: dc0c4f19-25a6-4b36-b076-b8df4d36bf65
+2025-07-30 16:20:45 INFO: Loaded 0 comments for post
+2025-07-30 16:20:45 WARNING: Error loading votes for post: Cannot invoke "main.java.model.Vote.getUpvote()" because "vote" is null
+2025-07-30 16:20:45 DEBUG: Post mapping stored: daccb118-d5d4-4788-a1a5-7ec212f09927 -> daccb118-d5d4-4788-a1a5-7ec212f09927
+2025-07-30 16:20:45 DEBUG: Loading comments for post ID: daccb118-d5d4-4788-a1a5-7ec212f09927
+2025-07-30 16:20:46 INFO: Loaded 0 comments for post
+2025-07-30 16:20:46 WARNING: Error loading votes for post: Cannot invoke "main.java.model.Vote.getUpvote()" because "vote" is null
+2025-07-30 16:20:46 DEBUG: Post mapping stored: 5bade457-2c10-4aaa-88b9-7017b517a4aa -> 5bade457-2c10-4aaa-88b9-7017b517a4aa
+2025-07-30 16:20:46 DEBUG: Loading comments for post ID: 5bade457-2c10-4aaa-88b9-7017b517a4aa
+2025-07-30 16:20:47 INFO: Loaded 0 comments for post
+2025-07-30 16:20:47 WARNING: Error loading votes for post: Cannot invoke "main.java.model.Vote.getUpvote()" because "vote" is null
+2025-07-30 16:20:47 INFO: Loaded 8 posts from database
+2025-07-30 16:20:48 INFO: Loaded 1 users from database
+2025-07-30 16:20:48 INFO: PostController initialized with endpoints:
+2025-07-30 16:20:48 INFO: - GET /posts
+2025-07-30 16:20:48 INFO: - POST /posts
+2025-07-30 16:20:48 INFO: VoteController initialized with endpoints:
+2025-07-30 16:20:48 INFO: - POST /api/post/{postId}/upvote
+2025-07-30 16:20:48 INFO: - POST /api/post/{postId}/downvote
+2025-07-30 16:20:48 INFO: - POST /api/comment/{commentId}/upvote
+2025-07-30 16:20:48 INFO: - POST /api/comment/{commentId}/downvote

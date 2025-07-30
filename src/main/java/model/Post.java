@@ -2,10 +2,8 @@ package main.java.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -36,7 +34,7 @@ public class Post {
 
     @Column(nullable = false)
     private Integer downvotes = 0;
-    
+
     @JsonProperty("score")
     @Transient
     private Integer score; // Calculated as upvotes - downvotes

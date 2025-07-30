@@ -7,6 +7,8 @@ C:\Users\Bogdan\Insiders\src\main\java\controller\VoteController.java
 C:\Users\Bogdan\Insiders\src\main\java\controller\WelcomeController.java
 C:\Users\Bogdan\Insiders\src\main\java\dto\post\PostCreateRequestDto.java
 C:\Users\Bogdan\Insiders\src\main\java\dto\post\PostResponseDto.java
+C:\Users\Bogdan\Insiders\src\main\java\dto\post\PostUpdateRequestDto.java
+C:\Users\Bogdan\Insiders\src\main\java\exceptions\PostNotFoundException.java
 C:\Users\Bogdan\Insiders\src\main\java\logger\AsyncLogManager.java
 C:\Users\Bogdan\Insiders\src\main\java\logger\ConsoleLogger.java
 C:\Users\Bogdan\Insiders\src\main\java\logger\FileLogger.java
