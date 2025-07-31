@@ -24,7 +24,7 @@ public class User {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     public User() {}
 
@@ -46,5 +46,5 @@ public class User {
         return hashedPassword;
     }
 
-    public LocalDateTime getCreatedAt() {return created_at;}
+    public LocalDateTime getCreatedAt() {return createdAt;}
 }

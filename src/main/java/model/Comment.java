@@ -1,63 +1,81 @@
 package main.java.model;
 
+import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 import java.util.TreeMap;
+import java.util.UUID;
 
+@Entity
+@Table(name = "comments")
 public class Comment {
-    private Integer databaseId; // ID-ul din baza de date
-    private final String content;
-    private final String username;
-    private final Vote vote;
-    private Integer idNextReply;
-    private final TreeMap<Integer, Comment> replies;
-    private boolean isDeleted;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private UUID id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String content;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "username")
+    private User user;
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    public Comment(String content, String username, Vote vote) {
-        this.databaseId = null; // Va fi setat când se salvează/încarcă din DB
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    public Comment() {
+    }
+
+    public Comment(UUID id, Post post, Comment parentComment, String content, User user) {
+        this.id = id;
+        this.post = post;
+        this.parentComment = parentComment;
         this.content = content;
-        this.username = username;
-        this.vote = vote;
-        this.idNextReply = 0;
-        this.replies = new TreeMap<>();
+        this.user = user;
         this.isDeleted = false;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    // Getter și setter pentru database ID
-    public Integer getDatabaseId() {
-        return databaseId;
+    public UUID getId() {
+        return id;
     }
 
-    public void setDatabaseId(Integer databaseId) {
-        this.databaseId = databaseId;
+    public Post getPost() {
+        return post;
+    }
+
+    public Comment getParentComment() {
+        return parentComment;
     }
 
     public String getContent() {
-        if (isDeleted) return "[deleted]";
-        else return content;
+        return content;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public Vote getVote() {
-        return vote;
-    }
-
-    public Integer getIdNextReply() {
-        return idNextReply;
-    }
-    public void setIdNextReply(Integer id) {
-        this.idNextReply = id;
-    }
-
-    public TreeMap<Integer, Comment> getReplies() {
-        return replies;
+    public User getUser() {
+        return user;
     }
 
     public boolean isDeleted() {
         return isDeleted;
     }
-    public void setIsDeleted(boolean value) {
-        isDeleted = value;
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }
