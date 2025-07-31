@@ -18,10 +18,6 @@ create table posts
         references users
             on delete cascade,
     subreddit       varchar(100)            not null,
-    upvotes         integer     default 1   not null,
-    downvotes       integer     default 0   not null,
-    comment_count   integer     default 0   not null,
-    id_next_comment integer     default 0   not null,
     created_at      timestamp   default CURRENT_TIMESTAMP not null,
     updated_at      timestamp   default CURRENT_TIMESTAMP not null
 );
@@ -55,9 +51,6 @@ create table comments
     username          varchar(255)            not null
         references users
             on delete cascade,
-    upvotes           integer     default 0   not null,
-    downvotes         integer     default 0   not null,
-    id_next_reply     integer     default 0   not null,
     is_deleted        boolean     default false not null,
     created_at        timestamp   default CURRENT_TIMESTAMP not null,
     updated_at        timestamp   default CURRENT_TIMESTAMP not null
@@ -75,10 +68,15 @@ create index idx_comments_username
 create index idx_comments_score
     on comments ((upvotes - downvotes) desc);
 
-create table post_votes
+create table votes
 (
+    id   serial
+        primary key,
     post_id    uuid         not null
         references posts
+            on delete cascade,
+    comment_id Comment
+        references comments
             on delete cascade,
     username   varchar(255) not null
         references users
@@ -91,18 +89,7 @@ create table post_votes
 create index idx_post_votes_post_id
     on post_votes (post_id);
 
-create table comment_votes
-(
-    comment_id integer      not null
-        references comments
-            on delete cascade,
-    username   varchar(255) not null
-        references users
-            on delete cascade,
-    is_upvote  boolean      not null,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    primary key (comment_id, username)
-);
+
 
 create index idx_comment_votes_comment_id
     on comment_votes (comment_id);
