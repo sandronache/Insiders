@@ -1,13 +1,20 @@
 package main.java.service;
 
+import main.java.dto.post.PostResponseDto;
+import main.java.dto.post.PostUpdateRequestDto;
+import main.java.exceptions.PostNotFoundException;
 import main.java.logger.LoggerFacade;
+import main.java.mapper.PostMapper;
 import main.java.model.AppData;
 import main.java.model.Post;
 import main.java.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeMap;
+import java.util.UUID;
 
 /**
  * Service responsible for post management operations
@@ -15,55 +22,45 @@ import java.util.TreeMap;
 
 @Service
 public class PostManagementService {
-    private static PostManagementService instance;
     private final PostRepository postRepository;
     private final ContentService contentService;
     private final DatabaseMappingService mappingService;
+    private final CommentService commentService;
 
-    private PostManagementService() {
-        this.postRepository = new PostRepository();
-        this.contentService = ContentService.getInstance();
-        this.mappingService = DatabaseMappingService.getInstance();
+    @Autowired
+    public PostManagementService(PostRepository postRepository, ContentService contentService, DatabaseMappingService mappingService, CommentService commentService) {
+        this.postRepository = postRepository;
+        this.contentService = contentService;
+        this.mappingService = mappingService;
+        this.commentService = commentService;
     }
 
-    public static PostManagementService getInstance() {
-        if (instance == null) {
-            instance = new PostManagementService();
-        }
-        return instance;
-    }
-
-    public TreeMap<Integer, Post> loadPostsFromDatabase() {
-        TreeMap<Integer, Post> posts = new TreeMap<>();
+    public TreeMap<UUID, Post> loadPostsFromDatabase() {
+        TreeMap<UUID, Post> posts = new TreeMap<>();
 
         try {
-            List<PostRepository.PostWithId> postsWithIds = postRepository.findAllOrderedByDateWithIds();
+            // Use the new JPA method to get all posts ordered by creation date
+            List<Post> allPosts = postRepository.findAllByOrderByCreatedAtDesc();
 
-            int index = 0;
-            for (PostRepository.PostWithId postWithId : postsWithIds) {
-                Post post = postWithId.getPost();
-                Integer databaseId = postWithId.getDatabaseId();
+            for (Post post : allPosts) {
+                posts.put(post.getId(), post);
 
-                posts.put(index, post);
-                mappingService.storePostMapping(index, databaseId);
+                // Store mapping using the post's UUID (optional, if needed)
+                mappingService.storePostMapping(post.getId(), post.getId());
 
                 // Load comments for this post
-                CommentService commentService = CommentService.getInstance();
-                commentService.loadCommentsForPost(post, databaseId);
+                commentService.loadCommentsForPost(post, post.getId());
 
                 // Load votes for this post
-                ContentService contentService = ContentService.getInstance();
-                contentService.loadVotesForPost(post, databaseId);
+                contentService.loadVotesForPost(post, post.getId());
 
                 // Load votes for all comments in this post
-                post.getComments().forEach((commentId, comment) -> {
-                    commentService.loadVotesForComment(comment);
-                });
-
-                index++;
+                post.getComments().forEach((commentId, comment) ->
+                        commentService.loadVotesForComment(comment)
+                );
             }
 
-            LoggerFacade.info("Loaded " + postsWithIds.size() + " posts from database");
+            LoggerFacade.info("Loaded " + allPosts.size() + " posts from database");
         } catch (Exception e) {
             LoggerFacade.warning("Could not load posts from database: " + e.getMessage());
             LoggerFacade.info("Starting with empty posts list");
@@ -85,17 +82,16 @@ public class PostManagementService {
             LoggerFacade.warning("Could not check for duplicate posts: " + e.getMessage());
         }
 
+        // Create post using the legacy method (with default title and subreddit)
         Post post = contentService.createPost(content, username);
-        Integer id = appData.getIdNextPost();
-        appData.setIdNextPost(id + 1);
 
         // Add to in-memory data
-        appData.getLoadedPosts().put(id, post);
+        appData.getLoadedPosts().put(post.getId(), post);
 
         // Save to database immediately
         try {
             postRepository.save(post);
-            LoggerFacade.info("Post saved to database immediately: " + id);
+            LoggerFacade.info("Post saved to database immediately: " + post.getId());
         } catch (Exception e) {
             LoggerFacade.warning("Could not save post to database immediately: " + e.getMessage());
         }
@@ -103,27 +99,9 @@ public class PostManagementService {
         LoggerFacade.info("New post created by user: " + username);
     }
 
-    public void deletePost(AppData appData, int idx) {
-        Post post = appData.getLoadedPosts().get(idx);
-        String currentUser = appData.getLoggedUser().getUsername();
-
-        if (post == null) {
-            LoggerFacade.warning("No post at index " + idx);
-            return;
-        }
-
-        if (!post.getUsername().equals(currentUser)) {
-            LoggerFacade.warning("Unauthorized deletion attempt by " + currentUser);
-            return;
-        }
-
-        appData.getLoadedPosts().remove(idx);
-        LoggerFacade.info("Post " + idx + " deleted by owner " + currentUser);
-    }
-
     private boolean postExistsInDatabase(String content, String username) {
         try {
-            List<Post> existingPosts = postRepository.findByUsername(username);
+            List<Post> existingPosts = postRepository.findByUsernameOrderByCreatedAtDesc(username);
             return existingPosts.stream()
                     .anyMatch(post -> post.getContent().equals(content));
         } catch (Exception e) {
@@ -131,4 +109,49 @@ public class PostManagementService {
             return false;
         }
     }
+
+    public List<Post> getAllPosts(String subreddit) {
+        if (subreddit != null && !subreddit.trim().isEmpty()) {
+            return postRepository.findBySubredditOrderByCreatedAtDesc(subreddit.trim());
+        }
+        return postRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public Post createPost(String title, String content, String author, String subreddit) {
+        Post post = new Post(title, content, author, subreddit);
+        return postRepository.save(post);
+    }
+
+    public PostResponseDto updatePost(UUID id, PostUpdateRequestDto requestDto) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + id + " nu a fost gasita."));
+
+        if (requestDto.title() != null && !requestDto.title().isBlank()) {
+            post.setTitle(requestDto.title());
+        }
+
+        if (requestDto.content() != null && !requestDto.content().isBlank()) {
+            post.setContent(requestDto.content());
+        }
+
+        postRepository.save(post);
+        return PostMapper.postToDto(post);
+    }
+
+
+    public void deletePostById(UUID postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new PostNotFoundException("Postarea nu a fost gasita");
+        }
+
+        postRepository.deleteById(postId);
+        LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
+    }
+
+    public Post getPostById(UUID postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost găsită"));
+    }
+
+
 }

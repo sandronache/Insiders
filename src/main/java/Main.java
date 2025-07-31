@@ -14,8 +14,9 @@ import java.util.Objects;
 @SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
-        final String loggerLocation = Objects.isNull(System.getenv("IS_DEV"))? "/mnt/resources/application.log" : "src/main/resources/application.log";
+        // Initialize logging BEFORE Spring Boot starts
+        final String loggerLocation = Objects.isNull(System.getenv("IS_DEV")) ?
+            "src/main/resources/application.log" : "src/main/resources/application.log";
 
         //ILogger consoleLogger = new ConsoleLogger();
         ILogger fileLogger = new FileLogger(loggerLocation);
@@ -25,8 +26,11 @@ public class Main {
         LoggerFacade.info("new version");
         LoggerFacade.info("Application starting up");
 
+        // Now start Spring Boot
+        SpringApplication.run(Main.class, args);
+
         // Initialize database instead of FilesService
-        DatabaseInitService databaseInitService = DatabaseInitService.getInstance();
+        //DatabaseInitService databaseInitService = DatabaseInitService.getInstance();
 
 //        // Test database connection and initialize schema
 //        if (!databaseInitService.testConnection()) {
@@ -51,5 +55,7 @@ public class Main {
         // LoggerFacade.info("Starting application interface");
         // app.run();
         // LoggerFacade.info("Application shutting down");
+
+        LoggerFacade.shutdown();
     }
 }

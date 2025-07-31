@@ -4,20 +4,22 @@ import main.java.util.DBConnection;
 import main.java.logger.LoggerFacade;
 
 import java.sql.*;
+import java.util.UUID;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class VoteRepository {
 
     // Post voting methods
-    public void addPostUpvote(Integer postId, String username) {
+    public void addPostUpvote(UUID postId, String username) {
         String sql = "INSERT INTO post_votes (post_id, username, is_upvote) VALUES (?, ?, true) " +
                     "ON CONFLICT (post_id, username) DO UPDATE SET is_upvote = true";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             stmt.setString(2, username);
             stmt.executeUpdate();
 
@@ -29,14 +31,14 @@ public class VoteRepository {
         }
     }
 
-    public void addPostDownvote(Integer postId, String username) {
+    public void addPostDownvote(UUID postId, String username) {
         String sql = "INSERT INTO post_votes (post_id, username, is_upvote) VALUES (?, ?, false) " +
                     "ON CONFLICT (post_id, username) DO UPDATE SET is_upvote = false";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             stmt.setString(2, username);
             stmt.executeUpdate();
 
@@ -88,14 +90,14 @@ public class VoteRepository {
     }
 
     // Methods to get vote lists (needed for loading votes into memory)
-    public java.util.List<String> getPostUpvotes(Integer postId) {
+    public java.util.List<String> getPostUpvotes(UUID postId) {
         java.util.List<String> upvotes = new java.util.ArrayList<>();
         String sql = "SELECT username FROM post_votes WHERE post_id = ? AND is_upvote = true";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -110,14 +112,14 @@ public class VoteRepository {
         return upvotes;
     }
 
-    public java.util.List<String> getPostDownvotes(Integer postId) {
+    public java.util.List<String> getPostDownvotes(UUID postId) {
         java.util.List<String> downvotes = new java.util.ArrayList<>();
         String sql = "SELECT username FROM post_votes WHERE post_id = ? AND is_upvote = false";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -177,14 +179,14 @@ public class VoteRepository {
     }
 
     // Emoji persistence methods
-    public void setPostEmojiFlag(Integer postId, boolean isEmoji) {
+    public void setPostEmojiFlag(UUID postId, boolean isEmoji) {
         String sql = "INSERT INTO post_emoji_flags (post_id, is_emoji) VALUES (?, ?) " +
                     "ON CONFLICT (post_id) DO UPDATE SET is_emoji = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             stmt.setBoolean(2, isEmoji);
             stmt.setBoolean(3, isEmoji);
             stmt.executeUpdate();
@@ -217,13 +219,13 @@ public class VoteRepository {
         }
     }
 
-    public boolean getPostEmojiFlag(Integer postId) {
+    public boolean getPostEmojiFlag(UUID postId) {
         String sql = "SELECT is_emoji FROM post_emoji_flags WHERE post_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {

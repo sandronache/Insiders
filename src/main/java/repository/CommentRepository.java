@@ -9,18 +9,19 @@ import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class CommentRepository {
 
-    public Integer save(Comment comment, Integer postId, Integer parentCommentId) {
+    public Integer save(Comment comment, UUID postId, Integer parentCommentId) {
         String sql = "INSERT INTO comments (post_id, parent_comment_id, content, username, id_next_reply, is_deleted) " +
                     "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             if (parentCommentId != null) {
                 stmt.setInt(2, parentCommentId);
             } else {
@@ -46,7 +47,7 @@ public class CommentRepository {
         return null;
     }
 
-    public List<Comment> findByPostId(Integer postId) {
+    public List<Comment> findByPostId(UUID postId) {
         List<Comment> comments = new ArrayList<>();
         String sql = "SELECT id, post_id, parent_comment_id, content, username, id_next_reply, is_deleted, created_at " +
                     "FROM comments WHERE post_id = ? AND parent_comment_id IS NULL ORDER BY created_at";
@@ -54,7 +55,7 @@ public class CommentRepository {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -108,6 +109,27 @@ public class CommentRepository {
         }
 
         return replies;
+    }
+
+    public UUID getPostIdByCommentId(Integer commentId) {
+        String sql = "SELECT post_id FROM comments WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, commentId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return (UUID) rs.getObject("post_id");
+            }
+
+        } catch (SQLException e) {
+            LoggerFacade.fatal("Error getting post ID by comment ID: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return null;
     }
 
     public void markAsDeleted(Integer id) {
@@ -204,7 +226,7 @@ public class CommentRepository {
         return comments;
     }
 
-    public List<Comment> findAllByPostId(Integer postId) {
+    public List<Comment> findAllByPostId(UUID postId) {
         List<Comment> comments = new ArrayList<>();
         String sql = "SELECT id, post_id, parent_comment_id, content, username, id_next_reply, is_deleted, created_at " +
                     "FROM comments WHERE post_id = ? ORDER BY created_at";
@@ -212,7 +234,7 @@ public class CommentRepository {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, postId);
+            stmt.setObject(1, postId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {

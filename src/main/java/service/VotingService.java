@@ -6,6 +6,7 @@ import main.java.repository.VoteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class VotingService {
@@ -46,7 +47,7 @@ public class VotingService {
     }
 
     // New method to check emoji and sync with database for posts
-    public void checkEmojiForPost(Vote vote, Integer postId) {
+    public void checkEmojiForPost(Vote vote, UUID postId) {
         int upvotesSize = getUpvoteCount(vote);
         int downvotesSize = getDownvoteCount(vote);
         boolean wasEmoji = vote.isEmoji();
@@ -98,7 +99,7 @@ public class VotingService {
     }
 
     // Load emoji status from database into memory
-    public void loadEmojiFromDatabase(Vote vote, Integer postId, Integer commentId) {
+    public void loadEmojiFromDatabase(Vote vote, UUID postId, Integer commentId) {
         try {
             VoteRepository voteRepository = new VoteRepository();
             boolean databaseEmoji = false;

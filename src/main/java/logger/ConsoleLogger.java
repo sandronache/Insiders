@@ -3,6 +3,11 @@ package main.java.logger;
 public class ConsoleLogger implements ILogger {
 
     @Override
+    public void log(String message) {
+        System.out.println(message);
+    }
+
+    @Override
     public void logDebug(String message) {
         System.out.println("DEBUG: " + message);
     }

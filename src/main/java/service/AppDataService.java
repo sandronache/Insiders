@@ -4,7 +4,6 @@ import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
 import main.java.model.Post;
 import main.java.model.User;
-import main.java.util.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import main.java.repository.UserRepository;
@@ -12,20 +11,20 @@ import main.java.repository.UserRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.UUID;
 
 @Service
 public class AppDataService {
-    private static AppDataService instance;
     private final PostManagementService postService;
     private final ContentService contentService;
     private final AppData appData;
     private final UserRepository userRepository;
 
     @Autowired
-    private AppDataService(UserRepository userRepository) {
+    private AppDataService(UserRepository userRepository, PostManagementService postService, ContentService contentService) {
         this.userRepository = userRepository;
-        this.postService = PostManagementService.getInstance();
-        this.contentService = ContentService.getInstance();
+        this.postService = postService;
+        this.contentService = contentService;
         this.appData = createAppData();
     }
 
@@ -35,13 +34,10 @@ public class AppDataService {
         LoggerFacade.info("Creating new application data");
 
         // Load posts from database (comments are loaded automatically)
-        TreeMap<Integer, Post> loadedPosts = postService.loadPostsFromDatabase();
+        TreeMap<UUID, Post> loadedPosts = postService.loadPostsFromDatabase();
 
-        // Get next post ID
+        // idNextPost nu mai este relevant cu UUID, setăm la 0 sau null
         int idNextPost = 0;
-        if (!loadedPosts.isEmpty()) {
-            idNextPost = loadedPosts.lastKey() + 1;
-        }
 
         // Load users from database
         HashMap<String, User> registeredUsers = loadUsersFromDatabase();
@@ -68,7 +64,8 @@ public class AppDataService {
         return users;
     }
 
-
+    // FOR CLI INTERFACE
+/*
     // Post management delegation
     public void addPost(AppData appData, String content) {
         postService.addPost(appData, content);
@@ -120,4 +117,5 @@ public class AppDataService {
 
         return feed.toString();
     }
+    */
 }

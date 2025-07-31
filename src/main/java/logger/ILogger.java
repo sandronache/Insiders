@@ -2,6 +2,8 @@ package main.java.logger;
 
 public interface ILogger {
 
+    void log(String message);
+
     void logDebug(String message);
 
     void logInfo(String message);
