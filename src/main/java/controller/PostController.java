@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import main.java.dto.comment.CommentCreateRequestDto;
 import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.post.*;
-import main.java.entity.Comment;
 import main.java.entity.Post;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;

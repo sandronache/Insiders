@@ -2,10 +2,13 @@ package main.java.service;
 
 import main.java.dto.comment.CommentCreateRequestDto;
 import main.java.dto.comment.CommentResponseDto;
+import main.java.dto.comment.CommentUpdateRequestDto;
+import main.java.dto.comment.VoteResponseDto;
 import main.java.entity.Comment;
 import main.java.entity.Post;
 import main.java.entity.User;
 import main.java.entity.Vote;
+import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.NotFoundException;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.CommentMapper;
@@ -34,7 +37,7 @@ public class CommentService {
         this.userManagementService = userManagementService;
     }
 
-
+    //de pastrat la refactor
     public List<CommentResponseDto> getCommentsForPost(UUID postId) {
         List<Comment> allComments = commentRepository.findByPostId(postId);
 
@@ -47,6 +50,8 @@ public class CommentService {
                 .toList();
     }
 
+
+    //de pastrat la refactor
     public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request){
         Post post = postManagementService.getPostById(postId);
         User user =userManagementService.findByUsername(request.author());
@@ -63,6 +68,53 @@ public class CommentService {
         return commentMapper.toDto(savedComment,List.of());
     }
 
+
+    //de pastrat la refactor
+    public CommentResponseDto getCommentWithReplies(UUID commentId){
+        Comment mainComment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
+        List<Comment> allComments = commentRepository.findByPostId(mainComment.getPost().getId());
+
+        return commentMapper.toDto(mainComment,allComments);
+    }
+
+
+    //de pastrat la refactor
+    public CommentResponseDto updateComment(UUID commentId, CommentUpdateRequestDto request){
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
+
+        comment.setContent(request.content());
+        Comment updatedComment = commentRepository.save(comment);
+        return commentMapper.toDto(updatedComment,List.of());
+    }
+
+    //de pastrat la refactor
+    public void deleteComment(UUID commentId){
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new NotFoundException("Comentariul nu a fost gasit"));
+        commentRepository.delete(comment);
+    }
+
+
+    //de pastrat la refactor  !! De modificat in VotingService
+    public VoteResponseDto voteComment(UUID commentId, String voteType, String username) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Comentariul nu a fost găsit"));
+
+        User user = userManagementService.findByUsername(username);
+
+        switch (voteType.toLowerCase()) {
+            case "up" -> votingService.createVote(user.getId(), null, comment.getId(), true);
+            case "down" -> votingService.createVote(user.getId(), null, comment.getId(), false);
+            case "none" -> votingService.deleteVoteForComment(comment, user);
+            default -> throw new InvalidVoteTypeException("Tipul de vot este invalid: " + voteType);
+        }
+
+        int upvotes = votingService.countUpvotesForComment(comment.getId());
+        int downvotes = votingService.countDownvotesForComment(comment.getId());
+        int score = upvotes - downvotes;
+        String userVote = votingService.getVoteTypeForUser(comment, user);
+
+        return new VoteResponseDto(upvotes, downvotes, score, userVote);
+    }
 
 
 

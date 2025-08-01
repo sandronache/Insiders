@@ -30,7 +30,7 @@ public class UserManagementService {
         this.userRepository = userRepository;
     }
 
-
+    //de pastrat la refactor
     public User findByUsername(String username){
         return userRepository.findByUsername(username).orElseThrow(() -> new UnauthorizedException("Utilizatorul"+ username + "nu a fost gasit"));
     }

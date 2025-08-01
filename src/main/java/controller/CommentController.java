@@ -1,50 +1,51 @@
 package main.java.controller;
 
-import main.java.entity.Comment;
-import main.java.repository.CommentRepository;
+import main.java.dto.comment.CommentResponseDto;
+import main.java.dto.comment.CommentUpdateRequestDto;
+import main.java.dto.comment.VoteRequestDto;
+import main.java.dto.comment.VoteResponseDto;
+import main.java.entity.User;
 import main.java.service.CommentService;
+import main.java.service.UserManagementService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/comments")
 public class CommentController {
+    public final CommentService commentService;
+    private final UserManagementService userService;
 
-    private final CommentService commentService = CommentService.getInstance();
-    private final CommentRepository commentRepository = new CommentRepository();
-
-    // Get all top-level comments for a post
-    @GetMapping("/post/{postId}")
-    public List<Comment> getCommentsByPost(@PathVariable UUID postId) {
-        return commentRepository.findByPostId(postId);
+    public CommentController(CommentService commentService, UserManagementService userService) {
+        this.commentService = commentService;
+        this.userService = userService;
     }
 
-    // Add a new top-level comment to a post
-    @PostMapping("/post/{postId}")
-    public Comment addComment(@PathVariable UUID postId, @RequestBody Comment comment) {
-        // Save comment in DB
-        Integer commentId = commentRepository.save(comment, postId, null);
-        comment.setDatabaseId(commentId);
-        return comment;
+    @GetMapping("/{commentId}")
+    public ResponseEntity<ResponseApi<CommentResponseDto>> getCommentWithReplies(@PathVariable UUID commentId){
+        CommentResponseDto response = commentService.getCommentWithReplies(commentId);
+        return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
-    // Add a reply to a comment
-    @PostMapping("/{parentCommentId}/reply")
-    public Comment addReply(@PathVariable Integer parentCommentId, @RequestBody Comment reply) {
-        // Get the post ID from the parent comment
-        UUID postId = commentRepository.getPostIdByCommentId(parentCommentId);
-
-        // Save reply in DB
-        Integer replyId = commentRepository.save(reply, postId, parentCommentId);
-        reply.setDatabaseId(replyId);
-        return reply;
+    @PutMapping("/{commentId}")
+    public ResponseEntity<ResponseApi<CommentResponseDto>> updateComment(@PathVariable UUID commentId, @RequestBody CommentUpdateRequestDto request){
+        CommentResponseDto response = commentService.updateComment(commentId,request);
+        return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
-    // Mark a comment as deleted
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@PathVariable Integer commentId) {
-        commentRepository.markAsDeleted(commentId);
+    public ResponseEntity<ResponseApi<String>> deleteComment(@PathVariable UUID commentId){
+        commentService.deleteComment(commentId);
+        return ResponseEntity.ok(new ResponseApi<>(true,"Comentariul a fost sters cu succes"));
     }
+
+    @PutMapping("/{commentId}/vote")
+    public ResponseEntity<ResponseApi<VoteResponseDto>> voteComment(@PathVariable UUID commentId, @RequestBody VoteRequestDto request){
+        User user = null; //!!! aici trebuie modificat dupa ce reorganizam UserService
+        VoteResponseDto response = commentService.voteComment(commentId,request.voteType(),user.getUsername());
+        return ResponseEntity.ok(new ResponseApi<>(true, response));
+    }
+
 }
