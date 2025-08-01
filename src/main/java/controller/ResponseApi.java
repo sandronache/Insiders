@@ -4,6 +4,7 @@ public class ResponseApi<T> {
     private boolean success;
     private T data;
     private String message;
+    private int total;
 
     public ResponseApi() {}
 
@@ -15,6 +16,12 @@ public class ResponseApi<T> {
     public ResponseApi(boolean success, String message){
         this.success = success;
         this.message = message;
+    }
+
+    public ResponseApi(boolean success, T data, int total){
+        this.success = success;
+        this.data = data;
+        this.total = total;
     }
 
     public boolean isSuccess() {
@@ -39,5 +46,13 @@ public class ResponseApi<T> {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
     }
 }

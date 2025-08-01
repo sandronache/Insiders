@@ -1,12 +1,17 @@
 package main.java.controller;
 
 import jakarta.validation.Valid;
+import main.java.dto.comment.CommentCreateRequestDto;
+import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.post.*;
+import main.java.entity.Comment;
 import main.java.entity.Post;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
+import main.java.service.CommentService;
 import main.java.service.PostManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,10 +23,12 @@ import java.util.UUID;
 public class PostController {
 
     private final PostManagementService postManagementService;
+    private final CommentService commentService;
 
     @Autowired
-    public PostController(PostManagementService postManagementService) {
+    public PostController(PostManagementService postManagementService, CommentService commentService) {
         this.postManagementService = postManagementService;
+        this.commentService = commentService;
         LoggerFacade.info("PostController initialized with endpoints:");
         LoggerFacade.info("- GET /posts");
         LoggerFacade.info("- POST /posts");
@@ -53,7 +60,8 @@ public class PostController {
 
         PostResponseDto dto = PostMapper.postToDto(post);
 
-        return ResponseEntity.ok(new ResponseApi<>(true,dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, dto));
+
     }
 
 
@@ -85,6 +93,19 @@ public class PostController {
         VoteResponseDto response = postManagementService.votePost(postId, request.voteType());
         return ResponseEntity.ok(new ResponseApi<>(true,response));
     }
+
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<ResponseApi<List<CommentResponseDto>>> getCommentsForPost(@PathVariable UUID postId){
+        List<CommentResponseDto> comments = commentService.getCommentsForPost(postId);
+        return ResponseEntity.ok(new ResponseApi<>(true,comments,comments.size()));
+    }
+
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<ResponseApi<CommentResponseDto>> createComment(@PathVariable UUID postId, @RequestBody CommentCreateRequestDto request){
+        CommentResponseDto response = commentService.createComment(postId,request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, response));
+    }
+
 
 
 }

@@ -1,9 +1,14 @@
 package main.java.service;
 
+import main.java.dto.comment.CommentCreateRequestDto;
+import main.java.dto.comment.CommentResponseDto;
 import main.java.entity.Comment;
 import main.java.entity.Post;
+import main.java.entity.User;
 import main.java.entity.Vote;
+import main.java.exceptions.NotFoundException;
 import main.java.logger.LoggerFacade;
+import main.java.mapper.CommentMapper;
 import main.java.repository.CommentRepository;
 import main.java.repository.VoteRepository;
 import main.java.util.Helper;
@@ -15,21 +20,51 @@ import java.util.UUID;
 
 @Service
 public class CommentService {
-    private static CommentService instance;
     private final VotingService votingService;
     private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
+    private final PostManagementService postManagementService;
+    private final UserManagementService userManagementService;
 
-    private CommentService(VotingService votingService) {
+    public  CommentService(VotingService votingService, CommentRepository commentRepository, CommentMapper commentMapper, PostManagementService postManagementService, UserManagementService userManagementService) {
         this.votingService = votingService;
-        this.commentRepository = new CommentRepository();
+        this.commentRepository = commentRepository;
+        this.commentMapper = commentMapper;
+        this.postManagementService = postManagementService;
+        this.userManagementService = userManagementService;
     }
 
-    public static CommentService getInstance() {
-        if (instance == null) {
-            instance = new CommentService(VotingService.getInstance());
-        }
-        return instance;
+
+    public List<CommentResponseDto> getCommentsForPost(UUID postId) {
+        List<Comment> allComments = commentRepository.findByPostId(postId);
+
+        List<Comment> rootComments = allComments.stream()
+                .filter(c -> c.getParentComment() == null)
+                .toList();
+
+        return rootComments.stream()
+                .map(c -> commentMapper.toDto(c, allComments))
+                .toList();
     }
+
+    public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request){
+        Post post = postManagementService.getPostById(postId);
+        User user =userManagementService.findByUsername(request.author());
+
+        Comment parent = null;
+        if (request.parentId() != null) {
+            parent = commentRepository.findById(request.parentId())
+                    .orElseThrow(() -> new NotFoundException("Comentariul părinte nu a fost găsit"));
+        }
+
+        Comment comment = new Comment(post,parent, request.content(),user);
+        Comment savedComment = commentRepository.save(comment);
+
+        return commentMapper.toDto(savedComment,List.of());
+    }
+
+
+
 
     public Comment createComment(String content, String username) {
         LoggerFacade.debug("Creating new comment by user: " + username);

@@ -3,6 +3,7 @@ package main.java.service;
 import main.java.entity.Comment;
 import main.java.entity.Post;
 import main.java.entity.User;
+import main.java.exceptions.UnauthorizedException;
 import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
 import main.java.repository.UserRepository;
@@ -24,9 +25,14 @@ public class UserManagementService {
     private final AppDataService appDataService;
 
     @Autowired
-    private UserManagementService(AppDataService appDataService) {
+    private UserManagementService(AppDataService appDataService, UserRepository userRepository) {
         this.appDataService = appDataService;
-        this.userRepository = new UserRepository();
+        this.userRepository = userRepository;
+    }
+
+
+    public User findByUsername(String username){
+        return userRepository.findByUsername(username).orElseThrow(() -> new UnauthorizedException("Utilizatorul"+ username + "nu a fost gasit"));
     }
 
 
