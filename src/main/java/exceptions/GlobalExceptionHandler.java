@@ -1,45 +1,73 @@
 package main.java.exceptions;
 
-import main.java.controller.ResponseApi;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        List<FieldErrorDetail> details = ex.getBindingResult().getFieldErrors().stream()
+                .map(err -> new FieldErrorDetail(err.getField(), err.getDefaultMessage()))
+                .toList();
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("VALIDATION_ERROR", "Datele furnizate nu sunt valide", details, request.getRequestURI()));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("UNAUTHORIZED", ex.getMessage(), null, request.getRequestURI()));
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse("FORBIDDEN", ex.getMessage(), null, request.getRequestURI()));
+    }
+
     @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<ResponseApi<Void>> handlePostNotFound(PostNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handlePostNotFound(PostNotFoundException ex, HttpServletRequest request) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(new ResponseApi<>(false, ex.getMessage()));
+                .body(new ErrorResponse("POST_NOT_FOUND", ex.getMessage(), null, request.getRequestURI()));
     }
 
-    @ExceptionHandler(InvalidVoteTypeException.class)
-    public ResponseEntity<ResponseApi<Void>> handleInvalidVote(InvalidVoteTypeException ex) {
+    @ExceptionHandler(ResourceConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(ResourceConflictException ex, HttpServletRequest request) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(new ResponseApi<>(false, ex.getMessage()));
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("RESOURCE_CONFLICT", ex.getMessage(), null, request.getRequestURI()));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ResponseApi<Void>> handleValidation(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
-                .map(err -> err.getField() + ": " + err.getDefaultMessage())
-                .reduce((msg1, msg2) -> msg1 + "; " + msg2)
-                .orElse("Invalid request");
-
+    @ExceptionHandler(UnprocessableEntityException.class)
+    public ResponseEntity<ErrorResponse> handleUnprocessable(UnprocessableEntityException ex, HttpServletRequest request) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(new ResponseApi<>(false, errorMessage));
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new ErrorResponse("UNPROCESSABLE_ENTITY", ex.getMessage(), null, request.getRequestURI()));
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimit(RateLimitExceededException ex, HttpServletRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new ErrorResponse("RATE_LIMIT_EXCEEDED", ex.getMessage(), null, request.getRequestURI()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ResponseApi<Void>> handleGeneralException(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, HttpServletRequest request) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ResponseApi<>(false, "Internal Server Error"));
+                .body(new ErrorResponse("INTERNAL_ERROR", "Eroare interna de server", null, request.getRequestURI()));
     }
 }

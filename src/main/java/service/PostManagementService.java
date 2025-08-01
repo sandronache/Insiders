@@ -2,20 +2,17 @@ package main.java.service;
 
 import main.java.dto.post.PostResponseDto;
 import main.java.dto.post.PostUpdateRequestDto;
-import main.java.dto.post.VoteRequestDto;
 import main.java.dto.post.VoteResponseDto;
 import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.PostNotFoundException;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
-import main.java.model.AppData;
 import main.java.model.Post;
 import main.java.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.UUID;
 
