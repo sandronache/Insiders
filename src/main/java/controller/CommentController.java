@@ -1,8 +1,8 @@
 package main.java.controller;
 
 import main.java.entity.Comment;
-import main.java.service.CommentService;
 import main.java.repository.CommentRepository;
+import main.java.service.CommentService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

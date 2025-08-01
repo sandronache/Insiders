@@ -2,9 +2,9 @@ package main.java.controller;
 
 import jakarta.validation.Valid;
 import main.java.dto.post.*;
+import main.java.entity.Post;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
-import main.java.entity.Post;
 import main.java.service.PostManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

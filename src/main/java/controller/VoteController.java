@@ -1,7 +1,7 @@
 package main.java.controller;
 
-import main.java.logger.LoggerFacade;
 import main.java.entity.Vote;
+import main.java.logger.LoggerFacade;
 import main.java.repository.VoteRepository;
 import main.java.service.VotingService;
 import org.springframework.beans.factory.annotation.Autowired;

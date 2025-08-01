@@ -1,7 +1,7 @@
 package main.java.logger;
 
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class LogManager {
     private static final LogManager instance = new LogManager();

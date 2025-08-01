@@ -1,9 +1,9 @@
 package main.java.service;
 
-import main.java.logger.LoggerFacade;
 import main.java.entity.Comment;
 import main.java.entity.Post;
 import main.java.entity.Vote;
+import main.java.logger.LoggerFacade;
 import main.java.repository.CommentRepository;
 import main.java.repository.VoteRepository;
 import main.java.util.Helper;

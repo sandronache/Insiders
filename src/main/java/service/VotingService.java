@@ -1,7 +1,7 @@
 package main.java.service;
 
-import main.java.logger.LoggerFacade;
 import main.java.entity.Vote;
+import main.java.logger.LoggerFacade;
 import main.java.repository.VoteRepository;
 import org.springframework.stereotype.Service;
 

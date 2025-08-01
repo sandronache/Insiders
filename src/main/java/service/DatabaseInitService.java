@@ -1,7 +1,7 @@
 package main.java.service;
 
-import main.java.util.DBConnection;
 import main.java.logger.LoggerFacade;
+import main.java.util.DBConnection;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;

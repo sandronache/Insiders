@@ -1,12 +1,12 @@
 package main.java.service;
 
-import main.java.logger.LoggerFacade;
-import main.java.model.AppData;
 import main.java.entity.Post;
 import main.java.entity.User;
+import main.java.logger.LoggerFacade;
+import main.java.model.AppData;
+import main.java.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import main.java.repository.UserRepository;
 
 import java.util.HashMap;
 import java.util.List;
