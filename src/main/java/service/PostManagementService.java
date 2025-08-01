@@ -7,7 +7,7 @@ import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.PostNotFoundException;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
-import main.java.entity.Post;
+import main.java.model.Post;
 import main.java.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
