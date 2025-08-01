@@ -1,6 +1,6 @@
 package main.java.repository;
 
-import main.java.model.User;
+import main.java.entity.User;
 import main.java.util.DBConnection;
 import main.java.logger.LoggerFacade;
 

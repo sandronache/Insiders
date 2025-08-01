@@ -2,9 +2,9 @@ package main.java.service;
 
 import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
-import main.java.model.Comment;
-import main.java.model.Post;
-import main.java.model.User;
+import main.java.entity.Comment;
+import main.java.entity.Post;
+import main.java.entity.User;
 import main.java.repository.UserRepository;
 import main.java.util.Helper;
 import org.springframework.beans.factory.annotation.Autowired;

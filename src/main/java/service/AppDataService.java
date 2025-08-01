@@ -2,8 +2,8 @@ package main.java.service;
 
 import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
-import main.java.model.Post;
-import main.java.model.User;
+import main.java.entity.Post;
+import main.java.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import main.java.repository.UserRepository;

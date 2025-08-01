@@ -1,17 +1,17 @@
-package main.java.model;
+package main.java.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.TreeMap;
 import java.util.UUID;
 
 @Entity
 @Table(name = "comments")
 public class Comment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -22,29 +22,26 @@ public class Comment {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "user_id")
     private User user;
-    @Column(name = "is_deleted", nullable = false)
+    @Column(nullable = false)
     private boolean isDeleted = false;
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public Comment() {
-    }
+    public Comment() {}
 
-    public Comment(UUID id, Post post, Comment parentComment, String content, User user) {
-        this.id = id;
+    public Comment(Post post, Comment parentComment, String content, User user) {
+        this.id = UUID.randomUUID();
         this.post = post;
         this.parentComment = parentComment;
         this.content = content;
         this.user = user;
         this.isDeleted = false;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     public UUID getId() {

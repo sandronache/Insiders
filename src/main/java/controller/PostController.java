@@ -4,15 +4,13 @@ import jakarta.validation.Valid;
 import main.java.dto.post.*;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
-import main.java.model.Post;
+import main.java.entity.Post;
 import main.java.service.PostManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController

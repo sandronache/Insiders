@@ -1,8 +1,10 @@
 package main.java.util;
-import main.java.model.Comment;
-import main.java.model.Post;
+import main.java.entity.Comment;
+import main.java.entity.Post;
 
-public class Helper {
+public final class Helper {
+    private Helper() {}
+
     // indexes
     public static int extractFirstLevel(String input) {
         if (input.length() == 1) {

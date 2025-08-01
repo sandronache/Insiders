@@ -1,5 +1,8 @@
 package main.java.model;
 
+import main.java.entity.Post;
+import main.java.entity.User;
+
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.UUID;

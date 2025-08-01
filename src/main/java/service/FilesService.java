@@ -1,10 +1,10 @@
 package main.java.service;
 
 import main.java.logger.LoggerFacade;
-import main.java.model.Comment;
-import main.java.model.Post;
-import main.java.model.User;
-import main.java.model.Vote;
+import main.java.entity.Comment;
+import main.java.entity.Post;
+import main.java.entity.User;
+import main.java.entity.Vote;
 import main.java.util.Constants;
 import org.springframework.stereotype.Service;
 

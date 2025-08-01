@@ -1,7 +1,9 @@
 create table users
 (
-    username        varchar(255) not null
+    id              uuid         not null
         primary key,
+    username        varchar(255) not null
+        unique,
     email           varchar(255) not null
         unique,
     hashed_password integer      not null,
@@ -14,8 +16,8 @@ create table posts
         primary key,
     title           varchar(300)            not null,
     content         text,
-    username        varchar(255)            not null
-        references users
+    user_id         uuid                    not null
+        references users(id)
             on delete cascade,
     subreddit       varchar(100)            not null,
     created_at      timestamp   default CURRENT_TIMESTAMP not null,
@@ -27,15 +29,15 @@ create table comments
 (
     id                uuid                    not null
         primary key,
-    post_id           uuid
+    post_id           uuid                    not null
         references posts
             on delete cascade,
     parent_comment_id uuid
         references comments
             on delete cascade,
     content           text                    not null,
-    username          varchar(255)            not null
-        references users
+    user_id         uuid                    not null
+        references users(id)
             on delete cascade,
     is_deleted        boolean     default false not null,
     created_at        timestamp   default CURRENT_TIMESTAMP not null,
@@ -52,29 +54,19 @@ create table votes
     comment_id uuid
         references comments
             on delete cascade,
-    username   varchar(255) not null
-        references users
+    user_id         uuid                    not null
+        references users(id)
             on delete cascade,
     is_upvote  boolean      not null,
     created_at timestamp default CURRENT_TIMESTAMP
 );
 
+create index idx_votes_user_id on votes(user_id);
+create index idx_votes_post_id on votes(post_id);
+create index idx_votes_comment_id on votes(comment_id);
 
+create index idx_posts_user_id on posts(user_id);
 
-create or replace function update_updated_at_column()
-returns trigger as $$
-begin
-    new.updated_at = CURRENT_TIMESTAMP;
-    return new;
-end;
-$$ language plpgsql;
-
-create trigger update_posts_updated_at
-    before update on posts
-    for each row
-    execute function update_updated_at_column();
-
-create trigger update_comments_updated_at
-    before update on comments
-    for each row
-    execute function update_updated_at_column();
+create index idx_comments_user_id on comments(user_id);
+create index idx_comments_post_id on comments(post_id);
+create index idx_comments_parent_comment_id on comments(parent_comment_id);

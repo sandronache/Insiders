@@ -1,7 +1,7 @@
 package main.java.repository;
 
-import main.java.model.Comment;
-import main.java.model.Vote;
+import main.java.entity.Comment;
+import main.java.entity.Vote;
 import main.java.util.DBConnection;
 import main.java.logger.LoggerFacade;
 import org.springframework.stereotype.Repository;

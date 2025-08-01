@@ -1,6 +1,6 @@
 package main.java.controller;
 
-import main.java.model.User;
+import main.java.entity.User;
 import main.java.service.AppDataService;
 import main.java.service.UserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;

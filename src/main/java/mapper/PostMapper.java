@@ -1,7 +1,7 @@
 package main.java.mapper;
 
 import main.java.dto.post.PostResponseDto;
-import main.java.model.Post;
+import main.java.entity.Post;
 
 public class PostMapper {
     public static PostResponseDto postToDto(Post post){

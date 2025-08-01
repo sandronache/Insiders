@@ -1,4 +1,4 @@
-package main.java.model;
+package main.java.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,7 +10,7 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -19,19 +19,24 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "hashed_password", nullable = false)
+    @Column(nullable = false)
     private int hashedPassword;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     public User() {}
 
     public User(String username, String email, int hashedPassword) {
+        this.id = UUID.randomUUID();
         this.username = username;
         this.email = email;
         this.hashedPassword = hashedPassword;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public String getUsername() {
