@@ -2,6 +2,9 @@ package main.java.service;
 
 import main.java.dto.post.PostResponseDto;
 import main.java.dto.post.PostUpdateRequestDto;
+import main.java.dto.post.VoteRequestDto;
+import main.java.dto.post.VoteResponseDto;
+import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.PostNotFoundException;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
@@ -69,46 +72,6 @@ public class PostManagementService {
         return posts;
     }
 
-    public void addPost(AppData appData, String content) {
-        String username = appData.getLoggedUser().getUsername();
-
-        // Check for duplicates
-        try {
-            if (postExistsInDatabase(content, username)) {
-                LoggerFacade.warning("Post with same content already exists, skipping save");
-                return;
-            }
-        } catch (Exception e) {
-            LoggerFacade.warning("Could not check for duplicate posts: " + e.getMessage());
-        }
-
-        // Create post using the legacy method (with default title and subreddit)
-        Post post = contentService.createPost(content, username);
-
-        // Add to in-memory data
-        appData.getLoadedPosts().put(post.getId(), post);
-
-        // Save to database immediately
-        try {
-            postRepository.save(post);
-            LoggerFacade.info("Post saved to database immediately: " + post.getId());
-        } catch (Exception e) {
-            LoggerFacade.warning("Could not save post to database immediately: " + e.getMessage());
-        }
-
-        LoggerFacade.info("New post created by user: " + username);
-    }
-
-    private boolean postExistsInDatabase(String content, String username) {
-        try {
-            List<Post> existingPosts = postRepository.findByUsernameOrderByCreatedAtDesc(username);
-            return existingPosts.stream()
-                    .anyMatch(post -> post.getContent().equals(content));
-        } catch (Exception e) {
-            LoggerFacade.warning("Error checking for existing posts: " + e.getMessage());
-            return false;
-        }
-    }
 
     public List<Post> getAllPosts(String subreddit) {
         if (subreddit != null && !subreddit.trim().isEmpty()) {
@@ -150,7 +113,39 @@ public class PostManagementService {
 
     public Post getPostById(UUID postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost găsită"));
+                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
+    }
+
+    public VoteResponseDto votePost(UUID postId, String voteType) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Postarea nu a fost gasita"));
+
+        switch(voteType.toLowerCase()){
+            case "up" ->{
+                post.setUpvotes(post.getUpvotes() + 1);
+                post.setCurrentUserVote("up");
+            }
+            case "down" ->{
+                post.setDownvotes(post.getDownvotes()+1);
+                post.setCurrentUserVote("down");
+            }
+            case "none" ->{
+                String currentVote = post.getCurrentUserVote();
+                if("up".equals(currentVote))
+                    post.setUpvotes(post.getUpvotes()-1);
+                if("down".equals(currentVote))
+                    post.setDownvotes(post.getDownvotes()-1);
+                post.setCurrentUserVote(null);
+            }
+            default -> throw new InvalidVoteTypeException("Tip de date invalid: "+voteType);
+        }
+        postRepository.save(post);
+
+        return new VoteResponseDto(
+                post.getUpvotes(),
+                post.getDownvotes(),
+                post.getScore(),
+                post.getCurrentUserVote()
+        );
     }
 
 
