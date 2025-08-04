@@ -66,4 +66,12 @@ public class Post {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }

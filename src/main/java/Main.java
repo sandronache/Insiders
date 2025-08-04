@@ -50,9 +50,9 @@ public class Main {
 //        }
 
         // Initialize services - they now use repositories instead of files
-        VotingService.getInstance();
-        CommentService.getInstance();
-        ContentService contentService = ContentService.getInstance();
+//        VotingService.getInstance();
+//        CommentService.getInstance();
+//        ContentService contentService = ContentService.getInstance();
 
         // AppInterface app = new CLIInterface(contentService, appDataService);
         // LoggerFacade.info("Starting application interface");

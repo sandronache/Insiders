@@ -60,4 +60,8 @@ public class Vote {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
+    public void setUpvote(boolean upvote) {
+        isUpvote = upvote;
+    }
 }

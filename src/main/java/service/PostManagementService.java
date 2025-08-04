@@ -3,6 +3,7 @@ package main.java.service;
 import main.java.dto.post.PostResponseDto;
 import main.java.dto.post.PostUpdateRequestDto;
 import main.java.dto.post.VoteResponseDto;
+import main.java.entity.User;
 import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.PostNotFoundException;
 import main.java.logger.LoggerFacade;
@@ -26,48 +27,52 @@ public class PostManagementService {
     private final ContentService contentService;
     private final DatabaseMappingService mappingService;
     private final CommentService commentService;
+    private final VotingService votingService;
+    private final UserManagementService userManagementService;
 
     @Autowired
-    public PostManagementService(PostRepository postRepository, ContentService contentService, DatabaseMappingService mappingService, CommentService commentService) {
+    public PostManagementService(PostRepository postRepository, ContentService contentService, DatabaseMappingService mappingService, CommentService commentService,  VotingService votingService, UserManagementService userManagementService) {
         this.postRepository = postRepository;
         this.contentService = contentService;
         this.mappingService = mappingService;
         this.commentService = commentService;
+        this.votingService = votingService;
+        this.userManagementService = userManagementService;
     }
 
-    public TreeMap<UUID, Post> loadPostsFromDatabase() {
-        TreeMap<UUID, Post> posts = new TreeMap<>();
-
-        try {
-            // Use the new JPA method to get all posts ordered by creation date
-            List<Post> allPosts = postRepository.findAllByOrderByCreatedAtDesc();
-
-            for (Post post : allPosts) {
-                posts.put(post.getId(), post);
-
-                // Store mapping using the post's UUID (optional, if needed)
-                mappingService.storePostMapping(post.getId(), post.getId());
-
-                // Load comments for this post
-                commentService.loadCommentsForPost(post, post.getId());
-
-                // Load votes for this post
-                contentService.loadVotesForPost(post, post.getId());
-
-                // Load votes for all comments in this post
-                post.getComments().forEach((commentId, comment) ->
-                        commentService.loadVotesForComment(comment)
-                );
-            }
-
-            LoggerFacade.info("Loaded " + allPosts.size() + " posts from database");
-        } catch (Exception e) {
-            LoggerFacade.warning("Could not load posts from database: " + e.getMessage());
-            LoggerFacade.info("Starting with empty posts list");
-        }
-
-        return posts;
-    }
+//    public TreeMap<UUID, Post> loadPostsFromDatabase() {
+//        TreeMap<UUID, Post> posts = new TreeMap<>();
+//
+//        try {
+//            // Use the new JPA method to get all posts ordered by creation date
+//            List<Post> allPosts = postRepository.findAllByOrderByCreatedAtDesc();
+//
+//            for (Post post : allPosts) {
+//                posts.put(post.getId(), post);
+//
+//                // Store mapping using the post's UUID (optional, if needed)
+//                mappingService.storePostMapping(post.getId(), post.getId());
+//
+//                // Load comments for this post
+//                commentService.loadCommentsForPost(post, post.getId());
+//
+//                // Load votes for this post
+//                contentService.loadVotesForPost(post, post.getId());
+//
+//                // Load votes for all comments in this post
+//                post.getComments().forEach((commentId, comment) ->
+//                        commentService.loadVotesForComment(comment)
+//                );
+//            }
+//
+//            LoggerFacade.info("Loaded " + allPosts.size() + " posts from database");
+//        } catch (Exception e) {
+//            LoggerFacade.warning("Could not load posts from database: " + e.getMessage());
+//            LoggerFacade.info("Starting with empty posts list");
+//        }
+//
+//        return posts;
+//    }
 
 
     public List<Post> getAllPosts(String subreddit) {
@@ -78,7 +83,8 @@ public class PostManagementService {
     }
 
     public Post createPost(String title, String content, String author, String subreddit) {
-        Post post = new Post(title, content, author, subreddit);
+        User user = userManagementService.findByUsername(author);
+        Post post = new Post(title, content, user, subreddit);
         return postRepository.save(post);
     }
 
@@ -113,36 +119,25 @@ public class PostManagementService {
                 .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
     }
 
-    public VoteResponseDto votePost(UUID postId, String voteType) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Postarea nu a fost gasita"));
+    public VoteResponseDto votePost(UUID postId, String voteType, String username) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Postarea nu a fost gasita"));
 
-        switch(voteType.toLowerCase()){
-            case "up" ->{
-                post.setUpvotes(post.getUpvotes() + 1);
-                post.setCurrentUserVote("up");
-            }
-            case "down" ->{
-                post.setDownvotes(post.getDownvotes()+1);
-                post.setCurrentUserVote("down");
-            }
-            case "none" ->{
-                String currentVote = post.getCurrentUserVote();
-                if("up".equals(currentVote))
-                    post.setUpvotes(post.getUpvotes()-1);
-                if("down".equals(currentVote))
-                    post.setDownvotes(post.getDownvotes()-1);
-                post.setCurrentUserVote(null);
-            }
-            default -> throw new InvalidVoteTypeException("Tip de date invalid: "+voteType);
+        User user = userManagementService.findByUsername(username);
+
+        switch (voteType.toLowerCase()) {
+            case "up" -> votingService.createVote(user.getId(), post.getId(), null, true);
+            case "down" -> votingService.createVote(user.getId(), post.getId(), null, false);
+            case "none" -> votingService.deleteVoteForPost(post, user);
+            default -> throw new InvalidVoteTypeException("Tip de vot invalid: " + voteType);
         }
-        postRepository.save(post);
 
-        return new VoteResponseDto(
-                post.getUpvotes(),
-                post.getDownvotes(),
-                post.getScore(),
-                post.getCurrentUserVote()
-        );
+        int upvotes = votingService.countUpvotesForPost(post.getId());
+        int downvotes = votingService.countDownvotesForPost(post.getId());
+        int score = upvotes - downvotes;
+        String userVote = votingService.getVoteTypeForUser(user.getId(),postId,null);
+
+        return new VoteResponseDto(upvotes, downvotes, score, userVote);
     }
 
 

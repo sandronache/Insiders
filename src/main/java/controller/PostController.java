@@ -5,6 +5,7 @@ import main.java.dto.comment.CommentCreateRequestDto;
 import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.post.*;
 import main.java.entity.Post;
+import main.java.entity.User;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
 import main.java.service.CommentService;
@@ -89,7 +90,8 @@ public class PostController {
 
     @PutMapping("/{postId}/vote")
     public ResponseEntity<ResponseApi<VoteResponseDto>> votePost(@PathVariable UUID postId, @RequestBody VoteRequestDto request){
-        VoteResponseDto response = postManagementService.votePost(postId, request.voteType());
+        User user = null; //!!! de modificat mai tarziu
+        VoteResponseDto response = postManagementService.votePost(postId, request.voteType(),user.getUsername());
         return ResponseEntity.ok(new ResponseApi<>(true,response));
     }
 
