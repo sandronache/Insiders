@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class CommentService {
-    private final VotingService votingService;
+public class CommentService{
+    private final CommentVotingService commentVotingService;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final UserManagementService userManagementService;
 
-    public  CommentService(VotingService votingService, CommentRepository commentRepository, CommentMapper commentMapper, UserManagementService userManagementService) {
-        this.votingService = votingService;
+    public  CommentService(CommentVotingService commentVotingService, CommentRepository commentRepository, CommentMapper commentMapper, UserManagementService userManagementService) {
+        this.commentVotingService = commentVotingService;
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
         this.userManagementService = userManagementService;
@@ -93,27 +93,9 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
 
-        User user = userManagementService.findByUsername(username);
-
-        switch (voteType.toLowerCase()) {
-            case "up" -> votingService.createVote(user.getId(), null, comment.getId(), true);
-            case "down" -> votingService.createVote(user.getId(), null, comment.getId(), false);
-            case "none" -> votingService.deleteVoteForComment(comment, user);
-            default -> throw new InvalidVoteTypeException("Tipul de vot este invalid: " + voteType);
-        }
-
-        int upvotes = votingService.countUpvotesForComment(comment.getId());
-        int downvotes = votingService.countDownvotesForComment(comment.getId());
-        int score = upvotes - downvotes;
-        String userVote = votingService.getVoteTypeForUser(user.getId(),null,commentId);
-
-        return new VoteResponseDto(upvotes, downvotes, score, userVote);
+        return commentVotingService.voteOnComment(commentId,voteType,username,comment);
     }
 
-    //de pastrat la refactor
-    public Comment findById(UUID commentId){
-        return commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
-    }
 
     public int countCommentsByPostId(UUID postId) {
         return commentRepository.countByPostId(postId);

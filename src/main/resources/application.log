@@ -200,3 +200,19 @@
 2025-08-06 15:34:31 INFO: Application starting up
 2025-08-06 16:36:39 INFO: new version
 2025-08-06 16:36:39 INFO: Application starting up
+2025-08-06 16:52:43 INFO: new version
+2025-08-06 16:52:43 INFO: Application starting up
+2025-08-06 17:00:28 INFO: new version
+2025-08-06 17:00:28 INFO: Application starting up
+2025-08-06 17:10:47 INFO: new version
+2025-08-06 17:10:47 INFO: Application starting up
+2025-08-06 17:20:12 INFO: new version
+2025-08-06 17:20:12 INFO: Application starting up
+2025-08-06 17:20:19 INFO: PostController initialized with endpoints:
+2025-08-06 17:20:19 INFO: - GET /posts
+2025-08-06 17:20:19 INFO: - POST /posts
+2025-08-06 17:20:19 INFO: - PUT /posts/{id}
+2025-08-06 17:20:19 INFO: - DELETE /posts/{id}
+2025-08-06 17:20:19 INFO: - GET /posts/{id}
+2025-08-06 17:20:19 INFO: - PUT /posts/{id}/vote
+2025-08-06 17:20:20 INFO: Application shutting down

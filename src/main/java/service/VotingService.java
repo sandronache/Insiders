@@ -7,7 +7,9 @@ import main.java.entity.Vote;
 import main.java.exceptions.NotFoundException;
 import main.java.logger.LoggerFacade;
 import main.java.repository.CommentRepository;
+import main.java.repository.PostRepository;
 import main.java.repository.VoteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,15 +20,16 @@ import java.util.UUID;
 public class VotingService {
 
     private final VoteRepository voteRepository;
-    private final PostManagementService postManagementService;
+    private final PostRepository postRepository;
     private final UserManagementService userManagementService;
-    private final CommentService commentService;
+    private final CommentLookUpService commentLookUpService;
 
-    public VotingService(VoteRepository voteRepository, PostManagementService postManagementService, UserManagementService userManagementService, CommentService commentService) {
+    @Autowired
+    public VotingService(VoteRepository voteRepository, PostRepository postRepository, UserManagementService userManagementService, CommentLookUpService commentLookUpService) {
         this.voteRepository = voteRepository;
-        this.postManagementService = postManagementService;
+        this.postRepository = postRepository;
         this.userManagementService = userManagementService;
-        this.commentService = commentService;
+        this.commentLookUpService = commentLookUpService;
     }
 
     //de pastrat la refactor
@@ -44,7 +47,7 @@ public class VotingService {
                 vote.setUpvote(isUpvote);
                 voteRepository.save(vote);
             } else {
-                Post post = postManagementService.getPostById(postId);
+                Post post = postRepository.getPostById(postId);
                 Vote vote = new Vote(post, null, user, isUpvote);
                 voteRepository.save(vote);
             }
@@ -55,7 +58,7 @@ public class VotingService {
                 vote.setUpvote(isUpvote);
                 voteRepository.save(vote);
             } else {
-                Comment comment = commentService.findById(commentId);
+                Comment comment = commentLookUpService.findById(commentId);
                 Vote vote = new Vote(null, comment, user, isUpvote);
                 voteRepository.save(vote);
             }
