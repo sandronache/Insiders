@@ -7,13 +7,14 @@ public class ImageOperationFactory
     {
         _operations = new Dictionary<OperationType, IImageOperation>()
         {
-            { OperationType.GrayscaleFilter, new GrayscaleFilter() },
+            { OperationType.Grayscale, new GrayscaleFilter() },
+            { OperationType.DoNothing, new DoNothingFilter() },
             { OperationType.Mirror, new Mirror() },
             { OperationType.Resize, new Resize() }
         };
     }
 
-    public IImageOperation? GetOperation(OperationType name)
+    public IImageOperation GetOperation(OperationType name)
     {
         return _operations.TryGetValue(name, out IImageOperation operation) ? operation : null;
     }

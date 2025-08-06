@@ -9,8 +9,8 @@ class Program
     static void Main()
     {
         /* Complete with your paths. */
-        string testInputPath = @"C:\Users\augus\Desktop\TestInput.json";
-        string testOutputPath = @"C:\Users\augus\Desktop\TestOutput.json";
+        string testInputPath = @"C:\Users\...\TestInput.json";
+        string testOutputPath = @"C:\Users\...\TestOutput.json";
 
         string jsonIn = File.ReadAllText(testInputPath);
 
@@ -23,7 +23,7 @@ class Program
         ProcessingService service = new ProcessingService();
 
         ProcessingResult result = service.Process(request);
-        File.WriteAllText(testOutputPath, result.Message);
+        File.WriteAllText(testOutputPath, result.ImageBase64);
     }
 }
 

@@ -2,8 +2,8 @@ namespace Processing.Operations;
 
 public enum OperationType
 {
-    GrayscaleFilter,
-    InvertFilter,
-    Resize,
-    Mirror
+    Grayscale,
+    DoNothing,
+    Mirror,
+    Resize
 }

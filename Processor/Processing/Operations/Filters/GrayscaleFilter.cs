@@ -1,6 +1,4 @@
 
-
-using Processing.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 

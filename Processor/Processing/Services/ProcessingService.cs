@@ -37,26 +37,21 @@ public class ProcessingService
                 FileName = request.FileName,
                 ImageBase64 = null
             };
-        } 
-        
-        foreach (var op in request.Operations)
-        {
-            Enum.TryParse<OperationType>(op.Name, ignoreCase: true, out var operationName);
-            var operation = _factory.GetOperation(operationName);
-            operation.Apply(currentImage, op.Parameters);
         }
 
-        using var ms = new MemoryStream();
-        currentImage.Save(ms, new PngEncoder());
-        byte[] Bytes = ms.ToArray();
-
+        foreach (OperationRequest operationRequest in request.Operations)
+        {
+            Enum.TryParse<OperationType>(operationRequest.Name, ignoreCase: true, out var operationName);
+            var operation = _factory.GetOperation(operationName);
+            operation.Apply(currentImage, operationRequest.Parameters);
+        }
 
         return new ProcessingResult
         {
             Response = true,
             Message = "No errors",
             FileName = request.FileName,
-            ImageBase64 = Convert.ToBase64String(Bytes)
+            ImageBase64 = ConvertToBase64(currentImage)
         };
     }
 
@@ -65,5 +60,13 @@ public class ProcessingService
         byte[] imageBytes = Convert.FromBase64String(imageBase64);
         using MemoryStream inputStream = new MemoryStream(imageBytes);
         return Image.Load(inputStream);
+    }
+
+    public string ConvertToBase64(Image image)
+    {
+        using var ms = new MemoryStream();
+        image.Save(ms, new PngEncoder());
+        byte[] Bytes = ms.ToArray();
+        return Convert.ToBase64String(Bytes);
     }
 }
