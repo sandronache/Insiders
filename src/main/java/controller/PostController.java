@@ -100,8 +100,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<ResponseApi<List<CommentResponseDto>>> getCommentsForPost(@PathVariable UUID postId){
-        List<CommentResponseDto> comments = commentService.getCommentsForPost(postId);
+    public ResponseEntity<ResponseApi<List<CommentResponseDto>>> getCommentsForPost(@PathVariable UUID postId,@RequestParam(defaultValue = "andrei") String username){
+        List<CommentResponseDto> comments = commentService.getCommentsForPost(postId,username);
         return ResponseEntity.ok(new ResponseApi<>(true,comments,comments.size()));
     }
 

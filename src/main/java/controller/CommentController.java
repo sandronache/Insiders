@@ -2,6 +2,8 @@ package main.java.controller;
 
 import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.comment.CommentUpdateRequestDto;
+import main.java.dto.vote.VoteRequestDto;
+import main.java.dto.vote.VoteResponseDto;
 import main.java.entity.User;
 import main.java.service.CommentService;
 import main.java.service.UserManagementService;
@@ -40,7 +42,7 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}/vote")
-    public ResponseEntity<ResponseApi<VoteResponseDto>> voteComment(@PathVariable UUID commentId, @RequestBody VoteRequestDto request,@RequestParam(defaultValue = "andrei") String username){
+    public ResponseEntity<ResponseApi<VoteResponseDto>> voteComment(@PathVariable UUID commentId, @RequestBody VoteRequestDto request, @RequestParam(defaultValue = "andrei") String username){
         VoteResponseDto response = commentService.voteComment(commentId,request.voteType(),username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }

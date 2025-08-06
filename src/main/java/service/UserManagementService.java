@@ -8,7 +8,6 @@ import main.java.exceptions.UnauthorizedException;
 import main.java.logger.LoggerFacade;
 import main.java.model.AppData;
 import main.java.repository.UserRepository;
-import main.java.util.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
