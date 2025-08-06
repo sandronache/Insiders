@@ -71,7 +71,8 @@ public class PostController {
     @PutMapping("/{id}")
     public ResponseEntity<ResponseApi<PostResponseDto>> updatePost(@PathVariable UUID id,
                                         @Valid @RequestBody PostUpdateRequestDto requestDto) {
-        PostResponseDto response = postManagementService.updatePost(id, requestDto);
+        PostModel postModel = postManagementService.updatePost(id, requestDto);
+        PostResponseDto response = PostMapper.postModelToDto(postModel);
         return ResponseEntity.ok(new ResponseApi<>(true,response));
     }
 

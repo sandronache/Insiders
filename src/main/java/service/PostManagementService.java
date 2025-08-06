@@ -1,10 +1,13 @@
 package main.java.service;
 
+import main.java.dto.post.PostResponseDto;
+import main.java.dto.post.PostUpdateRequestDto;
 import main.java.dto.vote.VoteResponseDto;
 import main.java.entity.User;
 import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.PostNotFoundException;
 import main.java.entity.Post;
+import main.java.logger.LoggerFacade;
 import main.java.model.PostModel;
 import main.java.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +126,31 @@ public class PostManagementService {
         String userVote = votingService.getVoteTypeForUser(user.getId(),postId,null);
 
         return new VoteResponseDto(upvotes, downvotes, score, userVote);
+    }
+
+    public PostModel updatePost(UUID id, PostUpdateRequestDto requestDto) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + id + " nu a fost gasita."));
+
+        if (requestDto.title() != null && !requestDto.title().isBlank()) {
+            post.setTitle(requestDto.title());
+        }
+
+        if (requestDto.content() != null && !requestDto.content().isBlank()) {
+            post.setContent(requestDto.content());
+        }
+
+        postRepository.save(post);
+        return buildFinalPost(post);
+    }
+
+    public void deletePostById(UUID postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new PostNotFoundException("Postarea nu a fost gasita");
+        }
+
+        postRepository.deleteById(postId);
+        LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
     }
 
 }
