@@ -1,13 +1,9 @@
 package main.java.service;
 
-import main.java.dto.post.PostResponseDto;
-import main.java.dto.post.PostUpdateRequestDto;
-import main.java.dto.post.VoteResponseDto;
+import main.java.dto.vote.VoteResponseDto;
 import main.java.entity.User;
 import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.PostNotFoundException;
-import main.java.logger.LoggerFacade;
-import main.java.mapper.PostMapper;
 import main.java.entity.Post;
 import main.java.model.PostModel;
 import main.java.repository.PostRepository;
@@ -16,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -85,6 +80,49 @@ public class PostManagementService {
     public Post getPostById(UUID postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
+    }
+
+    private PostModel buildFinalPostForNew(Post post) {
+        PostModel postModel = new PostModel(post);
+
+        postModel.setUpvotes(1);
+        postModel.setDownvotes(0);
+        postModel.setScore(1);
+        postModel.setCommentCount(0);
+        postModel.setUserVote("up");
+
+        return postModel;
+    }
+
+    public PostModel createPost(String title, String content, String author, String subreddit) {
+        User user = userManagementService.findByUsername(author);
+        Post post = new Post(title, content, user, subreddit);
+        postRepository.save(post);
+
+        votePost(post.getId(), "up", author);
+
+        return buildFinalPostForNew(post);
+    }
+
+    public VoteResponseDto votePost(UUID postId, String voteType, String username) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Postarea nu a fost gasita"));
+
+        User user = userManagementService.findByUsername(username);
+
+        switch (voteType.toLowerCase()) {
+            case "up" -> votingService.createVote(user.getId(), post.getId(), null, true);
+            case "down" -> votingService.createVote(user.getId(), post.getId(), null, false);
+            case "none" -> votingService.deleteVoteForPost(post, user);
+            default -> throw new InvalidVoteTypeException("Tip de vot invalid: " + voteType);
+        }
+
+        int upvotes = votingService.countUpvotesForPost(post.getId());
+        int downvotes = votingService.countDownvotesForPost(post.getId());
+        int score = upvotes - downvotes;
+        String userVote = votingService.getVoteTypeForUser(user.getId(),postId,null);
+
+        return new VoteResponseDto(upvotes, downvotes, score, userVote);
     }
 
 }

@@ -3,22 +3,17 @@ package main.java.service;
 import main.java.dto.comment.CommentCreateRequestDto;
 import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.comment.CommentUpdateRequestDto;
-import main.java.dto.comment.VoteResponseDto;
+import main.java.dto.vote.VoteResponseDto;
 import main.java.entity.Comment;
 import main.java.entity.Post;
 import main.java.entity.User;
-import main.java.entity.Vote;
 import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.NotFoundException;
-import main.java.logger.LoggerFacade;
 import main.java.mapper.CommentMapper;
 import main.java.repository.CommentRepository;
-import main.java.repository.VoteRepository;
-import main.java.util.Helper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.TreeMap;
 import java.util.UUID;
 
 @Service

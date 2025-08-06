@@ -1,4 +1,4 @@
-package main.java.dto.post;
+package main.java.dto.vote;
 
 import jakarta.validation.constraints.NotBlank;
 

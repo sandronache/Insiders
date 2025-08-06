@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import main.java.dto.comment.CommentCreateRequestDto;
 import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.post.*;
+import main.java.dto.vote.VoteRequestDto;
+import main.java.dto.vote.VoteResponseDto;
 import main.java.entity.Post;
 import main.java.entity.User;
 import main.java.logger.LoggerFacade;
@@ -52,14 +54,14 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<ResponseApi<PostResponseDto>> createPost(@Valid @RequestBody PostCreateRequestDto requestDto) {
-        Post post = postManagementService.createPost(
+        PostModel post = postManagementService.createPost(
                 requestDto.title(),
                 requestDto.content(),
                 requestDto.author(),
                 requestDto.subreddit()
         );
 
-        PostResponseDto dto = PostMapper.postToDto(post);
+        PostResponseDto dto = PostMapper.postModelToDto(post);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, dto));
 
@@ -92,7 +94,7 @@ public class PostController {
     @PutMapping("/{postId}/vote")
     public ResponseEntity<ResponseApi<VoteResponseDto>> votePost(@PathVariable UUID postId, @RequestBody VoteRequestDto request){
         User user = null; //!!! de modificat mai tarziu
-        VoteResponseDto response = postManagementService.votePost(postId, request.voteType(),user.getUsername());
+        VoteResponseDto response = postManagementService.votePost(postId, request.voteType(), "admin"); // si aici
         return ResponseEntity.ok(new ResponseApi<>(true,response));
     }
 
