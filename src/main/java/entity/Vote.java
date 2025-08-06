@@ -21,8 +21,8 @@ public class Vote {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    @Column(nullable = false)
-    private boolean isUpvote;
+    @Column(name = "is_upvote", nullable = false)
+    private boolean upvote;
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -34,7 +34,7 @@ public class Vote {
         this.post = post;
         this.comment = comment;
         this.user = user;
-        this.isUpvote = isUpvote;
+        this.upvote = isUpvote;
     }
 
     public UUID getId() {
@@ -54,7 +54,7 @@ public class Vote {
     }
 
     public boolean isUpvote() {
-        return isUpvote;
+        return upvote;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -62,6 +62,6 @@ public class Vote {
     }
 
     public void setUpvote(boolean upvote) {
-        isUpvote = upvote;
+        this.upvote = upvote;
     }
 }

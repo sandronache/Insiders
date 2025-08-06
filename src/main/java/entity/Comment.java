@@ -24,8 +24,8 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    @Column(nullable = false)
-    private boolean isDeleted = false;
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted = false;
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -41,7 +41,7 @@ public class Comment {
         this.parentComment = parentComment;
         this.content = content;
         this.user = user;
-        this.isDeleted = false;
+        this.deleted = false;
     }
 
     public UUID getId() {
@@ -69,7 +69,7 @@ public class Comment {
     }
 
     public boolean isDeleted() {
-        return isDeleted;
+        return deleted;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -81,6 +81,6 @@ public class Comment {
     }
 
     public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
+        this.deleted = deleted;
     }
 }
