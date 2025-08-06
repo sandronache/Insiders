@@ -22,16 +22,8 @@ class Program
         ProcessingRequest request = JsonSerializer.Deserialize<ProcessingRequest>(jsonIn, options);
         ProcessingService service = new ProcessingService();
 
-        ProcessingResult result = new ProcessingResult
-        {
-            Response = true,
-            Message = "Testing",
-            FileName = "ImageOut.jpg",
-            ImageBase64 = null
-        };
-
-        service.Process(request, result);
-        File.WriteAllText(testOutputPath, result.ImageBase64);
+        ProcessingResult result = service.Process(request);
+        File.WriteAllText(testOutputPath, result.Message);
     }
 }
 
