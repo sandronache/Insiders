@@ -6,19 +6,20 @@ public class ResponseApi<T> {
     private String message;
     private int total;
 
-    public ResponseApi() {}
+    public ResponseApi() {
+    }
 
-    public ResponseApi(boolean success, T data ){
+    public ResponseApi(boolean success, T data) {
         this.success = success;
         this.data = data;
     }
 
-    public ResponseApi(boolean success, String message){
+    public ResponseApi(boolean success, String message) {
         this.success = success;
         this.message = message;
     }
 
-    public ResponseApi(boolean success, T data, int total){
+    public ResponseApi(boolean success, T data, int total) {
         this.success = success;
         this.data = data;
         this.total = total;

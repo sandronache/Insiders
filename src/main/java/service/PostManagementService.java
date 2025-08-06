@@ -63,13 +63,13 @@ public class PostManagementService {
         return postModel;
     }
 
-    public List<PostModel> getAllPosts (String subreddit) {
-        List<Post> basePosts= getBasePosts(subreddit);
+    public List<PostModel> getAllPosts(String subreddit) {
+        List<Post> basePosts = getBasePosts(subreddit);
 
         List<PostModel> finalPosts = new LinkedList<>();
 
-        basePosts.forEach(post ->{
-                finalPosts.add(buildFinalPost(post));
+        basePosts.forEach(post -> {
+            finalPosts.add(buildFinalPost(post));
         });
 
         return finalPosts;
@@ -125,7 +125,7 @@ public class PostManagementService {
         int upvotes = votingService.countUpvotesForPost(post.getId());
         int downvotes = votingService.countDownvotesForPost(post.getId());
         int score = upvotes - downvotes;
-        String userVote = votingService.getVoteTypeForUser(user.getId(),postId,null);
+        String userVote = votingService.getVoteTypeForUser(user.getId(), postId, null);
 
         return new VoteResponseDto(upvotes, downvotes, score, userVote);
     }
@@ -155,7 +155,7 @@ public class PostManagementService {
         LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
     }
 
-    public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request){
+    public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request) {
         Post post = getPostById(postId);
 
         return commentService.createComment(post, request);

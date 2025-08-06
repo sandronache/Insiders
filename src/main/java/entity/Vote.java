@@ -27,7 +27,8 @@ public class Vote {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Vote() {}
+    public Vote() {
+    }
 
     public Vote(Post post, Comment comment, User user, boolean isUpvote) {
         this.id = UUID.randomUUID();

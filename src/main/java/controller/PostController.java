@@ -6,7 +6,6 @@ import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.post.*;
 import main.java.dto.vote.VoteRequestDto;
 import main.java.dto.vote.VoteResponseDto;
-import main.java.entity.Post;
 import main.java.entity.User;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
@@ -48,7 +47,7 @@ public class PostController {
         List<PostModel> posts = postManagementService.getAllPosts(subreddit);
         List<PostResponseDto> dtos = posts.stream().map(PostMapper::postModelToDto).toList();
 
-        return ResponseEntity.ok(new ResponseApi<>(true,dtos));
+        return ResponseEntity.ok(new ResponseApi<>(true, dtos));
 
     }
 
@@ -70,10 +69,10 @@ public class PostController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseApi<PostResponseDto>> updatePost(@PathVariable UUID id,
-                                        @Valid @RequestBody PostUpdateRequestDto requestDto) {
+                                                                   @Valid @RequestBody PostUpdateRequestDto requestDto) {
         PostModel postModel = postManagementService.updatePost(id, requestDto);
         PostResponseDto response = PostMapper.postModelToDto(postModel);
-        return ResponseEntity.ok(new ResponseApi<>(true,response));
+        return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
 
@@ -89,28 +88,27 @@ public class PostController {
         PostModel post = postManagementService.getPostByIdModel(postId);
         PostResponseDto dto = PostMapper.postModelToDto(post);
 
-        return ResponseEntity.ok(new ResponseApi<>(true,dto));
+        return ResponseEntity.ok(new ResponseApi<>(true, dto));
     }
 
     @PutMapping("/{postId}/vote")
-    public ResponseEntity<ResponseApi<VoteResponseDto>> votePost(@PathVariable UUID postId, @RequestBody VoteRequestDto request){
+    public ResponseEntity<ResponseApi<VoteResponseDto>> votePost(@PathVariable UUID postId, @RequestBody VoteRequestDto request) {
         User user = null; //!!! de modificat mai tarziu
         VoteResponseDto response = postManagementService.votePost(postId, request.voteType(), "admin"); // si aici
-        return ResponseEntity.ok(new ResponseApi<>(true,response));
+        return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<ResponseApi<List<CommentResponseDto>>> getCommentsForPost(@PathVariable UUID postId,@RequestParam(defaultValue = "andrei") String username){
-        List<CommentResponseDto> comments = commentService.getCommentsForPost(postId,username);
-        return ResponseEntity.ok(new ResponseApi<>(true,comments,comments.size()));
+    public ResponseEntity<ResponseApi<List<CommentResponseDto>>> getCommentsForPost(@PathVariable UUID postId, @RequestParam(defaultValue = "andrei") String username) {
+        List<CommentResponseDto> comments = commentService.getCommentsForPost(postId, username);
+        return ResponseEntity.ok(new ResponseApi<>(true, comments, comments.size()));
     }
 
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<ResponseApi<CommentResponseDto>> createComment(@PathVariable UUID postId, @RequestBody CommentCreateRequestDto request){
+    public ResponseEntity<ResponseApi<CommentResponseDto>> createComment(@PathVariable UUID postId, @RequestBody CommentCreateRequestDto request) {
         CommentResponseDto response = postManagementService.createComment(postId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, response));
     }
-
 
 
 }

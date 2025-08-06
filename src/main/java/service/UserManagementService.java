@@ -28,30 +28,30 @@ public class UserManagementService {
     private final UserRepository userRepository;
 
     @Autowired
-    private UserManagementService( UserRepository userRepository) {
+    private UserManagementService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User findByUsername(String username){
-        return userRepository.findByUsername(username).orElseThrow(() -> new UnauthorizedException("Utilizatorul"+ username + "nu a fost gasit"));
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UnauthorizedException("Utilizatorul" + username + "nu a fost gasit"));
     }
 
-    public User findById(UUID userId){
-        return userRepository.findById(userId).orElseThrow(()-> new NotFoundException("Utilizatorul cu id= "+userId+" nu a fost gasit"));
+    public User findById(UUID userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Utilizatorul cu id= " + userId + " nu a fost gasit"));
     }
 
-    public UserResponseDto getUserById(UUID userId){
-        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException("Utilizatorul cu id= "+userId+" nu a fost gasit"));
+    public UserResponseDto getUserById(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Utilizatorul cu id= " + userId + " nu a fost gasit"));
         return UserMapper.toDto(user);
     }
 
-    public UserResponseDto saveUser(String username, String email, String password){
+    public UserResponseDto saveUser(String username, String email, String password) {
         int hashedPassword = password.hashCode();
-        User savedUser = userRepository.save(new User(username,email,hashedPassword));
+        User savedUser = userRepository.save(new User(username, email, hashedPassword));
         return UserMapper.toDto(savedUser);
     }
 
-    public List<UserResponseDto> getAllUsers(){
+    public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll().stream().map(UserMapper::toDto).toList();
     }
 }

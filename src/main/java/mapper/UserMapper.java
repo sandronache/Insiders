@@ -6,7 +6,7 @@ import main.java.entity.User;
 import java.time.LocalDateTime;
 
 public class UserMapper {
-    public static UserResponseDto toDto(User user){
+    public static UserResponseDto toDto(User user) {
         return new UserResponseDto(
                 user.getId(),
                 user.getUsername(),

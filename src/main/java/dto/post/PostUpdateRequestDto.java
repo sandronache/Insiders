@@ -8,4 +8,5 @@ public record PostUpdateRequestDto(
 
         @Size(max = 10000)
         String content
-) {}
+) {
+}

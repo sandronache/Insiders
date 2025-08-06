@@ -33,7 +33,8 @@ public class Comment {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public Comment() {}
+    public Comment() {
+    }
 
     public Comment(Post post, Comment parentComment, String content, User user) {
         this.id = UUID.randomUUID();

@@ -16,14 +16,14 @@ public class CommentMapper {
         this.votingService = votingService;
     }
 
-    public CommentResponseDto toDto(Comment comment, List<Comment>allComments, String currentUsername){
-        UUID parentId = comment.getParentComment() !=null ? comment.getParentComment().getId() : null;
+    public CommentResponseDto toDto(Comment comment, List<Comment> allComments, String currentUsername) {
+        UUID parentId = comment.getParentComment() != null ? comment.getParentComment().getId() : null;
         String author = comment.isDeleted() ? "[deleted]" : comment.getUser().getUsername();
 
         String content = comment.isDeleted() ? "[comentariu sters]" : comment.getContent();
         int upVotes = votingService.countUpvotesForComment(comment.getId());
         int downVotes = votingService.countDownvotesForComment(comment.getId());
-        int score = upVotes -  downVotes;
+        int score = upVotes - downVotes;
 
         String userVote = null;
         if (currentUsername != null) {
@@ -33,8 +33,8 @@ public class CommentMapper {
 
 
         List<CommentResponseDto> replies = allComments.stream()
-                .filter(c -> comment.getId().equals(c.getParentComment()!=null ? c.getParentComment().getId():null))
-                .map(c -> toDto(c, allComments,currentUsername))
+                .filter(c -> comment.getId().equals(c.getParentComment() != null ? c.getParentComment().getId() : null))
+                .map(c -> toDto(c, allComments, currentUsername))
                 .toList();
 
         return new CommentResponseDto(

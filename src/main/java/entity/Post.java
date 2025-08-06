@@ -29,7 +29,8 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public Post() {}
+    public Post() {
+    }
 
     public Post(String title, String content, User user, String subreddit) {
         this.id = UUID.randomUUID();

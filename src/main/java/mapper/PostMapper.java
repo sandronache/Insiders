@@ -5,8 +5,8 @@ import main.java.entity.Post;
 import main.java.model.PostModel;
 
 public class PostMapper {
-    public static PostResponseDto postToDto(Post post,int upvotes, int downvotes, int commentCount, String userVote){
-        int score = upvotes -  downvotes;
+    public static PostResponseDto postToDto(Post post, int upvotes, int downvotes, int commentCount, String userVote) {
+        int score = upvotes - downvotes;
 
         return new PostResponseDto(
                 post.getId(),

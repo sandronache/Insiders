@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 public record CommentUpdateRequestDto(
         @NotBlank(message = "Continutul nu poate lipsi")
-        @Size(max=1000)
+        @Size(max = 1000)
         String content
 ) {
 }

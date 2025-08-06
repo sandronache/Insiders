@@ -29,7 +29,8 @@ public class User {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String username, String email, int hashedPassword) {
         this.id = UUID.randomUUID();
@@ -54,5 +55,7 @@ public class User {
         return hashedPassword;
     }
 
-    public LocalDateTime getCreatedAt() {return createdAt;}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }
