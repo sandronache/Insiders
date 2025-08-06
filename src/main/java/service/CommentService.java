@@ -121,6 +121,10 @@ public class CommentService {
         return commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
     }
 
+    public int countCommentsByPostId(UUID postId) {
+        return commentRepository.countByPostId(postId);
+    }
+
 
 
 //    public Comment createComment(String content, String username) {
