@@ -24,16 +24,14 @@ import java.util.UUID;
 @Service
 public class PostManagementService {
     private final PostRepository postRepository;
-    private final ContentService contentService;
     private final DatabaseMappingService mappingService;
     private final CommentService commentService;
     private final VotingService votingService;
     private final UserManagementService userManagementService;
 
     @Autowired
-    public PostManagementService(PostRepository postRepository, ContentService contentService, DatabaseMappingService mappingService, CommentService commentService,  VotingService votingService, UserManagementService userManagementService) {
-        this.postRepository = postRepository;
-        this.contentService = contentService;
+    public PostManagementService(PostRepository postRepository, DatabaseMappingService mappingService, CommentService commentService,  VotingService votingService, UserManagementService userManagementService) {
+        this.postRepository = postRepository;git
         this.mappingService = mappingService;
         this.commentService = commentService;
         this.votingService = votingService;

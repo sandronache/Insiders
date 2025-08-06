@@ -1,68 +1,68 @@
-package main.java.service;
-
-import main.java.entity.Post;
-import main.java.entity.User;
-import main.java.logger.LoggerFacade;
-import main.java.model.AppData;
-import main.java.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.UUID;
-
-@Service
-public class AppDataService {
-    private final PostManagementService postService;
-    private final ContentService contentService;
-    private final AppData appData;
-    private final UserRepository userRepository;
-
-    @Autowired
-    private AppDataService(UserRepository userRepository, PostManagementService postService, ContentService contentService) {
-        this.userRepository = userRepository;
-        this.postService = postService;
-        this.contentService = contentService;
-        this.appData = createAppData();
-    }
-
-    public AppData getAppData() { return this.appData; }
-
-    public AppData createAppData() {
-        LoggerFacade.info("Creating new application data");
-
-        // Load posts from database (comments are loaded automatically)
-        TreeMap<UUID, Post> loadedPosts = postService.loadPostsFromDatabase();
-
-        // idNextPost nu mai este relevant cu UUID, setăm la 0 sau null
-        int idNextPost = 0;
-
-        // Load users from database
-        HashMap<String, User> registeredUsers = loadUsersFromDatabase();
-
-        return new AppData(loadedPosts, idNextPost, registeredUsers);
-    }
-
-    private HashMap<String, User> loadUsersFromDatabase() {
-        HashMap<String, User> users = new HashMap<>();
-
-        try {
-            List<User> userList = userRepository.findAll();
-
-            for (User user : userList) {
-                users.put(user.getUsername(), user);
-            }
-
-            LoggerFacade.info("Loaded " + userList.size() + " users from database");
-        } catch (Exception e) {
-            LoggerFacade.warning("Could not load users from database: " + e.getMessage());
-            LoggerFacade.info("Starting with empty user list");
-        }
-
-        return users;
-    }
+//package main.java.service;
+//
+//import main.java.entity.Post;
+//import main.java.entity.User;
+//import main.java.logger.LoggerFacade;
+//import main.java.model.AppData;
+//import main.java.repository.UserRepository;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.stereotype.Service;
+//
+//import java.util.HashMap;
+//import java.util.List;
+//import java.util.TreeMap;
+//import java.util.UUID;
+//
+//@Service
+//public class AppDataService {
+//    private final PostManagementService postService;
+//    private final ContentService contentService;
+//    private final AppData appData;
+//    private final UserRepository userRepository;
+//
+//    @Autowired
+//    private AppDataService(UserRepository userRepository, PostManagementService postService, ContentService contentService) {
+//        this.userRepository = userRepository;
+//        this.postService = postService;
+//        this.contentService = contentService;
+//        this.appData = createAppData();
+//    }
+//
+//    public AppData getAppData() { return this.appData; }
+//
+//    public AppData createAppData() {
+//        LoggerFacade.info("Creating new application data");
+//
+//        // Load posts from database (comments are loaded automatically)
+//        TreeMap<UUID, Post> loadedPosts = postService.loadPostsFromDatabase();
+//
+//        // idNextPost nu mai este relevant cu UUID, setăm la 0 sau null
+//        int idNextPost = 0;
+//
+//        // Load users from database
+//        HashMap<String, User> registeredUsers = loadUsersFromDatabase();
+//
+//        return new AppData(loadedPosts, idNextPost, registeredUsers);
+//    }
+//
+//    private HashMap<String, User> loadUsersFromDatabase() {
+//        HashMap<String, User> users = new HashMap<>();
+//
+//        try {
+//            List<User> userList = userRepository.findAll();
+//
+//            for (User user : userList) {
+//                users.put(user.getUsername(), user);
+//            }
+//
+//            LoggerFacade.info("Loaded " + userList.size() + " users from database");
+//        } catch (Exception e) {
+//            LoggerFacade.warning("Could not load users from database: " + e.getMessage());
+//            LoggerFacade.info("Starting with empty user list");
+//        }
+//
+//        return users;
+//    }
 
     // FOR CLI INTERFACE
 /*
@@ -118,4 +118,4 @@ public class AppDataService {
         return feed.toString();
     }
     */
-}
+//}

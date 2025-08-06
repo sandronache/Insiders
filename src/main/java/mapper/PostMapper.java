@@ -9,7 +9,7 @@ public class PostMapper {
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
-                post.getUsername(),
+                post.getUser().getUsername(),
                 post.getSubreddit(),
                 post.getUpvotes(),
                 post.getDownvotes(),

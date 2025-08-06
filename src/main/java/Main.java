@@ -6,9 +6,6 @@ package main.java;
 import main.java.logger.FileLogger;
 import main.java.logger.ILogger;
 import main.java.logger.LoggerFacade;
-import main.java.service.CommentService;
-import main.java.service.ContentService;
-import main.java.service.VotingService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

@@ -23,11 +23,9 @@ import java.util.UUID;
 @Service
 public class UserManagementService {
     private final UserRepository userRepository;
-    private final AppDataService appDataService;
 
     @Autowired
-    private UserManagementService(AppDataService appDataService, UserRepository userRepository) {
-        this.appDataService = appDataService;
+    private UserManagementService( UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
