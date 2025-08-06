@@ -111,6 +111,10 @@ public class VotingService {
         voteRepository.deleteByUserIdAndPostId(user.getId(), post.getId());
     }
 
+    public UUID getUserIdByUsername(String username){
+        return userManagementService.findByUsername(username).getId();
+    }
+
 
 
 //    public Vote createVote() {

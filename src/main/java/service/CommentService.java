@@ -33,7 +33,7 @@ public class CommentService {
     }
 
     //de pastrat la refactor
-    public List<CommentResponseDto> getCommentsForPost(UUID postId) {
+    public List<CommentResponseDto> getCommentsForPost(UUID postId, String currentUsername) {
         List<Comment> allComments = commentRepository.findByPostId(postId);
 
         List<Comment> rootComments = allComments.stream()
@@ -41,7 +41,7 @@ public class CommentService {
                 .toList();
 
         return rootComments.stream()
-                .map(c -> commentMapper.toDto(c, allComments))
+                .map(c -> commentMapper.toDto(c, allComments, currentUsername))
                 .toList();
     }
 
@@ -54,38 +54,40 @@ public class CommentService {
         Comment parent = null;
         if (request.parentId() != null) {
             parent = commentRepository.findById(request.parentId())
-                    .orElseThrow(() -> new NotFoundException("Comentariul părinte nu a fost găsit"));
+                    .orElseThrow(() -> new NotFoundException("Comentariul parinte nu a fost gasit"));
         }
 
         Comment comment = new Comment(post,parent, request.content(),user);
         Comment savedComment = commentRepository.save(comment);
 
-        return commentMapper.toDto(savedComment,List.of());
+        return commentMapper.toDto(savedComment,List.of(), request.author());
     }
 
 
     //de pastrat la refactor
-    public CommentResponseDto getCommentWithReplies(UUID commentId){
+    public CommentResponseDto getCommentWithReplies(UUID commentId,String currentUsername) {
         Comment mainComment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
         List<Comment> allComments = commentRepository.findByPostId(mainComment.getPost().getId());
 
-        return commentMapper.toDto(mainComment,allComments);
+        return commentMapper.toDto(mainComment,allComments,currentUsername);
     }
 
 
     //de pastrat la refactor
-    public CommentResponseDto updateComment(UUID commentId, CommentUpdateRequestDto request){
+    public CommentResponseDto updateComment(UUID commentId, CommentUpdateRequestDto request,String currentUsername) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
 
         comment.setContent(request.content());
         Comment updatedComment = commentRepository.save(comment);
-        return commentMapper.toDto(updatedComment,List.of());
+        return commentMapper.toDto(updatedComment,List.of(),currentUsername);
     }
 
     //de pastrat la refactor
     public void deleteComment(UUID commentId){
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new NotFoundException("Comentariul nu a fost gasit"));
-        commentRepository.delete(comment);
+        comment.setDeleted(true);
+        comment.setContent("[comentariu sters]");
+        commentRepository.save(comment);
     }
 
 

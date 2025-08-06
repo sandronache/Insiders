@@ -79,4 +79,8 @@ public class Comment {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
 }
