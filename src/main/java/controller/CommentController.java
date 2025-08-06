@@ -24,14 +24,14 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<ResponseApi<CommentResponseDto>> getCommentWithReplies(@PathVariable UUID commentId){
-        CommentResponseDto response = commentService.getCommentWithReplies(commentId);
+    public ResponseEntity<ResponseApi<CommentResponseDto>> getCommentWithReplies(@PathVariable UUID commentId, @RequestParam(defaultValue = "andrei") String username){
+        CommentResponseDto response = commentService.getCommentWithReplies(commentId,username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<ResponseApi<CommentResponseDto>> updateComment(@PathVariable UUID commentId, @RequestBody CommentUpdateRequestDto request){
-        CommentResponseDto response = commentService.updateComment(commentId,request);
+    public ResponseEntity<ResponseApi<CommentResponseDto>> updateComment(@PathVariable UUID commentId, @RequestBody CommentUpdateRequestDto request, @RequestParam(defaultValue = "andrei") String username){
+        CommentResponseDto response = commentService.updateComment(commentId,request,username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
@@ -42,9 +42,8 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}/vote")
-    public ResponseEntity<ResponseApi<VoteResponseDto>> voteComment(@PathVariable UUID commentId, @RequestBody VoteRequestDto request){
-        User user = null; //!!! aici trebuie modificat dupa ce reorganizam UserService
-        VoteResponseDto response = commentService.voteComment(commentId,request.voteType(),user.getUsername());
+    public ResponseEntity<ResponseApi<VoteResponseDto>> voteComment(@PathVariable UUID commentId, @RequestBody VoteRequestDto request,@RequestParam(defaultValue = "andrei") String username){
+        VoteResponseDto response = commentService.voteComment(commentId,request.voteType(),username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
