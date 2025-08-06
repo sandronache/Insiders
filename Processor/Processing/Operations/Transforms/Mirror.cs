@@ -1,13 +1,12 @@
-
-
-using Processing.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
-public class GrayscaleFilter : IImageOperation
-{
+namespace Processing.Operations;
+
+public class Mirror : IImageOperation {
+
     public void Apply(Image image, Dictionary<string, string> parameters)
     {
-        image.Mutate(x => x.Grayscale());
+        image.Mutate(x => x.Flip(FlipMode.Horizontal));
     }
 }

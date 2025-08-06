@@ -9,8 +9,8 @@ class Program
     static void Main()
     {
         /* Complete with your paths. */
-        string testInputPath = @"C:\Users\...\TestInput.json";
-        string testOutputPath = @"C:\Users\...\TestOutput.json";
+        string testInputPath = @"C:\Users\augus\Desktop\TestInput.json";
+        string testOutputPath = @"C:\Users\augus\Desktop\TestOutput.json";
 
         string jsonIn = File.ReadAllText(testInputPath);
 

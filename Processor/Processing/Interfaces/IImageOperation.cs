@@ -1,6 +1,7 @@
 using Processing.Models;
+using SixLabors.ImageSharp;
 
 public interface IImageOperation
 {
-    public void Apply(ImagePackage imagePacket, Dictionary<string, string> parameters);
+    public void Apply(Image image, Dictionary<string, string> parameters);
 }

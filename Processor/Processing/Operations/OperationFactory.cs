@@ -8,7 +8,8 @@ public class ImageOperationFactory
         _operations = new Dictionary<OperationType, IImageOperation>()
         {
             { OperationType.GrayscaleFilter, new GrayscaleFilter() },
-            { OperationType.InvertFilter, new InvertFilter() }
+            { OperationType.Mirror, new Mirror() },
+            { OperationType.Resize, new Resize() }
         };
     }
 
