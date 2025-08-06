@@ -184,3 +184,5 @@
 2025-07-31 10:36:47 INFO: - POST /api/post/{postId}/downvote
 2025-07-31 10:36:47 INFO: - POST /api/comment/{commentId}/upvote
 2025-07-31 10:36:47 INFO: - POST /api/comment/{commentId}/downvote
+2025-08-06 14:32:37 INFO: new version
+2025-08-06 14:32:37 INFO: Application starting up
