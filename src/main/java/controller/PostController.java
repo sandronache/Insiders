@@ -8,6 +8,7 @@ import main.java.entity.Post;
 import main.java.entity.User;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
+import main.java.model.PostModel;
 import main.java.service.CommentService;
 import main.java.service.PostManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +43,8 @@ public class PostController {
     public ResponseEntity<ResponseApi<List<PostResponseDto>>> getAllPosts(@RequestParam(required = false) String subreddit) {
         LoggerFacade.info("GET /posts called");
 
-        List<Post> posts = postManagementService.getAllPosts(subreddit);
-        List<PostResponseDto> dtos = posts.stream().map(PostMapper::postToDto).toList();
+        List<PostModel> posts = postManagementService.getAllPosts(subreddit);
+        List<PostResponseDto> dtos = posts.stream().map(PostMapper::postModelToDto).toList();
 
         return ResponseEntity.ok(new ResponseApi<>(true,dtos));
 

@@ -9,10 +9,12 @@ import main.java.exceptions.PostNotFoundException;
 import main.java.logger.LoggerFacade;
 import main.java.mapper.PostMapper;
 import main.java.entity.Post;
+import main.java.model.PostModel;
 import main.java.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -24,19 +26,58 @@ import java.util.UUID;
 @Service
 public class PostManagementService {
     private final PostRepository postRepository;
+    private final ContentService contentService;
     private final DatabaseMappingService mappingService;
     private final CommentService commentService;
     private final VotingService votingService;
     private final UserManagementService userManagementService;
 
     @Autowired
-    public PostManagementService(PostRepository postRepository, DatabaseMappingService mappingService, CommentService commentService,  VotingService votingService, UserManagementService userManagementService) {
-        this.postRepository = postRepository;git
+    public PostManagementService(PostRepository postRepository, ContentService contentService, DatabaseMappingService mappingService, CommentService commentService, VotingService votingService, UserManagementService userManagementService) {
+        this.postRepository = postRepository;
+        this.contentService = contentService;
         this.mappingService = mappingService;
         this.commentService = commentService;
         this.votingService = votingService;
         this.userManagementService = userManagementService;
     }
+
+    private List<Post> getBasePosts(String subreddit) {
+        if (subreddit == null || subreddit.isBlank()) {
+            return postRepository.findAllByOrderByCreatedAtDesc();
+        }
+        return postRepository.findBySubredditOrderByCreatedAtDesc(subreddit);
+    }
+
+    private PostModel buildFinalPost(Post post) {
+        PostModel postModel = new PostModel(post);
+
+        int upVotes = votingService.countUpvotesForPost(post.getId());
+        int downVotes = votingService.countDownvotesForPost(post.getId());
+        int commentCount = commentService.countCommentsByPostId(post.getId());
+
+        postModel.setUpvotes(upVotes);
+        postModel.setDownvotes(downVotes);
+        postModel.setScore(upVotes - downVotes);
+        postModel.setCommentCount(commentCount);
+        postModel.setUserVote(null);
+
+        return postModel;
+    }
+
+    public List<PostModel> getAllPosts (String subreddit) {
+        List<Post> basePosts= getBasePosts(subreddit);
+
+        List<PostModel> finalPosts = new LinkedList<>();
+
+        basePosts.forEach(post ->{
+                finalPosts.add(buildFinalPost(post));
+        });
+
+        return finalPosts;
+    }
+
+}
 
 //    public TreeMap<UUID, Post> loadPostsFromDatabase() {
 //        TreeMap<UUID, Post> posts = new TreeMap<>();
@@ -71,72 +112,69 @@ public class PostManagementService {
 //
 //        return posts;
 //    }
-
-
-    public List<Post> getAllPosts(String subreddit) {
-        if (subreddit != null && !subreddit.trim().isEmpty()) {
-            return postRepository.findBySubredditOrderByCreatedAtDesc(subreddit.trim());
-        }
-        return postRepository.findAllByOrderByCreatedAtDesc();
-    }
-
-    public Post createPost(String title, String content, String author, String subreddit) {
-        User user = userManagementService.findByUsername(author);
-        Post post = new Post(title, content, user, subreddit);
-        return postRepository.save(post);
-    }
-
-    public PostResponseDto updatePost(UUID id, PostUpdateRequestDto requestDto) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + id + " nu a fost gasita."));
-
-        if (requestDto.title() != null && !requestDto.title().isBlank()) {
-            post.setTitle(requestDto.title());
-        }
-
-        if (requestDto.content() != null && !requestDto.content().isBlank()) {
-            post.setContent(requestDto.content());
-        }
-
-        postRepository.save(post);
-        return PostMapper.postToDto(post);
-    }
-
-
-    public void deletePostById(UUID postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new PostNotFoundException("Postarea nu a fost gasita");
-        }
-
-        postRepository.deleteById(postId);
-        LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
-    }
-
-    public Post getPostById(UUID postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
-    }
-
-    public VoteResponseDto votePost(UUID postId, String voteType, String username) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Postarea nu a fost gasita"));
-
-        User user = userManagementService.findByUsername(username);
-
-        switch (voteType.toLowerCase()) {
-            case "up" -> votingService.createVote(user.getId(), post.getId(), null, true);
-            case "down" -> votingService.createVote(user.getId(), post.getId(), null, false);
-            case "none" -> votingService.deleteVoteForPost(post, user);
-            default -> throw new InvalidVoteTypeException("Tip de vot invalid: " + voteType);
-        }
-
-        int upvotes = votingService.countUpvotesForPost(post.getId());
-        int downvotes = votingService.countDownvotesForPost(post.getId());
-        int score = upvotes - downvotes;
-        String userVote = votingService.getVoteTypeForUser(user.getId(),postId,null);
-
-        return new VoteResponseDto(upvotes, downvotes, score, userVote);
-    }
-
-
-}
+//
+//
+//    public List<Post> getAllPosts(String subreddit) {
+//        if (subreddit != null && !subreddit.trim().isEmpty()) {
+//            return postRepository.findBySubredditOrderByCreatedAtDesc(subreddit.trim());
+//        }
+//        return postRepository.findAllByOrderByCreatedAtDesc();
+//    }
+//
+//    public Post createPost(String title, String content, String author, String subreddit) {
+//        User user = userManagementService.findByUsername(author);
+//        Post post = new Post(title, content, user, subreddit);
+//        return postRepository.save(post);
+//    }
+//
+//    public PostResponseDto updatePost(UUID id, PostUpdateRequestDto requestDto) {
+//        Post post = postRepository.findById(id)
+//                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + id + " nu a fost gasita."));
+//
+//        if (requestDto.title() != null && !requestDto.title().isBlank()) {
+//            post.setTitle(requestDto.title());
+//        }
+//
+//        if (requestDto.content() != null && !requestDto.content().isBlank()) {
+//            post.setContent(requestDto.content());
+//        }
+//
+//        postRepository.save(post);
+//        return PostMapper.postToDto(post);
+//    }
+//
+//
+//    public void deletePostById(UUID postId) {
+//        if (!postRepository.existsById(postId)) {
+//            throw new PostNotFoundException("Postarea nu a fost gasita");
+//        }
+//
+//        postRepository.deleteById(postId);
+//        LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
+//    }
+//
+//    public Post getPostById(UUID postId) {
+//        return postRepository.findById(postId)
+//                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
+//    }
+//
+//    public VoteResponseDto votePost(UUID postId, String voteType, String username) {
+//        Post post = postRepository.findById(postId)
+//                .orElseThrow(() -> new PostNotFoundException("Postarea nu a fost gasita"));
+//
+//        User user = userManagementService.findByUsername(username);
+//
+//        switch (voteType.toLowerCase()) {
+//            case "up" -> votingService.createVote(user.getId(), post.getId(), null, true);
+//            case "down" -> votingService.createVote(user.getId(), post.getId(), null, false);
+//            case "none" -> votingService.deleteVoteForPost(post, user);
+//            default -> throw new InvalidVoteTypeException("Tip de vot invalid: " + voteType);
+//        }
+//
+//        int upvotes = votingService.countUpvotesForPost(post.getId());
+//        int downvotes = votingService.countDownvotesForPost(post.getId());
+//        int score = upvotes - downvotes;
+//        String userVote = votingService.getVoteTypeForUser(user.getId(),postId,null);
+//
+//        return new VoteResponseDto(upvotes, downvotes, score, userVote);
+//    }
