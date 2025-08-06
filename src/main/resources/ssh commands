@@ -9,3 +9,9 @@ ssh -i "insiders2025.pem" ec2-user@ec2-63-176-52-116.eu-central-1.compute.amazon
 Use insiders2.pem
 
 ssh -i "insiders2.pem" ubuntu@ec2-3-74-161-90.eu-central-1.compute.amazonaws.com
+
+For updating the backend in the EC2:
+
+cd path/to/your/local/Insiders/repository/
+mvn clean package
+scp -i "insiders2.pem" target/insiders-app-1.0-SNAPSHOT.jar ubuntu@ec2-3-74-161-90.eu-central-1.compute.amazonaws.com

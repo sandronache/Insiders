@@ -1,12 +1,21 @@
 package main.java.controller;
 
+import jakarta.validation.Valid;
+import main.java.dto.user.UserCreateRequestDto;
+import main.java.dto.user.UserResponseDto;
 import main.java.entity.User;
 import main.java.service.UserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.function.EntityResponse;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserManagementService userManagementService;
@@ -16,40 +25,22 @@ public class UserController {
         this.userManagementService = userManagementService;
     }
 
-    // For demonstration; in production, use session or security context
+    @PostMapping()
+    public ResponseEntity<ResponseApi<UserResponseDto>> createUser(@Valid @RequestBody UserCreateRequestDto request){
+        UserResponseDto response = userManagementService.saveUser(request.username(), request.email(), request.password());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, response));
+    }
 
-//    @PostMapping("/register")
-//    public String register(@RequestParam String username,
-//                           @RequestParam String email,
-//                           @RequestParam String password) {
-//        boolean success = userManagementService.register(appDataService.getAppData(), username, email, password);
-//        return success ? "Registration successful" : "Registration failed";
-//    }
-//
-//    @PostMapping("/login")
-//    public String login(@RequestParam String username,
-//                        @RequestParam String password) {
-//        boolean success = userManagementService.login(appDataService.getAppData(), username, password);
-//        return success ? "Login successful" : "Login failed";
-//    }
-//
-//    @PostMapping("/logout")
-//    public String logout() {
-//        userManagementService.logout(appDataService.getAppData());
-//        return "Logged out";
-//    }
-//
-//    @DeleteMapping("/delete")
-//    public String deleteUser() {
-//        if (appDataService.getAppData().getLoggedUser() == null) {
-//            return "No user logged in";
-//        }
-//        userManagementService.deleteUser(appDataService.getAppData());
-//        return "User deleted";
-//    }
-//
-//    @GetMapping("/me")
-//    public User getCurrentUser() {
-//        return appDataService.getAppData().getLoggedUser();
-//    }
+    @GetMapping("/{userId}")
+    public ResponseEntity<ResponseApi<UserResponseDto>> getUser(@PathVariable UUID userId){
+        UserResponseDto response = userManagementService.getUserById(userId);
+        return ResponseEntity.ok(new ResponseApi<>(true, response));
+    }
+
+    @GetMapping()
+    public ResponseEntity<ResponseApi<List<UserResponseDto>>> getUsers(){
+        List<UserResponseDto> users = userManagementService.getAllUsers();
+        return ResponseEntity.ok(new ResponseApi<>(true, users));
+    }
+
 }
