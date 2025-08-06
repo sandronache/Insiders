@@ -21,14 +21,12 @@ public class CommentService {
     private final VotingService votingService;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
-    private final PostManagementService postManagementService;
     private final UserManagementService userManagementService;
 
-    public  CommentService(VotingService votingService, CommentRepository commentRepository, CommentMapper commentMapper, PostManagementService postManagementService, UserManagementService userManagementService) {
+    public  CommentService(VotingService votingService, CommentRepository commentRepository, CommentMapper commentMapper, UserManagementService userManagementService) {
         this.votingService = votingService;
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
-        this.postManagementService = postManagementService;
         this.userManagementService = userManagementService;
     }
 
@@ -47,9 +45,8 @@ public class CommentService {
 
 
     //de pastrat la refactor
-    public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request){
-        Post post = postManagementService.getPostById(postId);
-        User user =userManagementService.findByUsername(request.author());
+    public CommentResponseDto createComment(Post post, CommentCreateRequestDto request){
+        User user = userManagementService.findByUsername(request.author());
 
         Comment parent = null;
         if (request.parentId() != null) {
@@ -57,10 +54,10 @@ public class CommentService {
                     .orElseThrow(() -> new NotFoundException("Comentariul parinte nu a fost gasit"));
         }
 
-        Comment comment = new Comment(post,parent, request.content(),user);
+        Comment comment = new Comment(post, parent, request.content(),user);
         Comment savedComment = commentRepository.save(comment);
 
-        return commentMapper.toDto(savedComment,List.of(), request.author());
+        return commentMapper.toDto(savedComment, List.of(), request.author());
     }
 
 

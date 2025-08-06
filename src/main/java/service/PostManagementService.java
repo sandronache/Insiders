@@ -1,10 +1,14 @@
 package main.java.service;
 
+import main.java.dto.comment.CommentCreateRequestDto;
+import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.post.PostResponseDto;
 import main.java.dto.post.PostUpdateRequestDto;
 import main.java.dto.vote.VoteResponseDto;
+import main.java.entity.Comment;
 import main.java.entity.User;
 import main.java.exceptions.InvalidVoteTypeException;
+import main.java.exceptions.NotFoundException;
 import main.java.exceptions.PostNotFoundException;
 import main.java.entity.Post;
 import main.java.logger.LoggerFacade;
@@ -149,6 +153,12 @@ public class PostManagementService {
 
         postRepository.deleteById(postId);
         LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
+    }
+
+    public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request){
+        Post post = getPostById(postId);
+
+        return commentService.createComment(post, request);
     }
 
 }

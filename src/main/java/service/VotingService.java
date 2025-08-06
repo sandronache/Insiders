@@ -21,14 +21,12 @@ public class VotingService {
     private final PostManagementService postManagementService;
     private final UserManagementService userManagementService;
     private final CommentService commentService;
-    private final CommentRepository commentRepository;
 
-    public VotingService(VoteRepository voteRepository, PostManagementService postManagementService, UserManagementService userManagementService, CommentService commentService, CommentRepository commentRepository) {
+    public VotingService(VoteRepository voteRepository, PostManagementService postManagementService, UserManagementService userManagementService, CommentService commentService) {
         this.voteRepository = voteRepository;
         this.postManagementService = postManagementService;
         this.userManagementService = userManagementService;
         this.commentService = commentService;
-        this.commentRepository = commentRepository;
     }
 
     //de pastrat la refactor
