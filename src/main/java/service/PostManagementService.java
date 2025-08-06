@@ -26,16 +26,14 @@ import java.util.UUID;
 @Service
 public class PostManagementService {
     private final PostRepository postRepository;
-    private final ContentService contentService;
     private final DatabaseMappingService mappingService;
     private final CommentService commentService;
     private final VotingService votingService;
     private final UserManagementService userManagementService;
 
     @Autowired
-    public PostManagementService(PostRepository postRepository, ContentService contentService, DatabaseMappingService mappingService, CommentService commentService, VotingService votingService, UserManagementService userManagementService) {
+    public PostManagementService(PostRepository postRepository, DatabaseMappingService mappingService, CommentService commentService, VotingService votingService, UserManagementService userManagementService) {
         this.postRepository = postRepository;
-        this.contentService = contentService;
         this.mappingService = mappingService;
         this.commentService = commentService;
         this.votingService = votingService;
@@ -75,6 +73,18 @@ public class PostManagementService {
         });
 
         return finalPosts;
+    }
+
+    public PostModel getPostByIdModel(UUID postId) {
+        Post basePost = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
+
+        return buildFinalPost(basePost);
+    }
+
+    public Post getPostById(UUID postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
     }
 
 }

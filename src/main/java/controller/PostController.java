@@ -83,8 +83,8 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<ResponseApi<PostResponseDto>> getPostById(@PathVariable UUID postId) {
-        Post post = postManagementService.getPostById(postId);
-        PostResponseDto dto = PostMapper.postToDto(post);
+        PostModel post = postManagementService.getPostByIdModel(postId);
+        PostResponseDto dto = PostMapper.postModelToDto(post);
 
         return ResponseEntity.ok(new ResponseApi<>(true,dto));
     }

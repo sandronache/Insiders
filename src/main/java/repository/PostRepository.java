@@ -9,6 +9,7 @@ import java.util.UUID;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, UUID> {
+    Post getPostById(UUID postId);
     List<Post> findAllByOrderByCreatedAtDesc();
     List<Post> findBySubredditOrderByCreatedAtDesc(String subreddit);
 }
