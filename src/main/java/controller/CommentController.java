@@ -2,8 +2,6 @@ package main.java.controller;
 
 import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.comment.CommentUpdateRequestDto;
-import main.java.dto.comment.VoteRequestDto;
-import main.java.dto.comment.VoteResponseDto;
 import main.java.entity.User;
 import main.java.service.CommentService;
 import main.java.service.UserManagementService;
