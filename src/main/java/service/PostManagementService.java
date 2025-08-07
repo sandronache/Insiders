@@ -1,6 +1,7 @@
 package main.java.service;
 
 // TODO: Service is using Dto objects but they must never get past Controller layer. Must only use from "model" package
+import jakarta.transaction.Transactional;
 import main.java.dto.comment.CommentCreateRequestDto;
 import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.post.PostUpdateRequestDto;
@@ -163,6 +164,7 @@ public class PostManagementService {
         LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
     }
 
+    @Transactional
     public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request) {
         Post post = getPostById(postId);
 

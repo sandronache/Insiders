@@ -1,11 +1,13 @@
 package main.java.service;
 
+import jakarta.transaction.Transactional;
+import main.java.dto.vote.VoteResponseDto;
 import main.java.entity.Comment;
 import main.java.entity.Post;
 import main.java.entity.User;
 import main.java.entity.Vote;
+import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.NotFoundException;
-import main.java.logger.LoggerFacade;
 import main.java.repository.CommentRepository;
 import main.java.repository.PostRepository;
 import main.java.repository.VoteRepository;
@@ -13,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -22,14 +23,33 @@ public class VotingService {
     private final VoteRepository voteRepository;
     private final PostRepository postRepository;
     private final UserManagementService userManagementService;
-    private final CommentLookUpService commentLookUpService;
+    private final CommentRepository commentRepository;
 
     @Autowired
-    public VotingService(VoteRepository voteRepository, PostRepository postRepository, UserManagementService userManagementService, CommentLookUpService commentLookUpService) {
+    public VotingService(VoteRepository voteRepository, PostRepository postRepository, UserManagementService userManagementService, CommentRepository commentRepository) {
         this.voteRepository = voteRepository;
         this.postRepository = postRepository;
         this.userManagementService = userManagementService;
-        this.commentLookUpService = commentLookUpService;
+        this.commentRepository = commentRepository;
+    }
+
+    @Transactional
+    public VoteResponseDto voteComment(UUID commentId, String voteType, String username) {
+        User user = userManagementService.findByUsername(username);
+
+        switch (voteType.toLowerCase()) {
+            case "up" -> createVote(user.getId(), null, commentId, true);
+            case "down" -> createVote(user.getId(), null, commentId, false);
+            case "none" -> deleteVoteForComment(commentId, user);
+            default -> throw new InvalidVoteTypeException("Tipul de vot este invalid: " + voteType);
+        }
+
+        int upvotes = countUpvotesForComment(commentId);
+        int downvotes = countDownvotesForComment(commentId);
+        int score = upvotes - downvotes;
+        String userVote = getVoteTypeForUser(user.getId(), null, commentId);
+
+        return new VoteResponseDto(upvotes, downvotes, score, userVote);
     }
 
     public void createVote(UUID userId, UUID postId, UUID commentId, boolean isUpvote) {
@@ -57,7 +77,9 @@ public class VotingService {
                 vote.setUpvote(isUpvote);
                 voteRepository.save(vote);
             } else {
-                Comment comment = commentLookUpService.findById(commentId);
+                Comment comment = commentRepository.findById(commentId)
+                        .orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
+
                 Vote vote = new Vote(null, comment, user, isUpvote);
                 voteRepository.save(vote);
             }
@@ -67,8 +89,8 @@ public class VotingService {
     }
 
 
-    public void deleteVoteForComment(Comment comment, User user) {
-        voteRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
+    public void deleteVoteForComment(UUID commentId, User user) {
+        voteRepository.deleteByUserIdAndCommentId(user.getId(), commentId);
     }
 
     public int countUpvotesForComment(UUID commentId) {
@@ -102,9 +124,5 @@ public class VotingService {
 
     public void deleteVoteForPost(Post post, User user) {
         voteRepository.deleteByUserIdAndPostId(user.getId(), post.getId());
-    }
-
-    public UUID getUserIdByUsername(String username) {
-        return userManagementService.findByUsername(username).getId();
     }
 }

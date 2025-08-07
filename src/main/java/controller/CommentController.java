@@ -6,6 +6,7 @@ import main.java.dto.vote.VoteRequestDto;
 import main.java.dto.vote.VoteResponseDto;
 import main.java.service.CommentService;
 import main.java.service.UserManagementService;
+import main.java.service.VotingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +16,11 @@ import java.util.UUID;
 @RequestMapping("/comments")
 public class CommentController {
     public final CommentService commentService;
+    private final VotingService votingService;
 
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService, VotingService votingService) {
         this.commentService = commentService;
+        this.votingService = votingService;
     }
 
     @GetMapping("/{commentId}")
@@ -40,7 +43,7 @@ public class CommentController {
 
     @PutMapping("/{commentId}/vote")
     public ResponseEntity<ResponseApi<VoteResponseDto>> voteComment(@PathVariable UUID commentId, @RequestBody VoteRequestDto request, @RequestParam(defaultValue = "andrei") String username) {
-        VoteResponseDto response = commentService.voteComment(commentId, request.voteType(), username);
+        VoteResponseDto response = votingService.voteComment(commentId, request.voteType(), username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 

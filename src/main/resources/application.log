@@ -278,3 +278,135 @@
 2025-08-07 18:00:15 INFO: - GET /posts/{id}
 2025-08-07 18:00:15 INFO: - PUT /posts/{id}/vote
 2025-08-07 18:00:16 INFO: Application shutting down
+2025-08-07 18:19:55 INFO: new version
+2025-08-07 18:19:55 INFO: Application starting up
+2025-08-07 18:25:24 INFO: new version
+2025-08-07 18:25:24 INFO: Application starting up
+2025-08-07 18:25:32 INFO: PostController initialized with endpoints:
+2025-08-07 18:25:32 INFO: - GET /posts
+2025-08-07 18:25:32 INFO: - POST /posts
+2025-08-07 18:25:32 INFO: - PUT /posts/{id}
+2025-08-07 18:25:32 INFO: - DELETE /posts/{id}
+2025-08-07 18:25:32 INFO: - GET /posts/{id}
+2025-08-07 18:25:32 INFO: - PUT /posts/{id}/vote
+2025-08-07 18:25:32 INFO: Application shutting down
+2025-08-07 18:34:20 INFO: new version
+2025-08-07 18:34:20 INFO: Application starting up
+2025-08-07 18:34:27 INFO: PostController initialized with endpoints:
+2025-08-07 18:34:27 INFO: - GET /posts
+2025-08-07 18:34:27 INFO: - POST /posts
+2025-08-07 18:34:27 INFO: - PUT /posts/{id}
+2025-08-07 18:34:27 INFO: - DELETE /posts/{id}
+2025-08-07 18:34:27 INFO: - GET /posts/{id}
+2025-08-07 18:34:27 INFO: - PUT /posts/{id}/vote
+2025-08-07 18:34:27 INFO: Application shutting down
+2025-08-07 18:42:20 INFO: new version
+2025-08-07 18:42:20 INFO: Application starting up
+2025-08-07 18:42:27 INFO: PostController initialized with endpoints:
+2025-08-07 18:42:27 INFO: - GET /posts
+2025-08-07 18:42:27 INFO: - POST /posts
+2025-08-07 18:42:27 INFO: - PUT /posts/{id}
+2025-08-07 18:42:27 INFO: - DELETE /posts/{id}
+2025-08-07 18:42:27 INFO: - GET /posts/{id}
+2025-08-07 18:42:27 INFO: - PUT /posts/{id}/vote
+2025-08-07 18:42:27 INFO: Application shutting down
+2025-08-07 19:27:08 INFO: new version
+2025-08-07 19:27:08 INFO: Application starting up
+2025-08-07 19:27:17 INFO: PostController initialized with endpoints:
+2025-08-07 19:27:17 INFO: - GET /posts
+2025-08-07 19:27:17 INFO: - POST /posts
+2025-08-07 19:27:17 INFO: - PUT /posts/{id}
+2025-08-07 19:27:17 INFO: - DELETE /posts/{id}
+2025-08-07 19:27:17 INFO: - GET /posts/{id}
+2025-08-07 19:27:17 INFO: - PUT /posts/{id}/vote
+2025-08-07 19:27:17 INFO: Application shutting down
+2025-08-07 19:40:44 INFO: new version
+2025-08-07 19:40:44 INFO: Application starting up
+2025-08-07 19:40:51 INFO: PostController initialized with endpoints:
+2025-08-07 19:40:51 INFO: - GET /posts
+2025-08-07 19:40:51 INFO: - POST /posts
+2025-08-07 19:40:51 INFO: - PUT /posts/{id}
+2025-08-07 19:40:51 INFO: - DELETE /posts/{id}
+2025-08-07 19:40:51 INFO: - GET /posts/{id}
+2025-08-07 19:40:51 INFO: - PUT /posts/{id}/vote
+2025-08-07 19:40:52 INFO: Application shutting down
+2025-08-07 19:41:42 INFO: new version
+2025-08-07 19:41:42 INFO: Application starting up
+2025-08-07 19:41:48 INFO: PostController initialized with endpoints:
+2025-08-07 19:41:48 INFO: - GET /posts
+2025-08-07 19:41:48 INFO: - POST /posts
+2025-08-07 19:41:48 INFO: - PUT /posts/{id}
+2025-08-07 19:41:48 INFO: - DELETE /posts/{id}
+2025-08-07 19:41:48 INFO: - GET /posts/{id}
+2025-08-07 19:41:48 INFO: - PUT /posts/{id}/vote
+2025-08-07 19:41:49 INFO: Application shutting down
+2025-08-07 19:51:17 INFO: new version
+2025-08-07 19:51:17 INFO: Application starting up
+2025-08-07 19:51:24 INFO: PostController initialized with endpoints:
+2025-08-07 19:51:24 INFO: - GET /posts
+2025-08-07 19:51:24 INFO: - POST /posts
+2025-08-07 19:51:24 INFO: - PUT /posts/{id}
+2025-08-07 19:51:24 INFO: - DELETE /posts/{id}
+2025-08-07 19:51:24 INFO: - GET /posts/{id}
+2025-08-07 19:51:24 INFO: - PUT /posts/{id}/vote
+2025-08-07 19:51:24 INFO: Application shutting down
+2025-08-07 19:57:22 INFO: new version
+2025-08-07 19:57:22 INFO: Application starting up
+2025-08-07 19:57:29 INFO: PostController initialized with endpoints:
+2025-08-07 19:57:29 INFO: - GET /posts
+2025-08-07 19:57:29 INFO: - POST /posts
+2025-08-07 19:57:29 INFO: - PUT /posts/{id}
+2025-08-07 19:57:29 INFO: - DELETE /posts/{id}
+2025-08-07 19:57:29 INFO: - GET /posts/{id}
+2025-08-07 19:57:29 INFO: - PUT /posts/{id}/vote
+2025-08-07 19:57:29 INFO: Application shutting down
+2025-08-07 20:01:47 INFO: new version
+2025-08-07 20:01:47 INFO: Application starting up
+2025-08-07 20:01:53 INFO: PostController initialized with endpoints:
+2025-08-07 20:01:53 INFO: - GET /posts
+2025-08-07 20:01:53 INFO: - POST /posts
+2025-08-07 20:01:53 INFO: - PUT /posts/{id}
+2025-08-07 20:01:53 INFO: - DELETE /posts/{id}
+2025-08-07 20:01:53 INFO: - GET /posts/{id}
+2025-08-07 20:01:53 INFO: - PUT /posts/{id}/vote
+2025-08-07 20:01:54 INFO: Application shutting down
+2025-08-07 21:34:47 INFO: new version
+2025-08-07 21:34:47 INFO: Application starting up
+2025-08-07 21:34:55 INFO: PostController initialized with endpoints:
+2025-08-07 21:34:55 INFO: - GET /posts
+2025-08-07 21:34:55 INFO: - POST /posts
+2025-08-07 21:34:55 INFO: - PUT /posts/{id}
+2025-08-07 21:34:55 INFO: - DELETE /posts/{id}
+2025-08-07 21:34:55 INFO: - GET /posts/{id}
+2025-08-07 21:34:55 INFO: - PUT /posts/{id}/vote
+2025-08-07 21:34:55 INFO: Application shutting down
+2025-08-07 21:58:53 INFO: new version
+2025-08-07 21:58:53 INFO: Application starting up
+2025-08-07 21:59:00 INFO: PostController initialized with endpoints:
+2025-08-07 21:59:00 INFO: - GET /posts
+2025-08-07 21:59:00 INFO: - POST /posts
+2025-08-07 21:59:00 INFO: - PUT /posts/{id}
+2025-08-07 21:59:00 INFO: - DELETE /posts/{id}
+2025-08-07 21:59:00 INFO: - GET /posts/{id}
+2025-08-07 21:59:00 INFO: - PUT /posts/{id}/vote
+2025-08-07 21:59:00 INFO: Application shutting down
+2025-08-07 23:13:13 INFO: new version
+2025-08-07 23:13:13 INFO: Application starting up
+2025-08-07 23:13:21 INFO: PostController initialized with endpoints:
+2025-08-07 23:13:21 INFO: - GET /posts
+2025-08-07 23:13:21 INFO: - POST /posts
+2025-08-07 23:13:21 INFO: - PUT /posts/{id}
+2025-08-07 23:13:21 INFO: - DELETE /posts/{id}
+2025-08-07 23:13:21 INFO: - GET /posts/{id}
+2025-08-07 23:13:21 INFO: - PUT /posts/{id}/vote
+2025-08-07 23:13:21 INFO: Application shutting down
+2025-08-07 23:23:05 INFO: new version
+2025-08-07 23:23:05 INFO: Application starting up
+2025-08-07 23:23:12 INFO: PostController initialized with endpoints:
+2025-08-07 23:23:12 INFO: - GET /posts
+2025-08-07 23:23:12 INFO: - POST /posts
+2025-08-07 23:23:12 INFO: - PUT /posts/{id}
+2025-08-07 23:23:12 INFO: - DELETE /posts/{id}
+2025-08-07 23:23:12 INFO: - GET /posts/{id}
+2025-08-07 23:23:12 INFO: - PUT /posts/{id}/vote
+2025-08-07 23:23:12 INFO: Application shutting down

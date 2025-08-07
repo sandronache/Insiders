@@ -2,6 +2,7 @@ package main.java.mapper;
 
 import main.java.dto.comment.CommentResponseDto;
 import main.java.entity.Comment;
+import main.java.service.UserManagementService;
 import main.java.service.VotingService;
 import org.springframework.stereotype.Component;
 
@@ -11,9 +12,11 @@ import java.util.UUID;
 @Component
 public class CommentMapper {
     private final VotingService votingService;
+    private final UserManagementService userManagementService;
 
-    public CommentMapper(VotingService votingService) {
+    public CommentMapper(VotingService votingService, UserManagementService userManagementService) {
         this.votingService = votingService;
+        this.userManagementService = userManagementService;
     }
 
     public CommentResponseDto toDto(Comment comment, List<Comment> allComments, String currentUsername) {
@@ -27,7 +30,7 @@ public class CommentMapper {
 
         String userVote = null;
         if (currentUsername != null) {
-            UUID userId = votingService.getUserIdByUsername(currentUsername);
+            UUID userId = userManagementService.findByUsername(currentUsername).getId();
             userVote = votingService.getVoteTypeForUser(userId, null, comment.getId());
         }
 

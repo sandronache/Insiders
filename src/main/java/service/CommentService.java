@@ -1,13 +1,12 @@
 package main.java.service;
 
+import jakarta.transaction.Transactional;
 import main.java.dto.comment.CommentCreateRequestDto;
 import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.comment.CommentUpdateRequestDto;
-import main.java.dto.vote.VoteResponseDto;
 import main.java.entity.Comment;
 import main.java.entity.Post;
 import main.java.entity.User;
-import main.java.exceptions.InvalidVoteTypeException;
 import main.java.exceptions.NotFoundException;
 import main.java.mapper.CommentMapper;
 import main.java.repository.CommentRepository;
@@ -18,19 +17,21 @@ import java.util.UUID;
 
 @Service
 public class CommentService {
-    private final CommentVotingService commentVotingService;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final UserManagementService userManagementService;
 
-    public CommentService(CommentVotingService commentVotingService, CommentRepository commentRepository, CommentMapper commentMapper, UserManagementService userManagementService) {
-        this.commentVotingService = commentVotingService;
+    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper, UserManagementService userManagementService) {
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
         this.userManagementService = userManagementService;
     }
 
+    public Comment getCommentById(UUID id){
+        return commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
+    }
 
+    @Transactional
     public List<CommentResponseDto> getCommentsForPost(UUID postId, String currentUsername) {
         List<Comment> allComments = commentRepository.findByPostId(postId);
 
@@ -49,8 +50,7 @@ public class CommentService {
 
         Comment parent = null;
         if (request.parentId() != null) {
-            parent = commentRepository.findById(request.parentId())
-                    .orElseThrow(() -> new NotFoundException("Comentariul parinte nu a fost gasit"));
+            parent = getCommentById(request.parentId());
         }
 
         Comment comment = new Comment(post, parent, request.content(), user);
@@ -60,35 +60,29 @@ public class CommentService {
     }
 
 
+    @Transactional
     public CommentResponseDto getCommentWithReplies(UUID commentId, String currentUsername) {
-        Comment mainComment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
+        Comment mainComment = getCommentById(commentId);
         List<Comment> allComments = commentRepository.findByPostId(mainComment.getPost().getId());
 
         return commentMapper.toDto(mainComment, allComments, currentUsername);
     }
 
-
+    @Transactional
     public CommentResponseDto updateComment(UUID commentId, CommentUpdateRequestDto request, String currentUsername) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
+        Comment comment = getCommentById(commentId);
 
         comment.setContent(request.content());
         Comment updatedComment = commentRepository.save(comment);
         return commentMapper.toDto(updatedComment, List.of(), currentUsername);
     }
 
+    @Transactional
     public void deleteComment(UUID commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
+        Comment comment = getCommentById(commentId);
         comment.setDeleted(true);
         comment.setContent("[comentariu sters]");
         commentRepository.save(comment);
-    }
-
-
-    public VoteResponseDto voteComment(UUID commentId, String voteType, String username) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
-
-        return commentVotingService.voteOnComment(commentId, voteType, username, comment);
     }
 
 
