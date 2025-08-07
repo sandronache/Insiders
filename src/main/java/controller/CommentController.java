@@ -15,11 +15,9 @@ import java.util.UUID;
 @RequestMapping("/comments")
 public class CommentController {
     public final CommentService commentService;
-    private final UserManagementService userService;
 
-    public CommentController(CommentService commentService, UserManagementService userService) {
+    public CommentController(CommentService commentService) {
         this.commentService = commentService;
-        this.userService = userService;
     }
 
     @GetMapping("/{commentId}")

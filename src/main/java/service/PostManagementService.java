@@ -1,16 +1,15 @@
 package main.java.service;
 
+// TODO: Service is using Dto objects but they must never get past Controller layer. Must only use from "model" package
 import main.java.dto.comment.CommentCreateRequestDto;
 import main.java.dto.comment.CommentResponseDto;
-import main.java.dto.post.PostResponseDto;
 import main.java.dto.post.PostUpdateRequestDto;
 import main.java.dto.vote.VoteResponseDto;
-import main.java.entity.Comment;
+
+import main.java.entity.Post;
 import main.java.entity.User;
 import main.java.exceptions.InvalidVoteTypeException;
-import main.java.exceptions.NotFoundException;
 import main.java.exceptions.PostNotFoundException;
-import main.java.entity.Post;
 import main.java.logger.LoggerFacade;
 import main.java.model.PostModel;
 import main.java.repository.PostRepository;
@@ -87,7 +86,15 @@ public class PostManagementService {
                 .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
     }
 
-    private PostModel buildFinalPostForNew(Post post) {
+    /**
+     * Converts a {@link Post} to a {@link PostModel}.
+     * Adds the default vote.
+     * "convertToModelAndUpvote"
+     *
+     * @param post
+     * @return
+     */
+    private PostModel buildFinalPostForNew(Post post) { // TODO: method name does not reflect purpose
         PostModel postModel = new PostModel(post);
 
         postModel.setUpvotes(1);
@@ -105,8 +112,9 @@ public class PostManagementService {
         postRepository.save(post);
 
         votePost(post.getId(), "up", author);
+        // return addDefaultUpvote(new PostModel(post))
 
-        return buildFinalPostForNew(post);
+        return buildFinalPostForNew(post); // TODO: buildFinalPostForNew is also doing the initial vote
     }
 
     public VoteResponseDto votePost(UUID postId, String voteType, String username) {

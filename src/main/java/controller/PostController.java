@@ -52,7 +52,10 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseApi<PostResponseDto>> createPost(@Valid @RequestBody PostCreateRequestDto requestDto) {
+    public ResponseEntity<ResponseApi<PRDto>> createPost(@Valid @RequestBody PostCreateRequestDto requestDto) {
+
+        // TODO: new Post from PostCreateRequestDto
+
         PostModel post = postManagementService.createPost(
                 requestDto.title(),
                 requestDto.content(),
@@ -60,9 +63,8 @@ public class PostController {
                 requestDto.subreddit()
         );
 
-        PostResponseDto dto = PostMapper.postModelToDto(post);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, PRDto.fromEntity(post)));
 
     }
 
