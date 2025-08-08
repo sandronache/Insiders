@@ -1,6 +1,7 @@
 package main.java.service;
 
 import jakarta.transaction.Transactional;
+import main.java.dto.vote.VoteRequestDto;
 import main.java.dto.vote.VoteResponseDto;
 import main.java.entity.Comment;
 import main.java.entity.Post;
@@ -34,8 +35,9 @@ public class VotingService {
     }
 
     @Transactional
-    public VoteResponseDto voteComment(UUID commentId, String voteType, String username) {
+    public VoteResponseDto voteComment(UUID commentId, VoteRequestDto request, String username) {
         User user = userManagementService.findByUsername(username);
+        String voteType = request.voteType();
 
         switch (voteType.toLowerCase()) {
             case "up" -> createVote(user.getId(), null, commentId, true);

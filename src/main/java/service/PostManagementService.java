@@ -164,13 +164,6 @@ public class PostManagementService {
         LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
     }
 
-    @Transactional
-    public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request) {
-        Post post = getPostById(postId);
-
-        return commentService.createComment(post, request);
-    }
-
 }
 
 //    public TreeMap<UUID, Post> loadPostsFromDatabase() {

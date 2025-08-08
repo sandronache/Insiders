@@ -4,8 +4,8 @@ import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.comment.CommentUpdateRequestDto;
 import main.java.dto.vote.VoteRequestDto;
 import main.java.dto.vote.VoteResponseDto;
+import main.java.logger.LoggerFacade;
 import main.java.service.CommentService;
-import main.java.service.UserManagementService;
 import main.java.service.VotingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +21,11 @@ public class CommentController {
     public CommentController(CommentService commentService, VotingService votingService) {
         this.commentService = commentService;
         this.votingService = votingService;
+        LoggerFacade.info("CommentController initialized with endpoints:");
+        LoggerFacade.info("- GET /comments/{commentId}");
+        LoggerFacade.info("- PUT /comments/{commentId}");
+        LoggerFacade.info("- DELETE /comments/{commentId}");
+        LoggerFacade.info("- PUT /comments/{commentId}/vote");
     }
 
     @GetMapping("/{commentId}")
@@ -43,7 +48,7 @@ public class CommentController {
 
     @PutMapping("/{commentId}/vote")
     public ResponseEntity<ResponseApi<VoteResponseDto>> voteComment(@PathVariable UUID commentId, @RequestBody VoteRequestDto request, @RequestParam(defaultValue = "andrei") String username) {
-        VoteResponseDto response = votingService.voteComment(commentId, request.voteType(), username);
+        VoteResponseDto response = votingService.voteComment(commentId, request, username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 

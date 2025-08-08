@@ -10,6 +10,7 @@ import main.java.entity.User;
 import main.java.exceptions.NotFoundException;
 import main.java.mapper.CommentMapper;
 import main.java.repository.CommentRepository;
+import main.java.repository.PostRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +21,13 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final UserManagementService userManagementService;
+    private final PostRepository postRepository;
 
-    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper, UserManagementService userManagementService) {
+    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper, UserManagementService userManagementService, PostRepository postRepository) {
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
         this.userManagementService = userManagementService;
+        this.postRepository = postRepository;
     }
 
     public Comment getCommentById(UUID id){
@@ -45,8 +48,12 @@ public class CommentService {
     }
 
 
-    public CommentResponseDto createComment(Post post, CommentCreateRequestDto request) {
+    @Transactional
+    public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request) {
         User user = userManagementService.findByUsername(request.author());
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Postarea nu a fost gasita"));
+
 
         Comment parent = null;
         if (request.parentId() != null) {
