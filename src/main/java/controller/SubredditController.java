@@ -31,7 +31,7 @@ public class SubredditController {
     @GetMapping()
     public ResponseEntity<ResponseApi<List<SubredditResponseDto>>> getAllSubreddits(){
         List<SubredditResponseDto> response = subredditService.getAllSubreddits();
-        return ResponseEntity.ok(new ResponseApi<>(true, response/*,total*/));
+        return ResponseEntity.ok(new ResponseApi<>(true, response, response.size()));
     }
 
 
@@ -56,7 +56,7 @@ public class SubredditController {
 
     @PutMapping("/{name}")
     public ResponseEntity<ResponseApi<SubredditResponseDto>> updateSubreddit(@PathVariable String name, @Valid @RequestBody SubredditUpdateRequestDto request){
-        SubredditResponseDto response = subredditService.update(request);
+        SubredditResponseDto response = subredditService.update(name,request);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
@@ -65,8 +65,5 @@ public class SubredditController {
         subredditService.delete(name);
         return ResponseEntity.ok(new ResponseApi<>(true, "Subreddit sters cu succes!"));
     }
-
-
-
 
 }

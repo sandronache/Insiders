@@ -38,7 +38,15 @@ public class Subreddit {
     @JsonIgnore
     private List<Post> posts = new ArrayList<>();
 
-    public Subreddit() { this.id = UUID.randomUUID(); }
+    public Subreddit() {}
+
+    public Subreddit(String name, String displayName, String description, String iconUrl) {
+        this.id = UUID.randomUUID();
+        this.name = name;
+        this.displayName = displayName;
+        this.description = description;
+        this.iconUrl = iconUrl;
+    }
 
     @PrePersist
     private void ensureId() {
