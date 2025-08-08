@@ -11,6 +11,6 @@ import java.util.UUID;
 public interface PostRepository extends JpaRepository<Post, UUID> {
     Post getPostById(UUID postId);
     List<Post> findAllByOrderByCreatedAtDesc();
-    List<Post> findBySubredditOrderByCreatedAtDesc(String subreddit);
-    int countBySubreddit(String subredditName);
+    List<Post> findBySubreddit_NameOrderByCreatedAtDesc(String name);
+    int countBySubreddit_Name(String name);
 }

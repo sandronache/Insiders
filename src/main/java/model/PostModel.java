@@ -24,7 +24,7 @@ public class PostModel {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.author = post.getUser().getUsername();
-        this.subreddit = post.getSubreddit();
+        this.subreddit = post.getSubreddit().getName();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
     }

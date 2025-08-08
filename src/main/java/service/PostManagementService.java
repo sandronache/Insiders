@@ -1,19 +1,19 @@
 package main.java.service;
 
 // TODO: Service is using Dto objects but they must never get past Controller layer. Must only use from "model" package
-import jakarta.transaction.Transactional;
-import main.java.dto.comment.CommentCreateRequestDto;
-import main.java.dto.comment.CommentResponseDto;
+import org.springframework.transaction.annotation.Transactional;
 import main.java.dto.post.PostUpdateRequestDto;
 import main.java.dto.vote.VoteResponseDto;
 
 import main.java.entity.Post;
+import main.java.entity.Subreddit;
 import main.java.entity.User;
 import main.java.exceptions.InvalidVoteTypeException;
-import main.java.exceptions.PostNotFoundException;
+import main.java.exceptions.NotFoundException;
 import main.java.logger.LoggerFacade;
 import main.java.model.PostModel;
 import main.java.repository.PostRepository;
+import main.java.repository.SubredditRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,20 +31,22 @@ public class PostManagementService {
     private final CommentService commentService;
     private final VotingService votingService;
     private final UserManagementService userManagementService;
+    private final SubredditRepository subredditRepository;
 
     @Autowired
-    public PostManagementService(PostRepository postRepository, CommentService commentService, VotingService votingService, UserManagementService userManagementService) {
+    public PostManagementService(PostRepository postRepository, CommentService commentService, VotingService votingService, UserManagementService userManagementService,SubredditRepository subredditRepository) {
         this.postRepository = postRepository;
         this.commentService = commentService;
         this.votingService = votingService;
         this.userManagementService = userManagementService;
+        this.subredditRepository = subredditRepository;
     }
 
     private List<Post> getBasePosts(String subreddit) {
         if (subreddit == null || subreddit.isBlank()) {
             return postRepository.findAllByOrderByCreatedAtDesc();
         }
-        return postRepository.findBySubredditOrderByCreatedAtDesc(subreddit);
+        return postRepository.findBySubreddit_NameOrderByCreatedAtDesc(subreddit);
     }
 
     private PostModel buildFinalPost(Post post) {
@@ -63,6 +65,7 @@ public class PostManagementService {
         return postModel;
     }
 
+    @Transactional(readOnly = true)
     public List<PostModel> getAllPosts(String subreddit) {
         List<Post> basePosts = getBasePosts(subreddit);
 
@@ -75,16 +78,17 @@ public class PostManagementService {
         return finalPosts;
     }
 
+    @Transactional(readOnly = true)
     public PostModel getPostByIdModel(UUID postId) {
         Post basePost = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
+                .orElseThrow(() -> new NotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
 
         return buildFinalPost(basePost);
     }
 
     public Post getPostById(UUID postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
+                .orElseThrow(() -> new NotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
     }
 
     /**
@@ -107,8 +111,11 @@ public class PostManagementService {
         return postModel;
     }
 
-    public PostModel createPost(String title, String content, String author, String subreddit) {
+    public PostModel createPost(String title, String content, String author, String subredditName) {
         User user = userManagementService.findByUsername(author);
+        String normalizedSubredditName = subredditName.trim().toLowerCase();
+        Subreddit subreddit = subredditRepository.findByNameIgnoreCase(normalizedSubredditName).orElseThrow(() -> new NotFoundException("Subreddit " + normalizedSubredditName+" nu a fost gasit"));
+
         Post post = new Post(title, content, user, subreddit);
         postRepository.save(post);
 
@@ -120,7 +127,7 @@ public class PostManagementService {
 
     public VoteResponseDto votePost(UUID postId, String voteType, String username) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Postarea nu a fost gasita"));
+                .orElseThrow(() -> new NotFoundException("Postarea nu a fost gasita"));
 
         User user = userManagementService.findByUsername(username);
 
@@ -141,7 +148,7 @@ public class PostManagementService {
 
     public PostModel updatePost(UUID id, PostUpdateRequestDto requestDto) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException("Postarea cu ID-ul " + id + " nu a fost gasita."));
+                .orElseThrow(() -> new NotFoundException("Postarea cu ID-ul " + id + " nu a fost gasita."));
 
         if (requestDto.title() != null && !requestDto.title().isBlank()) {
             post.setTitle(requestDto.title());
@@ -157,7 +164,7 @@ public class PostManagementService {
 
     public void deletePostById(UUID postId) {
         if (!postRepository.existsById(postId)) {
-            throw new PostNotFoundException("Postarea nu a fost gasita");
+            throw new NotFoundException("Postarea nu a fost gasita");
         }
 
         postRepository.deleteById(postId);

@@ -13,7 +13,7 @@ public class PostMapper {
                 post.getTitle(),
                 post.getContent(),
                 post.getUser().getUsername(),
-                post.getSubreddit(),
+                post.getSubreddit().getName(),
                 upvotes,
                 downvotes,
                 score,

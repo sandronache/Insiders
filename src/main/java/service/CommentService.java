@@ -1,6 +1,6 @@
 package main.java.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import main.java.dto.comment.CommentCreateRequestDto;
 import main.java.dto.comment.CommentResponseDto;
 import main.java.dto.comment.CommentUpdateRequestDto;
@@ -30,11 +30,13 @@ public class CommentService {
         this.postRepository = postRepository;
     }
 
+
+    @Transactional(readOnly = true)
     public Comment getCommentById(UUID id){
         return commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<CommentResponseDto> getCommentsForPost(UUID postId, String currentUsername) {
         List<Comment> allComments = commentRepository.findByPostId(postId);
 
@@ -48,7 +50,7 @@ public class CommentService {
     }
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public CommentResponseDto createComment(UUID postId, CommentCreateRequestDto request) {
         User user = userManagementService.findByUsername(request.author());
         Post post = postRepository.findById(postId)
@@ -67,7 +69,7 @@ public class CommentService {
     }
 
 
-    @Transactional
+    @Transactional(readOnly = true)
     public CommentResponseDto getCommentWithReplies(UUID commentId, String currentUsername) {
         Comment mainComment = getCommentById(commentId);
         List<Comment> allComments = commentRepository.findByPostId(mainComment.getPost().getId());
@@ -75,7 +77,7 @@ public class CommentService {
         return commentMapper.toDto(mainComment, allComments, currentUsername);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public CommentResponseDto updateComment(UUID commentId, CommentUpdateRequestDto request, String currentUsername) {
         Comment comment = getCommentById(commentId);
 
@@ -84,7 +86,7 @@ public class CommentService {
         return commentMapper.toDto(updatedComment, List.of(), currentUsername);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteComment(UUID commentId) {
         Comment comment = getCommentById(commentId);
         comment.setDeleted(true);
@@ -92,7 +94,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-
+    @Transactional(readOnly = true)
     public int countCommentsByPostId(UUID postId) {
         return commentRepository.countByPostId(postId);
     }

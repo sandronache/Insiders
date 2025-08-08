@@ -1,6 +1,6 @@
 package main.java.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import main.java.dto.subreddit.SubredditCreateRequestDto;
 import main.java.dto.subreddit.SubredditResponseDto;
 import main.java.dto.subreddit.SubredditUpdateRequestDto;
@@ -28,22 +28,22 @@ public class SubredditService {
         this.subredditMapper = subredditMapper;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<SubredditResponseDto> getAllSubreddits(){
         return subredditRepository.findAllByOrderByCreatedAtDesc().stream().map(subreddit -> {
-            int postCount = postRepository.countBySubreddit(subreddit.getName());
+            int postCount = postRepository.countBySubreddit_Name(subreddit.getName());
             return subredditMapper.toDto(subreddit, postCount);
         }).toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public SubredditResponseDto getSubredditByName(String name){
         Subreddit subreddit = subredditRepository.findByNameIgnoreCase(name).orElseThrow(()->new NotFoundException("Subreddit-ul nu a fost gasit"));
-        int postCount = postRepository.countBySubreddit(subreddit.getName());
+        int postCount = postRepository.countBySubreddit_Name(subreddit.getName());
         return subredditMapper.toDto(subreddit, postCount);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public SubredditResponseDto createSubreddit(SubredditCreateRequestDto request){
         String normalizedName = request.name().trim().toLowerCase();
 
@@ -59,7 +59,7 @@ public class SubredditService {
 
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public SubredditResponseDto update(String name,SubredditUpdateRequestDto request){
         Subreddit existingSubreddit = subredditRepository.findByNameIgnoreCase(name).orElseThrow(()->new NotFoundException("Subreddit-ul "+name +" nu a fost gasit"));
 
@@ -74,14 +74,14 @@ public class SubredditService {
         }
 
         Subreddit saved = subredditRepository.save(existingSubreddit);
-        int postCount = postRepository.countBySubreddit(saved.getName());
+        int postCount = postRepository.countBySubreddit_Name(saved.getName());
         return subredditMapper.toDto(saved, postCount);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(String name){
         Subreddit subreddit = subredditRepository.findByNameIgnoreCase(name).orElseThrow(()->new NotFoundException("Subreddit-ul nu a fost gasit"));
-        int postCount = postRepository.countBySubreddit(subreddit.getName());
+        int postCount = postRepository.countBySubreddit_Name(subreddit.getName());
         if(postCount>0){
             throw new BadRequestException("Nu poti sterge un subreddit ce are deja postari in el");
         }

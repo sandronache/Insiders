@@ -13,18 +13,25 @@ public class Post {
     @Id
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
+
     @Column(nullable = false, length = 300)
     private String title;
+
     @Column(columnDefinition = "TEXT")
     private String content;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @Column(nullable = false)
-    private String subreddit;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "subreddit_id", nullable = false)
+    private Subreddit subreddit;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
@@ -32,7 +39,7 @@ public class Post {
     public Post() {
     }
 
-    public Post(String title, String content, User user, String subreddit) {
+    public Post(String title, String content, User user, Subreddit subreddit) {
         this.id = UUID.randomUUID();
         this.title = title;
         this.content = content;
@@ -56,7 +63,7 @@ public class Post {
         return user;
     }
 
-    public String getSubreddit() {
+    public Subreddit getSubreddit() {
         return subreddit;
     }
 
