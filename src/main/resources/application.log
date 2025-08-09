@@ -493,3 +493,78 @@
 2025-08-08 21:57:19 INFO: - GET /posts/{id}
 2025-08-08 21:57:19 INFO: - PUT /posts/{id}/vote
 2025-08-08 21:57:20 INFO: Application shutting down
+2025-08-10 00:15:54 INFO: new version
+2025-08-10 00:15:54 INFO: Application starting up
+2025-08-10 00:16:02 INFO: CommentController initialized with endpoints:
+2025-08-10 00:16:02 INFO: - GET /comments/{commentId}
+2025-08-10 00:16:02 INFO: - PUT /comments/{commentId}
+2025-08-10 00:16:02 INFO: - DELETE /comments/{commentId}
+2025-08-10 00:16:02 INFO: - PUT /comments/{commentId}/vote
+2025-08-10 00:16:02 INFO: PostController initialized with endpoints:
+2025-08-10 00:16:02 INFO: - GET /posts
+2025-08-10 00:16:02 INFO: - POST /posts
+2025-08-10 00:16:02 INFO: - PUT /posts/{id}
+2025-08-10 00:16:02 INFO: - DELETE /posts/{id}
+2025-08-10 00:16:02 INFO: - GET /posts/{id}
+2025-08-10 00:16:02 INFO: - PUT /posts/{id}/vote
+2025-08-10 00:16:02 INFO: Application shutting down
+2025-08-10 00:39:11 INFO: new version
+2025-08-10 00:39:11 INFO: Application starting up
+2025-08-10 00:39:18 INFO: CommentController initialized with endpoints:
+2025-08-10 00:39:18 INFO: - GET /comments/{commentId}
+2025-08-10 00:39:18 INFO: - PUT /comments/{commentId}
+2025-08-10 00:39:18 INFO: - DELETE /comments/{commentId}
+2025-08-10 00:39:18 INFO: - PUT /comments/{commentId}/vote
+2025-08-10 00:39:18 INFO: PostController initialized with endpoints:
+2025-08-10 00:39:18 INFO: - GET /posts
+2025-08-10 00:39:18 INFO: - POST /posts
+2025-08-10 00:39:18 INFO: - PUT /posts/{id}
+2025-08-10 00:39:18 INFO: - DELETE /posts/{id}
+2025-08-10 00:39:18 INFO: - GET /posts/{id}
+2025-08-10 00:39:18 INFO: - PUT /posts/{id}/vote
+2025-08-10 00:39:19 INFO: Application shutting down
+2025-08-10 00:39:26 INFO: new version
+2025-08-10 00:39:26 INFO: Application starting up
+2025-08-10 00:39:33 INFO: CommentController initialized with endpoints:
+2025-08-10 00:39:33 INFO: - GET /comments/{commentId}
+2025-08-10 00:39:33 INFO: - PUT /comments/{commentId}
+2025-08-10 00:39:33 INFO: - DELETE /comments/{commentId}
+2025-08-10 00:39:33 INFO: - PUT /comments/{commentId}/vote
+2025-08-10 00:39:33 INFO: PostController initialized with endpoints:
+2025-08-10 00:39:33 INFO: - GET /posts
+2025-08-10 00:39:33 INFO: - POST /posts
+2025-08-10 00:39:33 INFO: - PUT /posts/{id}
+2025-08-10 00:39:34 INFO: - DELETE /posts/{id}
+2025-08-10 00:39:34 INFO: - GET /posts/{id}
+2025-08-10 00:39:34 INFO: - PUT /posts/{id}/vote
+2025-08-10 00:39:34 INFO: Application shutting down
+2025-08-10 00:50:08 INFO: new version
+2025-08-10 00:50:08 INFO: Application starting up
+2025-08-10 00:50:15 INFO: CommentController initialized with endpoints:
+2025-08-10 00:50:15 INFO: - GET /comments/{commentId}
+2025-08-10 00:50:15 INFO: - PUT /comments/{commentId}
+2025-08-10 00:50:15 INFO: - DELETE /comments/{commentId}
+2025-08-10 00:50:15 INFO: - PUT /comments/{commentId}/vote
+2025-08-10 00:50:15 INFO: PostController initialized with endpoints:
+2025-08-10 00:50:15 INFO: - GET /posts
+2025-08-10 00:50:15 INFO: - POST /posts
+2025-08-10 00:50:15 INFO: - PUT /posts/{id}
+2025-08-10 00:50:15 INFO: - DELETE /posts/{id}
+2025-08-10 00:50:15 INFO: - GET /posts/{id}
+2025-08-10 00:50:15 INFO: - PUT /posts/{id}/vote
+2025-08-10 00:50:16 INFO: Application shutting down
+2025-08-10 00:53:10 INFO: new version
+2025-08-10 00:53:10 INFO: Application starting up
+2025-08-10 00:53:17 INFO: CommentController initialized with endpoints:
+2025-08-10 00:53:17 INFO: - GET /comments/{commentId}
+2025-08-10 00:53:17 INFO: - PUT /comments/{commentId}
+2025-08-10 00:53:17 INFO: - DELETE /comments/{commentId}
+2025-08-10 00:53:17 INFO: - PUT /comments/{commentId}/vote
+2025-08-10 00:53:17 INFO: PostController initialized with endpoints:
+2025-08-10 00:53:17 INFO: - GET /posts
+2025-08-10 00:53:17 INFO: - POST /posts
+2025-08-10 00:53:17 INFO: - PUT /posts/{id}
+2025-08-10 00:53:17 INFO: - DELETE /posts/{id}
+2025-08-10 00:53:17 INFO: - GET /posts/{id}
+2025-08-10 00:53:17 INFO: - PUT /posts/{id}/vote
+2025-08-10 00:53:18 INFO: Application shutting down

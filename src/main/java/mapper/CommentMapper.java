@@ -2,8 +2,6 @@ package main.java.mapper;
 
 import main.java.dto.comment.CommentResponseDto;
 import main.java.entity.Comment;
-import main.java.service.UserManagementService;
-import main.java.service.VotingService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,34 +9,18 @@ import java.util.UUID;
 
 @Component
 public class CommentMapper {
-    private final VotingService votingService;
-    private final UserManagementService userManagementService;
 
-    public CommentMapper(VotingService votingService, UserManagementService userManagementService) {
-        this.votingService = votingService;
-        this.userManagementService = userManagementService;
-    }
-
-    public CommentResponseDto toDto(Comment comment, List<Comment> allComments, String currentUsername) {
+    public CommentResponseDto toDto(
+            Comment comment,
+            int upVotes,
+            int downVotes,
+            String userVote,
+            List<CommentResponseDto> replies
+    ) {
         UUID parentId = comment.getParentComment() != null ? comment.getParentComment().getId() : null;
-        String author = comment.isDeleted() ? "[deleted]" : comment.getUser().getUsername();
-
-        String content = comment.isDeleted() ? "[comentariu sters]" : comment.getContent();
-        int upVotes = votingService.countUpvotesForComment(comment.getId());
-        int downVotes = votingService.countDownvotesForComment(comment.getId());
+        String author = (comment.getUser() != null) ? comment.getUser().getUsername() : "[deleted]";
+        String content = comment.getContent();
         int score = upVotes - downVotes;
-
-        String userVote = null;
-        if (currentUsername != null) {
-            UUID userId = userManagementService.findByUsername(currentUsername).getId();
-            userVote = votingService.getVoteTypeForUser(userId, null, comment.getId());
-        }
-
-
-        List<CommentResponseDto> replies = allComments.stream()
-                .filter(c -> comment.getId().equals(c.getParentComment() != null ? c.getParentComment().getId() : null))
-                .map(c -> toDto(c, allComments, currentUsername))
-                .toList();
 
         return new CommentResponseDto(
                 comment.getId(),
