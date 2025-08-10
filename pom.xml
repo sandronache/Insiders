@@ -11,7 +11,7 @@
 
     <modules>
         <module>backend</module>
-        <!-- <module>cli</module> (când îl adaugi) -->
+        <module>cli</module>
     </modules>
 
     <properties>
