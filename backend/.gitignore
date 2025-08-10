@@ -1,0 +1,42 @@
+# Build artifacts
+target/
+*/target/
+
+# Logs
+*.log
+*.log.*
+logs/
+spring.log
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VSCode
+.vscode/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Maven wrapper executables
+mvnw
+mvnw.cmd
+
+# Maven wrapper JAR
+.mvn/wrapper/maven-wrapper.jar
+
+# Temporary files
+*.tmp
+*.temp
+
+# SSL / certificate files
+*.pem
+
+# Local configs (nu urci credențiale reale)
+application.properties
+application.yml
+application-*.properties
+application-*.yml
