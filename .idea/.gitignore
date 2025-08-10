@@ -1,12 +1,63 @@
-# Default ignored files
+# =========================
+# IntelliJ IDEA / JetBrains
+# =========================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# Maven / Gradle build output
+# =========================
+target/
+build/
+**/target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# OS generated files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Java crash logs
+# =========================
+hs_err_pid*
+replay_pid*
+
+# =========================
+# Certificates / Keys (sensitive)
+# =========================
+*.pem
+*.key
+
+# =========================
+# Maven wrapper binaries
+# =========================
+.mvn/wrapper/maven-wrapper.jar
+
+# =========================
+# Local configs
+# =========================
 /shelf/
 /workspace.xml
-# Editor-based HTTP Client requests
 /httpRequests/
-# Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
 
-.idea/
-target/
+# =========================
+# Project-specific exclusions
+# =========================
 insiders-app.iml
