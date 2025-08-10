@@ -1,8 +1,13 @@
 package org.insiders.backend.controller;
 
 import jakarta.validation.Valid;
+import org.insiders.backend.dto.user.LoginRequestDto;
+import org.insiders.backend.dto.user.LoginResponseDto;
 import org.insiders.backend.dto.user.UserCreateRequestDto;
 import org.insiders.backend.dto.user.UserResponseDto;
+import org.insiders.backend.service.AuthService;
+import org.insiders.backend.service.IAuthService;
+import org.insiders.backend.service.IUserService;
 import org.insiders.backend.service.UserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,11 +21,13 @@ import java.util.UUID;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserManagementService userManagementService;
+    private final IUserService userManagementService;
+    private final IAuthService authService;
 
     @Autowired
-    public UserController(UserManagementService userManagementService) {
+    public UserController(IUserService userManagementService, IAuthService authService) {
         this.userManagementService = userManagementService;
+        this.authService = authService;
     }
 
     @PostMapping()
@@ -39,6 +46,12 @@ public class UserController {
     public ResponseEntity<ResponseApi<List<UserResponseDto>>> getUsers() {
         List<UserResponseDto> users = userManagementService.getAllUsers();
         return ResponseEntity.ok(new ResponseApi<>(true, users));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ResponseApi<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto request) {
+        LoginResponseDto response = authService.login(request);
+        return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
 }
