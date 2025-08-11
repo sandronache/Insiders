@@ -1,6 +1,5 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.PixelFormats;
 using Processing.Interfaces;
 
 namespace Processing.Operations;

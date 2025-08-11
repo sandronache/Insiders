@@ -6,7 +6,7 @@ using Shared.Models;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace Processing.Services;
-public class ProcessingService
+public class ProcessingService : IProcessingService
 {
     private readonly OperationFactory _factory = new();
     private readonly ValidationService _validator;
@@ -30,6 +30,6 @@ public class ProcessingService
             operation.Apply(currentImage, descriptor.Parameters);
         }
 
-        return new ProcessingResult(true, "Processed", currentImage);
+        return new ProcessingResult(true, "Processed.", currentImage);
     }
 }
