@@ -1,13 +1,11 @@
-namespace Processing.Services;
-
-using System;
 using Processing.Interfaces;
 using Processing.Operations;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
 using Processing.Validators;
 using Shared.Models;
+using SixLabors.ImageSharp.PixelFormats;
 
+namespace Processing.Services;
 public class ProcessingService
 {
     private readonly OperationFactory _factory = new();
@@ -24,7 +22,7 @@ public class ProcessingService
 
     public ProcessingResult Process(ProcessingRequest request)
     {
-        Image currentImage = request.Image;
+        Image<Rgba32> currentImage = request.Image;
 
         foreach (OperationDescriptor descriptor in request.OperationsDescriptors)
         {

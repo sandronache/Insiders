@@ -1,3 +1,5 @@
+namespace Api.Dtos;
+
 public class ProcessingRequestDto
 {
     public IFormFile Image { get; set; }
