@@ -1,6 +1,7 @@
 ## API Usage
 
 **Endpoint:** `POST 16.170.234.239:80/api/`
+
 **Content-Type:** `multipart/form-data`
 
 ### Request Structure
@@ -10,6 +11,8 @@
 | `Image` | File | Image file to be processed. |
 | `Operations` | String | JSON array of operations to be applied. |
 
+### ProcessingRequestDto
+
 ```C#
 public class ProcessingRequestDto
 {
@@ -18,7 +21,7 @@ public class ProcessingRequestDto
 }
 ```
 
-Operations - JSON example:
+### Operations - JSON example:
 ```
 [
     {
