@@ -1,17 +1,32 @@
 package com.insiders;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import com.insiders.clients.AuthClient;
+import com.insiders.menu.AuthMenu;
+import com.insiders.session.SessionManager;
+import com.insiders.util.ConsoleIO;
+
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        String base = System.getenv().getOrDefault("API_BASE_URL", "http://localhost:8080");
+        var session = new SessionManager();
+        var authClient = new AuthClient(base, session::authHeaders);
+        var authMenu = new AuthMenu(authClient, session);
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        while(true){
+            System.out.println("\n --- Welcome to Insiders ---");
+            System.out.println("1. Authenticate");
+            System.out.println("0. Exit");
+
+            int choice = ConsoleIO.readInt("Enter your choice: ");
+            switch (choice){
+                case 1-> authMenu.showMenu();
+                case 0 -> {
+                    System.out.println("See you next time!");
+                    return;
+                }
+                default -> System.out.println("Invalid choice.Please try again!");
+            }
         }
     }
 }
