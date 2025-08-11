@@ -3,7 +3,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace Processing.Operations;
 
-public class InvertFilter : IImageOperation
+public class BrightnessFilter : IImageOperation
 {
     /* Parameters: none. */
     public void Apply(Image image, Dictionary<string, string> parameters)

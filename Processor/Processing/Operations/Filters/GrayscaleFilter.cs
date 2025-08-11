@@ -5,8 +5,9 @@ namespace Processing.Operations;
 
 public class GrayscaleFilter : IImageOperation
 {
+    /* Parameters: none. */
     public void Apply(Image image, Dictionary<string, string> parameters)
     {
-        image.Mutate(x => x.Grayscale());
+        /* Implement code here. */
     }
 }
