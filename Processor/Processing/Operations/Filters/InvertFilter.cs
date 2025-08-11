@@ -3,10 +3,10 @@ using SixLabors.ImageSharp.Processing;
 
 namespace Processing.Operations;
 
-public class GrayscaleFilter : IImageOperation
+public class InvertFilter : IImageOperation
 {
     public void Apply(Image image, Dictionary<string, string> parameters)
     {
-        image.Mutate(x => x.Grayscale());
+        image.Mutate(x => x.Invert());
     }
 }

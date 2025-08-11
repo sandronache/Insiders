@@ -1,4 +1,3 @@
-using Processing.Models;
 using SixLabors.ImageSharp;
 
 public interface IImageOperation

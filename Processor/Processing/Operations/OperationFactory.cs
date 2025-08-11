@@ -1,21 +1,24 @@
+using Shared.Enums;
+
 namespace Processing.Operations;
-public class ImageOperationFactory
+
+public class OperationFactory
 {
     private readonly Dictionary<OperationType, IImageOperation> _operations;
 
-    public ImageOperationFactory()
+    public OperationFactory()
     {
         _operations = new Dictionary<OperationType, IImageOperation>()
         {
-            { OperationType.Grayscale, new GrayscaleFilter() },
-            { OperationType.DoNothing, new DoNothingFilter() },
-            { OperationType.Mirror, new Mirror() },
-            { OperationType.Resize, new Resize() }
+            { OperationType.DoNothingFilter, new DoNothingFilter() },
+            { OperationType.GrayscaleFilter, new GrayscaleFilter() },
+            { OperationType.InvertFilter, new InvertFilter() },
+            { OperationType.MirrorTransform, new MirrorTransform() }
         };
     }
 
-    public IImageOperation GetOperation(OperationType name)
+    public IImageOperation GetOperation(OperationType type)
     {
-        return _operations.TryGetValue(name, out IImageOperation operation) ? operation : null;
+        return _operations.TryGetValue(type, out IImageOperation operation) ? operation : null;
     }
 }
