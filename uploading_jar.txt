@@ -7,3 +7,9 @@ scp -i C:/Users/stone/Documents/Docs/Backups/Insiders_23_07_2025/Insiders2.pem t
 
 ~ Tot pe git bash ne conectam la ec2 (schimbati path-ul la cel local voua):
 ssh -i C:/Users/stone/Documents/Docs/Backups/Insiders_23_07_2025/Insiders2.pem ubuntu@ec2-3-74-161-90.eu-central-1.compute.amazonaws.com
+
+~ Verificam daca fisierul backend-1.0-SNAPSHOT.jar exista in EC2:
+ls -l
+
+~ Rulam in background backend-ul:
+nohup java -jar backend-1.0-SNAPSHOT.jar > log.txt 2>&1 &
