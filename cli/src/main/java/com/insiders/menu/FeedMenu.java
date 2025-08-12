@@ -2,6 +2,7 @@ package com.insiders.menu;
 
 import com.insiders.clients.PostClient;
 import com.insiders.dto.post.PostResponseDto;
+import com.insiders.dto.post.PostCreateRequestDto;
 import com.insiders.http.ApiResult;
 import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
@@ -24,20 +25,23 @@ public class FeedMenu {
     }
 
     public void showMenu() {
-        System.out.println("\n=== Latest Posts ===");
+        // Afișează un mesaj de bun venit personalizat
+        System.out.println("\n=== Welcome " + sessionManager.username() + "! ===");
+        System.out.println("=== Latest Posts ===");
         viewAllPosts();
 
         while (true) {
             System.out.println("\n--- Feed Menu ---");
             System.out.println("1. Refresh Posts");
             System.out.println("2. View Posts by Subreddit");
-            System.out.println("3. Enter Post");
+            System.out.println("3. Create New Post");
+            System.out.println("4. Enter Post ID to Manage");
             System.out.println("0. Back");
 
             int choice = ConsoleIO.readInt("Enter your choice:");
             switch (choice) {
                 case 1 -> viewAllPosts();
-                case 2 -> viewPostsBySubreddit();
+                case 2 -> createPost();
                 case 3 -> enterPostId();
                 case 0 -> {
                     return;
@@ -101,13 +105,45 @@ public class FeedMenu {
         }
     }
 
-    private void viewPostsBySubreddit() {
-        String subreddit = ConsoleIO.readLine("Enter subreddit name: ");
-        ApiResult<List<PostResponseDto>> result = postClient.getPostsBySubreddit(subreddit);
+
+    private void createPost() {
+        System.out.println("\n=== Create New Post ===");
+
+        String title = ConsoleIO.readLine("Enter post title: ");
+        if (title.trim().isEmpty()) {
+            System.out.println("Title cannot be empty!");
+            return;
+        }
+
+        String content = ConsoleIO.readLine("Enter post content: ");
+        String subreddit = ConsoleIO.readLine("Enter subreddit: ");
+        if (subreddit.trim().isEmpty()) {
+            System.out.println("Subreddit cannot be empty!");
+            return;
+        }
+
+        String author = sessionManager.username();
+
+        PostCreateRequestDto createRequest = new PostCreateRequestDto(title, content, author, subreddit);
+
+        System.out.println("Creating post...");
+        ApiResult<PostResponseDto> result = postClient.createPost(createRequest);
+
         if (result.success) {
-            displayPostsAndNavigate(result.data);
+            PostResponseDto createdPost = result.data;
+            System.out.println("Post created successfully!");
+            System.out.println("Post ID: " + createdPost.id());
+            System.out.println("Title: " + createdPost.title());
+
+            String viewPost = ConsoleIO.readLine("Do you want to view/manage the created post? (y/n): ");
+            if ("y".equalsIgnoreCase(viewPost.trim())) {
+                postMenu.showPostManagementMenu(createdPost.id());
+            }
+
+            System.out.println("\n=== Updated Feed ===");
+            viewAllPosts();
         } else {
-            System.out.println("Error loading posts: " + result.message);
+            System.out.println("Error creating post: " + result.message + " (Status: " + result.status + ")");
         }
     }
 }
