@@ -1,5 +1,6 @@
 using Processing.Interfaces;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Processing.Services;
 
@@ -14,7 +15,7 @@ public class ValidationService
         ErrorMessage = null;
     }
 
-    public void Validate(Image image)
+    public void Validate(Image<Rgba32> image)
     {
         foreach (IImageValidator validator in _validators)
         {

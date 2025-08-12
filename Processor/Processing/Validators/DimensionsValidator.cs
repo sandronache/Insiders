@@ -1,5 +1,6 @@
 using Processing.Interfaces;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Processing.Validators;
 

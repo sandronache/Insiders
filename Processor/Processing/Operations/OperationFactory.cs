@@ -1,6 +1,7 @@
 using Shared.Enums;
 
 namespace Processing.Operations;
+using Processing.Interfaces;
 
 public class OperationFactory
 {
@@ -13,6 +14,8 @@ public class OperationFactory
             { OperationType.DoNothingFilter, new DoNothingFilter() },
             { OperationType.GrayscaleFilter, new GrayscaleFilter() },
             { OperationType.InvertFilter, new InvertFilter() },
+            { OperationType.SepiaFilter, new SepiaFilter() },
+            { OperationType.SharpenFilter, new SharpenFilter() },
             { OperationType.MirrorTransform, new MirrorTransform() }
         };
     }
