@@ -11,6 +11,9 @@ public record PostResponseDto(
         String subreddit,
         int upvotes,
         int downvotes,
+        int score,
+        int commentCount,
+        String userVote,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
