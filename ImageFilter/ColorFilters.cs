@@ -5,7 +5,7 @@ namespace ImageFilter
 {
     public class ColorFilters
     {
-        // Color Inversion Filter
+        // Color Inversion Filter - Index 2
         public static Bitmap ApplyInvert(Bitmap source)
         {
             Bitmap result = new Bitmap(source.Width, source.Height);
@@ -26,7 +26,7 @@ namespace ImageFilter
             return result;
         }
 
-        // Black and White (Grayscale) Filter
+        // Black and White (Grayscale) Filter - Index 0
         public static Bitmap ApplyGrayscale(Bitmap source)
         {
             Bitmap result = new Bitmap(source.Width, source.Height);
@@ -43,7 +43,7 @@ namespace ImageFilter
             return result;
         }
 
-        // Blur Filter
+        // Blur Filter - Index 3
         public static Bitmap ApplyBlur(Bitmap source)
         {
             Bitmap result = new Bitmap(source.Width, source.Height);
