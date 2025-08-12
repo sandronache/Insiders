@@ -55,9 +55,7 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseApi<PRDto>> createPost(@Valid @RequestBody PostCreateRequestDto requestDto) {
-
-        // TODO: new Post from PostCreateRequestDto
+    public ResponseEntity<ResponseApi<PostResponseDto>> createPost(@Valid @RequestBody PostCreateRequestDto requestDto) {
 
         PostModel post = postManagementService.createPost(
                 requestDto.title(),
@@ -67,7 +65,7 @@ public class PostController {
         );
 
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, PRDto.fromEntity(post)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, PostMapper.postModelToDto(post)));
 
     }
 
@@ -98,8 +96,7 @@ public class PostController {
 
     @PutMapping("/{postId}/vote")
     public ResponseEntity<ResponseApi<VoteResponseDto>> votePost(@PathVariable UUID postId, @RequestBody VoteRequestDto request) {
-        User user = null; //!!! de modificat mai tarziu
-        VoteResponseDto response = postManagementService.votePost(postId, request.voteType(), "admin"); // si aici
+        VoteResponseDto response = postManagementService.votePost(postId, request.voteType(), "andrei"); // si aici
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
