@@ -1,6 +1,6 @@
 package com.insiders.dto.post;
 
-public record PostCreateRequestDto(
+public record PostUpdateRequestDto(
         String title,
         String content
 ) {

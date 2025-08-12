@@ -15,7 +15,7 @@ public class AuthMenu {
         this.sessionManager = sessionManager;
     }
 
-    public void showMenu(){
+    public boolean showMenu(){
         while(true){
             System.out.println("\n--- Authentication Menu ---");
             System.out.println("1. Register");
@@ -24,15 +24,23 @@ public class AuthMenu {
 
             int choice = ConsoleIO.readInt("Enter your choice:");
             switch(choice){
-                case 1 -> register();
-                case 2 -> login();
-                case 0 -> {return;}
+                case 1 -> {
+                    if (register()) {
+                        return true;
+                    }
+                }
+                case 2 -> {
+                    if (login()) {
+                        return true;
+                    }
+                }
+                case 0 -> {return false;}
                 default -> System.out.println("Invalid choice.Please try again!");
             }
         }
     }
 
-    public void register(){
+    public boolean register(){
         String username = ConsoleIO.readLine("Username: ");
         String email = ConsoleIO.readLine("Email: ");
         String password = ConsoleIO.readPassword("Password: ");
@@ -40,12 +48,19 @@ public class AuthMenu {
 
         if(response.success){
             System.out.println("User "+username+" has been registered successfully!");
-        }else{
+            var loginResponse = client.login(new LoginRequestDto(email, password));
+            if(loginResponse.success){
+                sessionManager.set(loginResponse.data.userId(), loginResponse.data.username());
+                System.out.println("You have been automatically logged in!");
+                return true;
+            }
+        } else {
             System.out.println("Error ("+response.status+"): "+response.message);
         }
+        return false;
     }
 
-    public void login(){
+    public boolean login(){
         String email = ConsoleIO.readLine("Email: ");
         String password = ConsoleIO.readPassword("Password: ");
         var response = client.login(new LoginRequestDto(email,password));
@@ -53,8 +68,10 @@ public class AuthMenu {
         if(response.success){
             sessionManager.set(response.data.userId(), response.data.username());
             System.out.println("Hello "+ sessionManager.username()+"! You have been logged in successfully!");
+            return true;
         }else{
             System.out.println("Error ("+response.status+"): "+response.message);
+            return false;
         }
     }
 }
