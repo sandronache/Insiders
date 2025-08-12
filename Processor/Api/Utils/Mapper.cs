@@ -1,8 +1,9 @@
-using Shared.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Shared.Models;
+using Api.Dtos;
 
 namespace Api.Utils;
 
@@ -14,7 +15,7 @@ public class Mapper
         using var stream = new MemoryStream();
         await request.Image.CopyToAsync(stream);
         stream.Position = 0;
-        Image image = Image.Load(stream);
+        Image<Rgba32> image = Image.Load<Rgba32>(stream);
 
         var options = new JsonSerializerOptions
         {

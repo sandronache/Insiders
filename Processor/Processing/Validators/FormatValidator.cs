@@ -1,10 +1,8 @@
 using Processing.Interfaces;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Processing.Validators;
-
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Metadata;
 
 public class FormatValidator : IImageValidator
 {

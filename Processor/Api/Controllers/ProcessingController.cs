@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Shared.Models;
+using SixLabors.ImageSharp;
 using Processing.Services;
 using Api.Utils;
-using SixLabors.ImageSharp;
+using Api.Dtos;
+
+namespace Api.Controllers;
 
 [ApiController]
 [Route("api/")]
