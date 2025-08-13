@@ -25,7 +25,6 @@ public class FeedMenu {
     }
 
     public void showMenu() {
-        // Afișează un mesaj de bun venit personalizat
         System.out.println("\n=== Welcome " + sessionManager.username() + "! ===");
         System.out.println("=== Latest Posts ===");
         viewAllPosts();
@@ -33,9 +32,8 @@ public class FeedMenu {
         while (true) {
             System.out.println("\n--- Feed Menu ---");
             System.out.println("1. Refresh Posts");
-            System.out.println("2. View Posts by Subreddit");
-            System.out.println("3. Create New Post");
-            System.out.println("4. Enter Post ID to Manage");
+            System.out.println("2. Create New Post");
+            System.out.println("3. Enter Post");
             System.out.println("0. Back");
 
             int choice = ConsoleIO.readInt("Enter your choice:");
@@ -91,7 +89,7 @@ public class FeedMenu {
 
             postIdMapping.put(simpleId, post.id());
 
-            System.out.println("ID: " + simpleId + " (UUID: " + post.id() + ")");
+            System.out.println("ID: " + simpleId);
             System.out.println("Title: " + post.title());
             System.out.println("Author: " + post.author());
 

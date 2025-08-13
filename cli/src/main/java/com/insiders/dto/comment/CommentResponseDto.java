@@ -1,14 +1,21 @@
 package com.insiders.dto.comment;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public record CommentResponseDto(
         UUID id,
+        UUID postId,
+        UUID parentId,
         String content,
         String author,
-        UUID postId,
+        int upvotes,
+        int downvotes,
+        int score,
+        String userVote,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        List<CommentResponseDto> replies
 ) {
 }

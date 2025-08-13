@@ -1,7 +1,10 @@
 package com.insiders.dto.comment;
 
+import java.util.UUID;
+
 public record CommentCreateRequestDto(
         String content,
-        String author
+        String author,
+        UUID parentId
 ) {
 }

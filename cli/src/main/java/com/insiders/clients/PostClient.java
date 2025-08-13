@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.insiders.dto.ResponseApi;
 import com.insiders.dto.comment.CommentCreateRequestDto;
 import com.insiders.dto.comment.CommentResponseDto;
+import com.insiders.dto.post.PostCreateRequestDto;
 import com.insiders.dto.post.PostResponseDto;
 import com.insiders.dto.post.PostUpdateRequestDto;
 import com.insiders.dto.vote.VoteRequestDto;
@@ -32,6 +33,10 @@ public class PostClient {
         return api.get("/posts", new TypeReference<ResponseApi<List<PostResponseDto>>>(){});
     }
 
+    public ApiResult<PostResponseDto> createPost(PostCreateRequestDto createRequest) {
+        return api.post("/posts", createRequest, new TypeReference<ResponseApi<PostResponseDto>>(){});
+    }
+
     public ApiResult<PostResponseDto> updatePost(UUID postId, PostUpdateRequestDto updateRequest) {
         return api.put("/posts/" + postId, updateRequest, new TypeReference<ResponseApi<PostResponseDto>>(){});
     }
@@ -46,11 +51,11 @@ public class PostClient {
     }
 
     public ApiResult<VoteResponseDto> upvotePost(UUID postId) {
-        return votePost(postId, "UPVOTE");
+        return votePost(postId, "up");
     }
 
     public ApiResult<VoteResponseDto> downvotePost(UUID postId) {
-        return votePost(postId, "DOWNVOTE");
+        return votePost(postId, "down");
     }
 
     public ApiResult<List<CommentResponseDto>> getCommentsForPost(UUID postId) {
@@ -63,7 +68,16 @@ public class PostClient {
                 new TypeReference<ResponseApi<CommentResponseDto>>(){});
     }
 
-    public ApiResult<List<PostResponseDto>> getPostsBySubreddit(String subreddit) {
-        return api.get("/posts/subreddit/" + subreddit, new TypeReference<ResponseApi<List<PostResponseDto>>>(){});
+    public ApiResult<VoteResponseDto> voteComment(UUID commentId, String voteType) {
+        VoteRequestDto voteRequest = new VoteRequestDto(voteType);
+        return api.put("/comments/" + commentId + "/vote", voteRequest, new TypeReference<ResponseApi<VoteResponseDto>>(){});
+    }
+
+    public ApiResult<VoteResponseDto> upvoteComment(UUID commentId) {
+        return voteComment(commentId, "up");
+    }
+
+    public ApiResult<VoteResponseDto> downvoteComment(UUID commentId) {
+        return voteComment(commentId, "down");
     }
 }
