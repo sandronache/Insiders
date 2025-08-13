@@ -19,7 +19,7 @@ public class CommentMapper {
     ) {
         UUID parentId = comment.getParentComment() != null ? comment.getParentComment().getId() : null;
         String author = (comment.getUser() != null) ? comment.getUser().getUsername() : "[deleted]";
-        String content = comment.getContent();
+        String content = (comment.isEdited() && !comment.getContent().contains("[edit]")? "[edit]  ": "") + comment.getContent();
         int score = upVotes - downVotes;
 
         return new CommentResponseDto(

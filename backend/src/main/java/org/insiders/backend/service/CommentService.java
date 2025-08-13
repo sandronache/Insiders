@@ -46,7 +46,7 @@ public class CommentService {
     public List<CommentResponseDto> getCommentsForPost(UUID postId, String currentUsername) {
         List<Comment> allComments = commentRepository.findByPostId(postId);
         List<Comment> rootComments = allComments.stream()
-                .filter(c -> c.getParentComment() == null && !c.isDeleted())
+                .filter(c -> c.getParentComment() == null)
                 .toList();
 
         UUID currentUserId = (currentUsername != null)
@@ -67,9 +67,6 @@ public class CommentService {
         Comment parent = null;
         if (request.parentId() != null) {
             parent = getCommentById(request.parentId());
-            if(parent.isDeleted()){
-                throw new NotFoundException("Nu poti raspunde unui comnetariu sters!");
-            }
         }
 
         Comment savedComment = commentRepository.saveAndFlush(new Comment(post, parent, request.content(), user));
@@ -82,10 +79,6 @@ public class CommentService {
     @Transactional(readOnly = true)
     public CommentResponseDto getCommentWithReplies(UUID commentId, String currentUsername) {
         Comment mainComment = getCommentById(commentId);
-
-        if(mainComment.isDeleted()){
-            throw new NotFoundException("Comentariul nu a fost gasit");
-        }
 
         List<Comment> allComments = commentRepository.findByPostId(mainComment.getPost().getId());
 
@@ -100,11 +93,8 @@ public class CommentService {
     public CommentResponseDto updateComment(UUID commentId, CommentUpdateRequestDto request, String currentUsername) {
         Comment comment = getCommentById(commentId);
 
-        if(comment.isDeleted()){
-            throw new NotFoundException("Comentariul nu a fost gasit");
-        }
-
         comment.setContent(request.content());
+        comment.setEdited(true);
         Comment updatedComment = commentRepository.save(comment);
 
         int up = votingService.countUpvotesForComment(updatedComment.getId());
@@ -122,8 +112,7 @@ public class CommentService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteComment(UUID commentId) {
         Comment comment = getCommentById(commentId);
-        comment.setDeleted(true);
-        commentRepository.save(comment);
+        commentRepository.delete(comment);
     }
 
     @Transactional(readOnly = true)
@@ -132,10 +121,6 @@ public class CommentService {
     }
 
     private CommentResponseDto buildTreeDto(Comment node, List<Comment> all, UUID currentUserId) {
-        if (node.isDeleted()) {
-            return null;
-        }
-
         int up = votingService.countUpvotesForComment(node.getId());
         int down = votingService.countDownvotesForComment(node.getId());
         String userVote = null;
