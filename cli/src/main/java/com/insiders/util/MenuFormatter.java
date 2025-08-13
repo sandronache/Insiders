@@ -1,8 +1,5 @@
 package com.insiders.util;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class MenuFormatter {
     public static final String HORIZONTAL_LINE = "═";
     public static final String VERTICAL_LINE = "║";
@@ -16,12 +13,10 @@ public class MenuFormatter {
     private static final String LEFT_CROSS = "╠";
     private static final String RIGHT_CROSS = "╣";
 
-    // ANSI Color codes
     public static final String RESET = "\u001B[0m";
     public static final String BOLD = "\u001B[1m";
     public static final String UNDERLINE = "\u001B[4m";
 
-    // Colors
     public static final String BLACK = "\u001B[30m";
     public static final String RED = "\u001B[31m";
     public static final String GREEN = "\u001B[32m";
@@ -31,15 +26,6 @@ public class MenuFormatter {
     public static final String CYAN = "\u001B[36m";
     public static final String WHITE = "\u001B[37m";
 
-    // Background colors
-    public static final String BG_BLACK = "\u001B[40m";
-    public static final String BG_RED = "\u001B[41m";
-    public static final String BG_GREEN = "\u001B[42m";
-    public static final String BG_YELLOW = "\u001B[43m";
-    public static final String BG_BLUE = "\u001B[44m";
-    public static final String BG_PURPLE = "\u001B[45m";
-    public static final String BG_CYAN = "\u001B[46m";
-    public static final String BG_WHITE = "\u001B[47m";
 
     public static void printWelcomeHeader(String username) {
         int width = 60;
@@ -79,39 +65,31 @@ public class MenuFormatter {
     public static void printPostCard(int id, String title, String author, boolean isOwnPost,
                                    String subreddit, int score, int commentCount, String timeAgo) {
         int width = 80;
-
-        // Top border
         System.out.println(TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT);
 
-        // ID and Title
         String idLine = String.format("ID: %s%d%s", YELLOW + BOLD, id, RESET);
         String titleLine = String.format("Title: %s%s%s", CYAN + BOLD, title, RESET);
         printBoxLine(idLine, width);
         printBoxLine(titleLine, width);
 
-        // Author with special marking for own posts
         String authorDisplay = isOwnPost ?
             String.format("%s%s%s %s📝 [YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
             String.format("%s%s%s", GREEN, author, RESET);
         String authorLine = "Author: " + authorDisplay;
         printBoxLine(authorLine, width);
 
-        // Subreddit and Score
         String subredditLine = String.format("Subreddit: %s%s%s", BLUE, subreddit, RESET);
         String scoreColor = score >= 0 ? GREEN : RED;
         String scoreLine = String.format("Score: %s%d%s", scoreColor, score, RESET);
         printBoxLine(subredditLine, width);
         printBoxLine(scoreLine, width);
 
-        // Comments count
         String commentsLine = String.format("Comments: %s%d%s", CYAN, commentCount, RESET);
         printBoxLine(commentsLine, width);
 
-        // Time
         String timeLine = String.format("Posted: %s%s%s", PURPLE, timeAgo, RESET);
         printBoxLine(timeLine, width);
 
-        // Bottom border
         System.out.println(BOTTOM_LEFT + HORIZONTAL_LINE.repeat(width - 2) + BOTTOM_RIGHT);
         System.out.println();
     }
@@ -150,29 +128,23 @@ public class MenuFormatter {
                                       String subreddit, int upvotes, int downvotes, String userVote, String timeAgo) {
         int width = 80;
 
-        // Top border
         System.out.println(TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT);
 
-        // Title
         String titleLine = String.format("Title: %s%s%s", CYAN + BOLD, title, RESET);
         printBoxLine(titleLine, width);
 
-        // Content
         String contentLine = String.format("Content: %s%s%s", WHITE, content != null ? content : "", RESET);
         printBoxLine(contentLine, width);
 
-        // Author
         String authorDisplay = isOwnPost ?
             String.format("%s%s%s %s📝 [YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
             String.format("%s%s%s", GREEN, author, RESET);
         String authorLine = "Author: " + authorDisplay;
         printBoxLine(authorLine, width);
 
-        // Subreddit
         String subredditLine = String.format("Subreddit: %s%s%s", BLUE, subreddit, RESET);
         printBoxLine(subredditLine, width);
 
-        // Score and votes
         int score = upvotes - downvotes;
         String scoreColor = score >= 0 ? GREEN : RED;
         String scoreLine = String.format("Score: %s%d%s", scoreColor, score, RESET);
@@ -182,7 +154,6 @@ public class MenuFormatter {
             GREEN, upvotes, RESET, RED, downvotes, RESET);
         printBoxLine(votesLine, width);
 
-        // User vote status
         if (userVote != null && !userVote.isEmpty() && !"none".equals(userVote)) {
             String voteDisplay = userVote.equals("up") ?
                 String.format("%s⬆️ YOU UPVOTED%s", GREEN + BOLD, RESET) :
@@ -191,11 +162,9 @@ public class MenuFormatter {
             printBoxLine(userVoteLine, width);
         }
 
-        // Time
         String timeLine = String.format("Posted: %s%s%s", PURPLE, timeAgo, RESET);
         printBoxLine(timeLine, width);
 
-        // Bottom border
         System.out.println(BOTTOM_LEFT + HORIZONTAL_LINE.repeat(width - 2) + BOTTOM_RIGHT);
         printEmptyLine();
     }
@@ -216,32 +185,26 @@ public class MenuFormatter {
         String replyIndicator = indentLevel > 0 ? "↳ " : "";
         int width = 80 - (indentLevel * 2);
 
-        // Top border
         System.out.println(indent + TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT);
 
-        // Comment ID and Reply indicator
         String idLine = replyIndicator + String.format("Comment ID: %s%d%s", YELLOW + BOLD, id, RESET);
         printCommentLine(idLine, width, indent);
 
-        // Author with special marking for own comments
         String authorDisplay = isOwnComment ?
             String.format("%s%s%s %s💬 [YOUR COMMENT]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
             String.format("%s%s%s", GREEN, author, RESET);
         String authorLine = "Author: " + authorDisplay;
         printCommentLine(authorLine, width, indent);
 
-        // Content
         String contentLine = String.format("Content: %s%s%s", WHITE, content, RESET);
         printCommentLine(contentLine, width, indent);
 
-        // Score and votes
         String scoreColor = score >= 0 ? GREEN : RED;
         String scoreLine = String.format("Score: %s%d%s (%s%d%s↑ %s%d%s↓)",
             scoreColor, score, RESET,
             GREEN, upvotes, RESET,
             RED, downvotes, RESET);
 
-        // Add user vote status if exists
         if (userVote != null && !userVote.isEmpty() && !"none".equals(userVote)) {
             String voteDisplay = userVote.equals("up") ?
                 String.format(" %s⬆️ [YOU UPVOTED]%s", GREEN + BOLD, RESET) :
@@ -250,35 +213,27 @@ public class MenuFormatter {
         }
         printCommentLine(scoreLine, width, indent);
 
-        // Time
         String timeLine = String.format("Posted: %s%s%s", PURPLE, timeAgo, RESET);
         printCommentLine(timeLine, width, indent);
-
-        // Bottom border
         System.out.println(indent + BOTTOM_LEFT + HORIZONTAL_LINE.repeat(width - 2) + BOTTOM_RIGHT);
         System.out.println();
     }
 
     private static void printBoxedHeader(String title, String subtitle, int width, String color, String style) {
-        // Top border
         System.out.println(color + style + TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT + RESET);
 
-        // Title line
         String titleLine = centerText(title, width - 4);
         System.out.println(color + style + VERTICAL_LINE + " " + titleLine + " " + VERTICAL_LINE + RESET);
 
-        // Subtitle if provided
         if (subtitle != null && !subtitle.isEmpty()) {
             String subtitleLine = centerText(subtitle, width - 4);
             System.out.println(color + style + VERTICAL_LINE + " " + subtitleLine + " " + VERTICAL_LINE + RESET);
         }
 
-        // Bottom border
         System.out.println(color + style + BOTTOM_LEFT + HORIZONTAL_LINE.repeat(width - 2) + BOTTOM_RIGHT + RESET);
     }
 
     private static void printBoxLine(String text, int width) {
-        // Remove ANSI codes for length calculation
         String cleanText = text.replaceAll("\u001B\\[[;\\d]*m", "");
         String padding = " ".repeat(Math.max(0, width - 4 - cleanText.length()));
         System.out.println(VERTICAL_LINE + " " + text + padding + " " + VERTICAL_LINE);
