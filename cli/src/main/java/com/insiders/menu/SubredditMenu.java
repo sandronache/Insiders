@@ -197,19 +197,21 @@ public class SubredditMenu {
     }
 
     private void selectSubredditForPosts() {
-        String subredditIdStr = ConsoleIO.readLine("Enter the subreddit ID to view posts: ");
-        try {
-            int simpleId = Integer.parseInt(subredditIdStr);
-
-            String subredditName = subredditNameMapping.get(simpleId);
-            if (subredditName != null) {
-                viewSubredditPosts(subredditName);
-            } else {
-                MenuFormatter.printErrorMessage("Invalid subreddit ID! Please choose a number from the list above.");
-            }
-        } catch (NumberFormatException e) {
-            MenuFormatter.printErrorMessage("Please enter a valid number from the subreddits list.");
+        String input = ConsoleIO.readLine("Enter subreddit name (e.g., 'technology' or 'r/technology'): ");
+        if (input.trim().isEmpty()) {
+            MenuFormatter.printErrorMessage("Subreddit name cannot be empty!");
+            return;
         }
+
+        String subredditName = input.trim();
+
+        if (subredditName.toLowerCase().startsWith("r/")) {
+            subredditName = subredditName.substring(2);
+        }
+
+        subredditName = subredditName.toLowerCase();
+
+        viewSubredditPosts(subredditName);
     }
 
     private void viewSubredditPosts(String subredditName) {
@@ -257,6 +259,7 @@ public class SubredditMenu {
                 isOwnPost,
                 post.subreddit(),
                 score,
+                post.commentCount(),
                 timeAgo
             );
         }
@@ -278,13 +281,21 @@ public class SubredditMenu {
     }
 
     private void editSubreddit() {
-        String subredditName = ConsoleIO.readLine("Enter the subreddit name to edit: ");
-        if (subredditName.trim().isEmpty()) {
+        String input = ConsoleIO.readLine("Enter the subreddit name to edit (e.g., 'technology' or 'r/technology'): ");
+        if (input.trim().isEmpty()) {
             MenuFormatter.printErrorMessage("Subreddit name cannot be empty!");
             return;
         }
 
-        ApiResult<SubredditResponseDto> subredditResult = subredditClient.getSubredditByName(subredditName.trim());
+        String subredditName = input.trim();
+
+        if (subredditName.toLowerCase().startsWith("r/")) {
+            subredditName = subredditName.substring(2);
+        }
+
+        subredditName = subredditName.toLowerCase();
+
+        ApiResult<SubredditResponseDto> subredditResult = subredditClient.getSubredditByName(subredditName);
         if (!subredditResult.success) {
             MenuFormatter.printErrorMessage("Error loading subreddit 'r/" + subredditName + "': " + subredditResult.message);
             MenuFormatter.printInfoMessage("Make sure the subreddit name is correct and exists.");
@@ -308,7 +319,7 @@ public class SubredditMenu {
         );
 
         MenuFormatter.printInfoMessage("Updating subreddit...");
-        ApiResult<SubredditResponseDto> result = subredditClient.updateSubreddit(subredditName.trim(), updateRequest);
+        ApiResult<SubredditResponseDto> result = subredditClient.updateSubreddit(subredditName, updateRequest);
 
         if (result.success) {
             MenuFormatter.printSuccessMessage("Subreddit updated successfully!");
@@ -320,13 +331,21 @@ public class SubredditMenu {
     }
 
     private void deleteSubreddit() {
-        String subredditName = ConsoleIO.readLine("Enter the subreddit name to delete: ");
-        if (subredditName.trim().isEmpty()) {
+        String input = ConsoleIO.readLine("Enter the subreddit name to delete (e.g., 'technology' or 'r/technology'): ");
+        if (input.trim().isEmpty()) {
             MenuFormatter.printErrorMessage("Subreddit name cannot be empty!");
             return;
         }
 
-        ApiResult<SubredditResponseDto> subredditResult = subredditClient.getSubredditByName(subredditName.trim());
+        String subredditName = input.trim();
+
+        if (subredditName.toLowerCase().startsWith("r/")) {
+            subredditName = subredditName.substring(2);
+        }
+
+        subredditName = subredditName.toLowerCase();
+
+        ApiResult<SubredditResponseDto> subredditResult = subredditClient.getSubredditByName(subredditName);
         if (!subredditResult.success) {
             MenuFormatter.printErrorMessage("Error loading subreddit 'r/" + subredditName + "': " + subredditResult.message);
             MenuFormatter.printInfoMessage("Make sure the subreddit name is correct and exists.");
@@ -350,7 +369,7 @@ public class SubredditMenu {
         String confirm = ConsoleIO.readLine("Type 'yes' to confirm deletion: ");
 
         if ("yes".equalsIgnoreCase(confirm)) {
-            ApiResult<String> result = subredditClient.deleteSubreddit(subredditName.trim());
+            ApiResult<String> result = subredditClient.deleteSubreddit(subredditName);
             if (result.success) {
                 MenuFormatter.printSuccessMessage("Subreddit deleted successfully!");
             } else {

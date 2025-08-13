@@ -43,7 +43,7 @@ public class PostMenu {
                 "4. Upvote Post",
                 "5. Downvote Post",
                 "6. Comment Actions",
-                "0. Back"
+                "0. Back to Feed Menu"
             );
 
             int choice = ConsoleIO.readInt("Enter your choice:");

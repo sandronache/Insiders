@@ -50,7 +50,7 @@ public class AuthMenu {
 
         String username = ConsoleIO.readLine("Username: ");
         String email = ConsoleIO.readLine("Email: ");
-        String password = ConsoleIO.readPassword("Password: ");
+        String password = MenuFormatter.readPasswordWithMasking("Password: ");
 
         MenuFormatter.printInfoMessage("Creating your account...");
         var response = client.register(new RegisterRequestDto(username, email, password));
@@ -79,7 +79,7 @@ public class AuthMenu {
         MenuFormatter.printMenuHeader("User Login");
 
         String email = ConsoleIO.readLine("Email: ");
-        String password = ConsoleIO.readPassword("Password: ");
+        String password = MenuFormatter.readPasswordWithMasking("Password: ");
 
         MenuFormatter.printInfoMessage("Authenticating...");
         var response = client.login(new LoginRequestDto(email, password));

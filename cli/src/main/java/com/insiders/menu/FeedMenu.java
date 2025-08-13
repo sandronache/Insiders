@@ -46,7 +46,10 @@ public class FeedMenu {
 
             int choice = ConsoleIO.readInt("Enter your choice:");
             switch (choice) {
-                case 1 -> viewAllPosts();
+                case 1 -> {
+                    MenuFormatter.printInfoMessage("Refreshing posts...");
+                    viewAllPosts();
+                }
                 case 2 -> createPost();
                 case 3 -> enterPostId();
                 case 4 -> subredditActions();
@@ -75,6 +78,8 @@ public class FeedMenu {
             UUID actualPostId = postIdMapping.get(simpleId);
             if (actualPostId != null) {
                 postMenu.showPostManagementMenu(actualPostId);
+                MenuFormatter.printInfoMessage("Returning to feed...");
+                viewAllPosts();
             } else {
                 MenuFormatter.printErrorMessage("Invalid post ID! Please choose a number from the list above.");
             }
@@ -108,6 +113,7 @@ public class FeedMenu {
                 isOwnPost,
                 post.subreddit(),
                 score,
+                post.commentCount(),
                 timeAgo
             );
         }
@@ -141,7 +147,8 @@ public class FeedMenu {
             MenuFormatter.printSuccessMessage("Post created successfully!");
             MenuFormatter.printInfoMessage("Post ID: " + createdPost.id() + "\nTitle: " + createdPost.title());
             postMenu.showPostManagementMenu(createdPost.id());
-
+            MenuFormatter.printInfoMessage("Returning to feed...");
+            viewAllPosts();
         } else {
             MenuFormatter.printErrorMessage("Error creating post: " + result.message + " (Status: " + result.status + ")");
         }

@@ -11,16 +11,6 @@ public class ConsoleIO {
         return sc.nextLine().trim();
     }
 
-    public static String readPassword(String prompt){
-        Console c = System.console();
-        if (c != null) {
-            char[] pwd = c.readPassword(prompt);
-            return pwd == null ? "" : new String(pwd);
-        }
-        System.out.print(prompt);
-        return sc.nextLine();
-    }
-
     public static int readInt(String prompt){
         while (true) {
             System.out.print(prompt);

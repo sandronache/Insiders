@@ -77,7 +77,7 @@ public class MenuFormatter {
     }
 
     public static void printPostCard(int id, String title, String author, boolean isOwnPost,
-                                   String subreddit, int score, String timeAgo) {
+                                   String subreddit, int score, int commentCount, String timeAgo) {
         int width = 80;
 
         // Top border
@@ -102,6 +102,10 @@ public class MenuFormatter {
         String scoreLine = String.format("Score: %s%d%s", scoreColor, score, RESET);
         printBoxLine(subredditLine, width);
         printBoxLine(scoreLine, width);
+
+        // Comments count
+        String commentsLine = String.format("Comments: %s%d%s", CYAN, commentCount, RESET);
+        printBoxLine(commentsLine, width);
 
         // Time
         String timeLine = String.format("Posted: %s%s%s", PURPLE, timeAgo, RESET);
@@ -299,7 +303,6 @@ public class MenuFormatter {
     }
 
     private static void printCommentLine(String text, int width, String indent) {
-        // Remove ANSI codes for length calculation
         String cleanText = text.replaceAll("\u001B\\[[;\\d]*m", "");
         String padding = " ".repeat(Math.max(0, width - 4 - cleanText.length()));
         System.out.println(indent + VERTICAL_LINE + " " + text + padding + " " + VERTICAL_LINE);
@@ -316,5 +319,18 @@ public class MenuFormatter {
             "6. Downvote comment",
             "0. Back"
         );
+    }
+
+    public static String readPasswordWithMasking(String prompt) {
+        java.io.Console console = System.console();
+        if (console != null) {
+            char[] pwd = console.readPassword(prompt);
+            return pwd == null ? "" : new String(pwd);
+        } else {
+            printWarningMessage("Running in IDE - password will be visible while typing");
+            printInfoMessage("For secure password input, run: java -jar target/cli-1.0-SNAPSHOT.jar");
+            System.out.print(prompt);
+            return new java.util.Scanner(System.in).nextLine();
+        }
     }
 }
