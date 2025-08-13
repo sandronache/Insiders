@@ -51,11 +51,11 @@ public class PostClient {
     }
 
     public ApiResult<VoteResponseDto> upvotePost(UUID postId) {
-        return votePost(postId, "UPVOTE");
+        return votePost(postId, "up");
     }
 
     public ApiResult<VoteResponseDto> downvotePost(UUID postId) {
-        return votePost(postId, "DOWNVOTE");
+        return votePost(postId, "down");
     }
 
     public ApiResult<List<CommentResponseDto>> getCommentsForPost(UUID postId) {
@@ -74,10 +74,10 @@ public class PostClient {
     }
 
     public ApiResult<VoteResponseDto> upvoteComment(UUID commentId) {
-        return voteComment(commentId, "UPVOTE");
+        return voteComment(commentId, "up");
     }
 
     public ApiResult<VoteResponseDto> downvoteComment(UUID commentId) {
-        return voteComment(commentId, "DOWNVOTE");
+        return voteComment(commentId, "down");
     }
 }
