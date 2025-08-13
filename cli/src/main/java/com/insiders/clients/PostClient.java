@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.insiders.dto.ResponseApi;
 import com.insiders.dto.comment.CommentCreateRequestDto;
 import com.insiders.dto.comment.CommentResponseDto;
+import com.insiders.dto.comment.CommentUpdateRequestDto;
 import com.insiders.dto.post.PostCreateRequestDto;
 import com.insiders.dto.post.PostResponseDto;
 import com.insiders.dto.post.PostUpdateRequestDto;
@@ -79,5 +80,18 @@ public class PostClient {
 
     public ApiResult<VoteResponseDto> downvoteComment(UUID commentId) {
         return voteComment(commentId, "down");
+    }
+
+    public ApiResult<CommentResponseDto> updateComment(UUID commentId, CommentUpdateRequestDto updateRequest) {
+        return api.put("/comments/" + commentId, updateRequest, new TypeReference<ResponseApi<CommentResponseDto>>(){});
+    }
+
+    public ApiResult<String> deleteComment(UUID commentId) {
+        return api.delete("/comments/" + commentId, new TypeReference<ResponseApi<String>>(){});
+    }
+
+    public ApiResult<List<PostResponseDto>> getPostsBySubreddit(String subredditName) {
+        return api.get("/subreddits/" + subredditName + "/posts",
+                new TypeReference<ResponseApi<List<PostResponseDto>>>(){});
     }
 }

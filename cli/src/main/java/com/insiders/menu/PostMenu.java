@@ -3,12 +3,14 @@ package com.insiders.menu;
 import com.insiders.clients.PostClient;
 import com.insiders.dto.comment.CommentCreateRequestDto;
 import com.insiders.dto.comment.CommentResponseDto;
+import com.insiders.dto.comment.CommentUpdateRequestDto;
 import com.insiders.dto.post.PostResponseDto;
 import com.insiders.dto.post.PostUpdateRequestDto;
 import com.insiders.dto.vote.VoteResponseDto;
 import com.insiders.http.ApiResult;
 import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
+import com.insiders.util.TimeUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -75,16 +77,32 @@ public class PostMenu {
             System.out.println("Content: " + post.content());
             System.out.println("Author: " + post.author());
             System.out.println("Subreddit: " + post.subreddit());
+            int score = post.upvotes() - post.downvotes();
+            System.out.println("Score: " + score);
             System.out.println("Upvotes: " + post.upvotes());
             System.out.println("Downvotes: " + post.downvotes());
-            System.out.println("Created: " + post.createdAt());
-            System.out.println("Updated: " + post.updatedAt());
+            System.out.println("Posted: " + TimeUtils.getRelativeTime(post.createdAt().toString()));
         } else {
             System.out.println("Error loading post: " + result.message);
         }
     }
 
     private void editPost(UUID postId) {
+        ApiResult<PostResponseDto> postResult = client.getPostById(postId);
+        if (!postResult.success) {
+            System.out.println("Error loading post: " + postResult.message);
+            return;
+        }
+
+        PostResponseDto post = postResult.data;
+        String currentUser = sessionManager.username();
+
+        if (!post.author().equals(currentUser)) {
+            System.out.println("❌ You can only edit your own posts!");
+            System.out.println("This post belongs to: " + post.author());
+            return;
+        }
+
         String title = ConsoleIO.readLine("Enter new title (or press Enter to keep current): ");
         String content = ConsoleIO.readLine("Enter new content (or press Enter to keep current): ");
 
@@ -102,6 +120,21 @@ public class PostMenu {
     }
 
     private boolean deletePost(UUID postId) {
+        ApiResult<PostResponseDto> postResult = client.getPostById(postId);
+        if (!postResult.success) {
+            System.out.println("Error loading post: " + postResult.message);
+            return false;
+        }
+
+        PostResponseDto post = postResult.data;
+        String currentUser = sessionManager.username();
+
+        if (!post.author().equals(currentUser)) {
+            System.out.println("❌ You can only delete your own posts!");
+            System.out.println("This post belongs to: " + post.author());
+            return false;
+        }
+
         String confirm = ConsoleIO.readLine("Are you sure you want to delete this post? (yes/no): ");
         if ("yes".equalsIgnoreCase(confirm)) {
             ApiResult<String> result = client.deletePost(postId);
@@ -116,16 +149,51 @@ public class PostMenu {
     }
 
     private void upvotePost(UUID postId) {
-        System.out.println("Upvoting post...");
-        ApiResult<VoteResponseDto> result = client.upvotePost(postId);
+        System.out.println("Processing upvote...");
 
-        System.out.println("API Response - Success: " + result.success + ", Status: " + result.status + ", Message: " + result.message);
+        ApiResult<PostResponseDto> postResult = client.getPostById(postId);
+        if (!postResult.success) {
+            System.out.println("Error checking post state: " + postResult.message);
+            return;
+        }
+
+        String currentVote = postResult.data.userVote();
+        System.out.println("DEBUG: Current user vote: '" + currentVote + "'");
+
+        String voteType = "up";
+
+        if ("up".equals(currentVote)) {
+            voteType = "none";
+            System.out.println("Removing your upvote...");
+        } else {
+            System.out.println("Upvoting post...");
+        }
+
+        System.out.println("DEBUG: Sending vote type: '" + voteType + "'");
+
+        ApiResult<VoteResponseDto> result = client.votePost(postId, voteType);
 
         if (result.success) {
             VoteResponseDto vote = result.data;
             if (vote != null) {
-                System.out.println("✅ Post upvoted successfully!");
+                System.out.println("DEBUG: Response user vote: '" + vote.userVote() + "'");
+
+                if ("none".equals(voteType)) {
+                    System.out.println("✅ Upvote removed successfully!");
+                } else {
+                    System.out.println("✅ Post upvoted successfully!");
+                }
                 System.out.println("Score: " + vote.upvotes() + "↑ " + vote.downvotes() + "↓");
+
+                if (vote.userVote() != null && !vote.userVote().isEmpty() && !"none".equals(vote.userVote())) {
+                    String voteDisplay = vote.userVote().equals("up") ? "⬆️ YOU UPVOTED" :
+                                       vote.userVote().equals("down") ? "⬇️ YOU DOWNVOTED" : "";
+                    if (!voteDisplay.isEmpty()) {
+                        System.out.println("Your vote: " + voteDisplay);
+                    }
+                } else {
+                    System.out.println("Your vote: None");
+                }
             } else {
                 System.out.println("✅ Vote successful but no vote data received.");
             }
@@ -135,18 +203,53 @@ public class PostMenu {
     }
 
     private void downvotePost(UUID postId) {
-        System.out.println("Downvoting post...");
-        ApiResult<VoteResponseDto> result = client.downvotePost(postId);
+        System.out.println("Processing downvote...");
 
-        System.out.println("API Response - Success: " + result.success + ", Status: " + result.status + ", Message: " + result.message);
+        ApiResult<PostResponseDto> postResult = client.getPostById(postId);
+        if (!postResult.success) {
+            System.out.println("Error checking post state: " + postResult.message);
+            return;
+        }
+
+        String currentVote = postResult.data.userVote();
+        System.out.println("DEBUG: Current user vote: '" + currentVote + "'");
+
+        String voteType = "down";
+
+        if ("down".equals(currentVote)) {
+            voteType = "none";
+            System.out.println("Removing your downvote...");
+        } else {
+            System.out.println("Downvoting post...");
+        }
+
+        System.out.println("DEBUG: Sending vote type: '" + voteType + "'");
+
+        ApiResult<VoteResponseDto> result = client.votePost(postId, voteType);
 
         if (result.success) {
             VoteResponseDto vote = result.data;
             if (vote != null) {
-                System.out.println("Post downvoted successfully!");
+                System.out.println("DEBUG: Response user vote: '" + vote.userVote() + "'");
+
+                if ("none".equals(voteType)) {
+                    System.out.println("✅ Downvote removed successfully!");
+                } else {
+                    System.out.println("✅ Post downvoted successfully!");
+                }
                 System.out.println("Score: " + vote.upvotes() + "↑ " + vote.downvotes() + "↓");
+
+                if (vote.userVote() != null && !vote.userVote().isEmpty() && !"none".equals(vote.userVote())) {
+                    String voteDisplay = vote.userVote().equals("up") ? "⬆️ YOU UPVOTED" :
+                                       vote.userVote().equals("down") ? "⬇️ YOU DOWNVOTED" : "";
+                    if (!voteDisplay.isEmpty()) {
+                        System.out.println("Your vote: " + voteDisplay);
+                    }
+                } else {
+                    System.out.println("Your vote: None");
+                }
             } else {
-                System.out.println("Vote successful but no vote data received.");
+                System.out.println("✅ Vote successful but no vote data received.");
             }
         } else {
             System.out.println("Error voting: " + result.message + " (Status: " + result.status + ")");
@@ -201,15 +304,15 @@ public class PostMenu {
         String voteStatus = "";
         if (comment.userVote() != null) {
             voteStatus = switch (comment.userVote()) {
-                case "UPVOTE" -> " ⬆️ [YOU UPVOTED]";
-                case "DOWNVOTE" -> " ⬇️ [YOU DOWNVOTED]";
+                case "up" -> " ⬆️ [YOU UPVOTED]";
+                case "down" -> " ⬇️ [YOU DOWNVOTED]";
                 default -> "";
             };
         }
 
         System.out.println(indent + "  Content: " + comment.content());
         System.out.println(indent + "  Score: " + comment.score() + " (" + comment.upvotes() + "↑ " + comment.downvotes() + "↓)" + voteStatus);
-        System.out.println(indent + "  Created: " + comment.createdAt());
+        System.out.println(indent + "  Posted: " + TimeUtils.getRelativeTime(comment.createdAt().toString()));
 
         System.out.println(indent + "---");
     }
@@ -218,8 +321,10 @@ public class PostMenu {
         System.out.println("\n=== Comment Actions ===");
         System.out.println("1. Add comment");
         System.out.println("2. Reply to existing comment");
-        System.out.println("3. Upvote comment");
-        System.out.println("4. Downvote comment");
+        System.out.println("3. Edit comment");
+        System.out.println("4. Delete comment");
+        System.out.println("5. Upvote comment");
+        System.out.println("6. Downvote comment");
         System.out.println("0. Back");
 
         int choice = ConsoleIO.readInt("Choose option: ");
@@ -227,8 +332,10 @@ public class PostMenu {
         switch (choice) {
             case 1 -> createTopLevelComment(postId);
             case 2 -> createReplyComment(postId);
-            case 3 -> voteOnComment(postId, "UPVOTE");
-            case 4 -> voteOnComment(postId, "DOWNVOTE");
+            case 3 -> editComment(postId);
+            case 4 -> deleteComment(postId);
+            case 5 -> voteOnComment(postId, "UPVOTE");
+            case 6 -> voteOnComment(postId, "DOWNVOTE");
             case 0 -> System.out.println("Returning to post management...");
             default -> System.out.println("Invalid choice!");
         }
@@ -301,15 +408,55 @@ public class PostMenu {
                 System.out.println("Invalid comment ID! Please choose a number from the comments list above.");
                 return;
             }
+            ApiResult<List<CommentResponseDto>> commentsResult = client.getCommentsForPost(postId);
+            String currentVote = null;
 
-            ApiResult<VoteResponseDto> result = voteType.equals("UPVOTE") ?
-                client.upvoteComment(commentId) : client.downvoteComment(commentId);
+            if (commentsResult.success && commentsResult.data != null) {
+                CommentResponseDto targetComment = findCommentInHierarchy(commentsResult.data, commentId);
+                if (targetComment != null) {
+                    currentVote = targetComment.userVote();
+                }
+            }
+
+            System.out.println("DEBUG: Current comment vote: '" + currentVote + "'");
+
+            String actualVoteType = voteType.equals("UPVOTE") ? "up" : "down";
+
+            if (actualVoteType.equals(currentVote)) {
+                actualVoteType = "none";
+                System.out.println("Removing your " + (voteType.equals("UPVOTE") ? "upvote" : "downvote") + "...");
+            } else {
+                System.out.println((voteType.equals("UPVOTE") ? "Upvoting" : "Downvoting") + " comment...");
+            }
+
+            System.out.println("DEBUG: Sending comment vote type: '" + actualVoteType + "'");
+
+            ApiResult<VoteResponseDto> result = client.voteComment(commentId, actualVoteType);
 
             if (result.success) {
                 VoteResponseDto vote = result.data;
-                String action = voteType.equals("UPVOTE") ? "upvoted" : "downvoted";
-                System.out.println("Comment " + action + " successfully!");
-                System.out.println("Score: " + vote.upvotes() + "↑ " + vote.downvotes() + "↓");
+                if (vote != null) {
+                    System.out.println("DEBUG: Comment response user vote: '" + vote.userVote() + "'");
+
+                    if ("none".equals(actualVoteType)) {
+                        System.out.println("✅ " + (voteType.equals("UPVOTE") ? "Upvote" : "Downvote") + " removed successfully!");
+                    } else {
+                        System.out.println("✅ Comment " + (voteType.equals("UPVOTE") ? "upvoted" : "downvoted") + " successfully!");
+                    }
+                    System.out.println("Score: " + vote.upvotes() + "↑ " + vote.downvotes() + "↓");
+
+                    if (vote.userVote() != null && !vote.userVote().isEmpty() && !"none".equals(vote.userVote())) {
+                        String voteDisplay = vote.userVote().equals("up") ? "⬆️ YOU UPVOTED" :
+                                           vote.userVote().equals("down") ? "⬇️ YOU DOWNVOTED" : "";
+                        if (!voteDisplay.isEmpty()) {
+                            System.out.println("Your vote: " + voteDisplay);
+                        }
+                    } else {
+                        System.out.println("Your vote: None");
+                    }
+                } else {
+                    System.out.println("✅ Vote successful but no vote data received.");
+                }
                 refreshCommentsDisplay(postId);
             } else {
                 System.out.println("Error voting on comment: " + result.message + " (Status: " + result.status + ")");
@@ -318,6 +465,124 @@ public class PostMenu {
             System.out.println("Please enter a valid number from the comments list.");
         }
     }
-}
 
-// TODO Voting posts and comments (Andrei user hardcoded)
+    private CommentResponseDto findCommentInHierarchy(List<CommentResponseDto> comments, UUID commentId) {
+        for (CommentResponseDto comment : comments) {
+            if (comment.id().equals(commentId)) {
+                return comment;
+            }
+            if (comment.replies() != null && !comment.replies().isEmpty()) {
+                CommentResponseDto found = findCommentInHierarchy(comment.replies(), commentId);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void editComment(UUID postId) {
+        String commentIdStr = ConsoleIO.readLine("Enter the comment ID you want to edit: ");
+        try {
+            int simpleCommentId = Integer.parseInt(commentIdStr);
+
+            UUID commentId = commentIdMapping.get(simpleCommentId);
+            if (commentId == null) {
+                System.out.println("Invalid comment ID! Please choose a number from the comments list above.");
+                return;
+            }
+
+            ApiResult<List<CommentResponseDto>> commentsResult = client.getCommentsForPost(postId);
+            if (!commentsResult.success) {
+                System.out.println("Error loading comments: " + commentsResult.message);
+                return;
+            }
+
+            CommentResponseDto targetComment = findCommentInHierarchy(commentsResult.data, commentId);
+            if (targetComment == null) {
+                System.out.println("Comment not found!");
+                return;
+            }
+
+            String currentUser = sessionManager.username();
+
+            if (!targetComment.author().equals(currentUser)) {
+                System.out.println("❌ You can only edit your own comments!");
+                System.out.println("This comment belongs to: " + targetComment.author());
+                return;
+            }
+
+            System.out.println("Current content: " + targetComment.content());
+            String newContent = ConsoleIO.readLine("Enter new content: ");
+
+            if (newContent.trim().isEmpty()) {
+                System.out.println("Comment content cannot be empty!");
+                return;
+            }
+
+            CommentUpdateRequestDto updateRequest = new CommentUpdateRequestDto(newContent);
+
+            ApiResult<CommentResponseDto> result = client.updateComment(commentId, updateRequest);
+            if (result.success) {
+                System.out.println("✅ Comment updated successfully!");
+                refreshCommentsDisplay(postId);
+            } else {
+                System.out.println("Error updating comment: " + result.message);
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid number from the comments list.");
+        }
+    }
+
+    private void deleteComment(UUID postId) {
+        String commentIdStr = ConsoleIO.readLine("Enter the comment ID you want to delete: ");
+        try {
+            int simpleCommentId = Integer.parseInt(commentIdStr);
+
+            UUID commentId = commentIdMapping.get(simpleCommentId);
+            if (commentId == null) {
+                System.out.println("Invalid comment ID! Please choose a number from the comments list above.");
+                return;
+            }
+
+            ApiResult<List<CommentResponseDto>> commentsResult = client.getCommentsForPost(postId);
+            if (!commentsResult.success) {
+                System.out.println("Error loading comments: " + commentsResult.message);
+                return;
+            }
+
+            CommentResponseDto targetComment = findCommentInHierarchy(commentsResult.data, commentId);
+            if (targetComment == null) {
+                System.out.println("Comment not found!");
+                return;
+            }
+
+            String currentUser = sessionManager.username();
+
+            if (!targetComment.author().equals(currentUser)) {
+                System.out.println("❌ You can only delete your own comments!");
+                System.out.println("This comment belongs to: " + targetComment.author());
+                return;
+            }
+
+            System.out.println("Comment content: " + targetComment.content());
+            String confirm = ConsoleIO.readLine("Are you sure you want to delete this comment? (yes/no): ");
+
+            if ("yes".equalsIgnoreCase(confirm)) {
+                ApiResult<String> result = client.deleteComment(commentId);
+                if (result.success) {
+                    System.out.println("✅ Comment deleted successfully!");
+                    refreshCommentsDisplay(postId);
+                } else {
+                    System.out.println("Error deleting comment: " + result.message);
+                }
+            } else {
+                System.out.println("Delete cancelled.");
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid number from the comments list.");
+        }
+    }
+}

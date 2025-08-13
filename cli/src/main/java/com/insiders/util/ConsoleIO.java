@@ -28,7 +28,7 @@ public class ConsoleIO {
                 return Integer.parseInt(sc.nextLine().trim());
             }
             catch (NumberFormatException e) {
-                System.out.println("Introduceti un numar.");
+                System.out.println("Insert a number.");
             }
         }
     }

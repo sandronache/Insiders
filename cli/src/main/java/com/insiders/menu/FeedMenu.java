@@ -1,11 +1,14 @@
 package com.insiders.menu;
 
 import com.insiders.clients.PostClient;
+import com.insiders.clients.SubredditClient;
 import com.insiders.dto.post.PostResponseDto;
 import com.insiders.dto.post.PostCreateRequestDto;
 import com.insiders.http.ApiResult;
 import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
+import com.insiders.util.TimeUtils;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,12 +19,14 @@ public class FeedMenu {
     private final PostClient postClient;
     private final SessionManager sessionManager;
     private final PostMenu postMenu;
-    private Map<Integer, UUID> postIdMapping = new HashMap<>();
+    private final SubredditMenu subredditMenu;
+    private final Map<Integer, UUID> postIdMapping = new HashMap<>();
 
-    public FeedMenu(PostClient postClient, SessionManager sessionManager) {
+    public FeedMenu(PostClient postClient, SubredditClient subredditClient, SessionManager sessionManager) {
         this.postClient = postClient;
         this.sessionManager = sessionManager;
         this.postMenu = new PostMenu(postClient, sessionManager);
+        this.subredditMenu = new SubredditMenu(postClient, subredditClient, sessionManager);
     }
 
     public void showMenu() {
@@ -34,13 +39,15 @@ public class FeedMenu {
             System.out.println("1. Refresh Posts");
             System.out.println("2. Create New Post");
             System.out.println("3. Enter Post");
-            System.out.println("0. Back");
+            System.out.println("4. Subreddit Actions");
+            System.out.println("0. Back to Main Menu");
 
             int choice = ConsoleIO.readInt("Enter your choice:");
             switch (choice) {
                 case 1 -> viewAllPosts();
                 case 2 -> createPost();
                 case 3 -> enterPostId();
+                case 4 -> subredditActions();
                 case 0 -> {
                     return;
                 }
@@ -98,11 +105,12 @@ public class FeedMenu {
             }
 
             System.out.println("Subreddit: " + post.subreddit());
-            System.out.println("Upvotes: " + post.upvotes() + " | Downvotes: " + post.downvotes());
+            int score = post.upvotes() - post.downvotes();
+            System.out.println("Score: " + score);
+            System.out.println("Posted: " + TimeUtils.getRelativeTime(post.createdAt().toString()));
             System.out.println("---");
         }
     }
-
 
     private void createPost() {
         System.out.println("\n=== Create New Post ===");
@@ -139,9 +147,14 @@ public class FeedMenu {
             }
 
             System.out.println("\n=== Updated Feed ===");
+
             viewAllPosts();
         } else {
             System.out.println("Error creating post: " + result.message + " (Status: " + result.status + ")");
         }
+    }
+
+    private void subredditActions() {
+        subredditMenu.showSubredditActions();
     }
 }
