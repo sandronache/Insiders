@@ -10,6 +10,7 @@ import com.insiders.http.ApiResult;
 import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
 import com.insiders.util.TimeUtils;
+import com.insiders.util.MenuFormatter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,10 +32,12 @@ public class SubredditMenu {
 
     public void showSubredditActions() {
         while (true) {
-            System.out.println("\n=== Subreddit Actions ===");
-            System.out.println("1. Create Subreddit");
-            System.out.println("2. All Subreddits");
-            System.out.println("0. Back");
+            MenuFormatter.printMenuHeader("Subreddit Actions");
+            MenuFormatter.printMenuOptions(
+                "1. Create Subreddit",
+                "2. All Subreddits",
+                "0. Back"
+            );
 
             int choice = ConsoleIO.readInt("Choose option: ");
 
@@ -42,32 +45,32 @@ public class SubredditMenu {
                 case 1 -> createSubreddit();
                 case 2 -> allSubreddits();
                 case 0 -> {
-                    System.out.println("Returning to feed menu...");
+                    MenuFormatter.printInfoMessage("Returning to feed menu...");
                     return;
                 }
-                default -> System.out.println("Invalid choice!");
+                default -> MenuFormatter.printErrorMessage("Invalid choice!");
             }
         }
     }
 
     private void createSubreddit() {
-        System.out.println("\n=== Create New Subreddit ===");
+        MenuFormatter.printMenuHeader("Create New Subreddit");
 
         String name = ConsoleIO.readLine("Enter subreddit name (lowercase, alphanumeric and underscore only): ");
         if (name.trim().isEmpty()) {
-            System.out.println("Subreddit name cannot be empty!");
+            MenuFormatter.printErrorMessage("Subreddit name cannot be empty!");
             return;
         }
 
         String displayName = ConsoleIO.readLine("Enter display name: ");
         if (displayName.trim().isEmpty()) {
-            System.out.println("Display name cannot be empty!");
+            MenuFormatter.printErrorMessage("Display name cannot be empty!");
             return;
         }
 
         String description = ConsoleIO.readLine("Enter subreddit description: ");
         if (description.trim().isEmpty()) {
-            System.out.println("Description cannot be empty!");
+            MenuFormatter.printErrorMessage("Description cannot be empty!");
             return;
         }
 
@@ -83,24 +86,24 @@ public class SubredditMenu {
             iconUrl
         );
 
-        System.out.println("Creating subreddit...");
+        MenuFormatter.printInfoMessage("Creating subreddit...");
         ApiResult<SubredditResponseDto> result = subredditClient.createSubreddit(createRequest);
 
         if (result.success) {
             SubredditResponseDto createdSubreddit = result.data;
-            System.out.println("✅ Subreddit created successfully!");
-            System.out.println("Name: " + createdSubreddit.name());
-            System.out.println("Display Name: " + createdSubreddit.displayName());
-            System.out.println("Description: " + createdSubreddit.description());
-            System.out.println("You can now create posts in this subreddit!");
+            MenuFormatter.printSuccessMessage("Subreddit created successfully!");
+            MenuFormatter.printInfoMessage("Name: " + createdSubreddit.name());
+            MenuFormatter.printInfoMessage("Display Name: " + createdSubreddit.displayName());
+            MenuFormatter.printInfoMessage("Description: " + createdSubreddit.description());
+            MenuFormatter.printInfoMessage("You can now create posts in this subreddit!");
         } else {
-            System.out.println("❌ Error creating subreddit: " + result.message + " (Status: " + result.status + ")");
+            MenuFormatter.printErrorMessage("Error creating subreddit: " + result.message + " (Status: " + result.status + ")");
         }
     }
 
     private void allSubreddits() {
-        System.out.println("\n=== All Subreddits ===");
-        System.out.println("Loading all subreddits...");
+        MenuFormatter.printMenuHeader("All Subreddits");
+        MenuFormatter.printInfoMessage("Loading all subreddits...");
 
         ApiResult<List<SubredditResponseDto>> result = subredditClient.getAllSubreddits();
 
@@ -108,46 +111,76 @@ public class SubredditMenu {
             List<SubredditResponseDto> subreddits = result.data;
 
             if (subreddits.isEmpty()) {
-                System.out.println("No subreddits found.");
-                System.out.println("Be the first to create a subreddit!");
+                MenuFormatter.printInfoMessage("No subreddits found.");
+                MenuFormatter.printInfoMessage("Be the first to create a subreddit!");
                 return;
             } else {
                 displaySubredditsList(subreddits);
                 showSubredditManagementOptions();
             }
         } else {
-            System.out.println("Error loading subreddits: " + result.message);
+            MenuFormatter.printErrorMessage("Error loading subreddits: " + result.message);
             return;
         }
     }
 
     private void displaySubredditsList(List<SubredditResponseDto> subreddits) {
         subredditNameMapping.clear();
-        System.out.println("\n--- All Subreddits (" + subreddits.size() + ") ---");
+        MenuFormatter.printMenuHeader("All Subreddits (" + subreddits.size() + ")");
 
         for (int i = 0; i < subreddits.size(); i++) {
             SubredditResponseDto subreddit = subreddits.get(i);
             int simpleId = i + 1;
             subredditNameMapping.put(simpleId, subreddit.name());
 
-            System.out.println("ID: " + simpleId);
-            System.out.println("Name: " + subreddit.name());
-            System.out.println("Display Name: " + subreddit.displayName());
-            System.out.println("Description: " + subreddit.description());
-            System.out.println("Members: " + subreddit.memberCount());
-            System.out.println("Posts: " + subreddit.postCount());
-            System.out.println("Created: " + TimeUtils.getRelativeTime(subreddit.createdAt().toString()));
-            System.out.println("---");
+            displaySubredditCard(simpleId, subreddit);
         }
+    }
+
+    private void displaySubredditCard(int id, SubredditResponseDto subreddit) {
+        int width = 80;
+        String timeAgo = TimeUtils.getRelativeTime(subreddit.createdAt().toString());
+
+        System.out.println(MenuFormatter.TOP_LEFT + MenuFormatter.HORIZONTAL_LINE.repeat(width - 2) + MenuFormatter.TOP_RIGHT);
+
+        String idLine = String.format("ID: %s%d%s", MenuFormatter.YELLOW + MenuFormatter.BOLD, id, MenuFormatter.RESET);
+        String nameLine = String.format("Name: %sr/%s%s", MenuFormatter.CYAN + MenuFormatter.BOLD, subreddit.name(), MenuFormatter.RESET);
+        printSubredditLine(idLine, width);
+        printSubredditLine(nameLine, width);
+
+        String displayNameLine = String.format("Display Name: %s%s%s", MenuFormatter.GREEN + MenuFormatter.BOLD, subreddit.displayName(), MenuFormatter.RESET);
+        printSubredditLine(displayNameLine, width);
+
+        String descriptionLine = String.format("Description: %s%s%s", MenuFormatter.WHITE, subreddit.description(), MenuFormatter.RESET);
+        printSubredditLine(descriptionLine, width);
+
+        String membersLine = String.format("Members: %s%d%s", MenuFormatter.BLUE, subreddit.memberCount(), MenuFormatter.RESET);
+        String postsLine = String.format("Posts: %s%d%s", MenuFormatter.PURPLE, subreddit.postCount(), MenuFormatter.RESET);
+        printSubredditLine(membersLine, width);
+        printSubredditLine(postsLine, width);
+
+        String timeLine = String.format("Created: %s%s%s", MenuFormatter.PURPLE, timeAgo, MenuFormatter.RESET);
+        printSubredditLine(timeLine, width);
+
+        System.out.println(MenuFormatter.BOTTOM_LEFT + MenuFormatter.HORIZONTAL_LINE.repeat(width - 2) + MenuFormatter.BOTTOM_RIGHT);
+        System.out.println();
+    }
+
+    private void printSubredditLine(String text, int width) {
+        String cleanText = text.replaceAll("\u001B\\[[;\\d]*m", "");
+        String padding = " ".repeat(Math.max(0, width - 4 - cleanText.length()));
+        System.out.println(MenuFormatter.VERTICAL_LINE + " " + text + padding + " " + MenuFormatter.VERTICAL_LINE);
     }
 
     private void showSubredditManagementOptions() {
         while (true) {
-            System.out.println("\n=== Subreddit Management ===");
-            System.out.println("1. View posts from subreddit");
-            System.out.println("2. Edit subreddit");
-            System.out.println("3. Delete subreddit");
-            System.out.println("0. Back to Subreddit Actions");
+            MenuFormatter.printMenuHeader("Subreddit Management");
+            MenuFormatter.printMenuOptions(
+                "1. View posts from subreddit",
+                "2. Edit subreddit",
+                "3. Delete subreddit",
+                "0. Back to Subreddit Actions"
+            );
 
             int choice = ConsoleIO.readInt("Choose option: ");
             switch (choice) {
@@ -155,10 +188,10 @@ public class SubredditMenu {
                 case 2 -> editSubreddit();
                 case 3 -> deleteSubreddit();
                 case 0 -> {
-                    System.out.println("Returning to subreddit actions...");
+                    MenuFormatter.printInfoMessage("Returning to subreddit actions...");
                     return;
                 }
-                default -> System.out.println("Invalid choice!");
+                default -> MenuFormatter.printErrorMessage("Invalid choice!");
             }
         }
     }
@@ -172,62 +205,60 @@ public class SubredditMenu {
             if (subredditName != null) {
                 viewSubredditPosts(subredditName);
             } else {
-                System.out.println("Invalid subreddit ID! Please choose a number from the list above.");
+                MenuFormatter.printErrorMessage("Invalid subreddit ID! Please choose a number from the list above.");
             }
         } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid number from the subreddits list.");
+            MenuFormatter.printErrorMessage("Please enter a valid number from the subreddits list.");
         }
     }
 
     private void viewSubredditPosts(String subredditName) {
-        System.out.println("\n=== Posts in Subreddit: " + subredditName + " ===");
-        System.out.println("Loading posts...");
+        MenuFormatter.printMenuHeader("Posts in Subreddit: r/" + subredditName);
+        MenuFormatter.printInfoMessage("Loading posts...");
 
         ApiResult<List<PostResponseDto>> result = subredditClient.getSubredditPosts(subredditName);
 
         if (result.success) {
             List<PostResponseDto> posts = result.data;
             if (posts.isEmpty()) {
-                System.out.println("No posts found in subreddit '" + subredditName + "'.");
-                System.out.println("Be the first to create a post in this subreddit!");
+                MenuFormatter.printInfoMessage("No posts found in subreddit 'r/" + subredditName + "'.");
+                MenuFormatter.printInfoMessage("Be the first to create a post in this subreddit!");
             } else {
-                System.out.println("Found " + posts.size() + " posts in r/" + subredditName);
+                MenuFormatter.printInfoMessage("Found " + posts.size() + " posts in r/" + subredditName);
                 displayPostsAndNavigate(posts);
             }
         } else {
-            System.out.println("❌ Error loading posts from subreddit '" + subredditName + "': " + result.message);
-            System.out.println("Make sure the subreddit name is correct and exists.");
+            MenuFormatter.printErrorMessage("Error loading posts from subreddit 'r/" + subredditName + "': " + result.message);
+            MenuFormatter.printInfoMessage("Make sure the subreddit name is correct and exists.");
         }
     }
 
     private void displayPostsAndNavigate(List<PostResponseDto> posts) {
         if (posts.isEmpty()) {
-            System.out.println("No posts found.");
+            MenuFormatter.printInfoMessage("No posts found.");
             return;
         }
 
         postIdMapping.clear();
 
-        System.out.println("\n--- Posts Feed ---");
         for (int i = 0; i < posts.size(); i++) {
             PostResponseDto post = posts.get(i);
             int simpleId = i + 1;
-
             postIdMapping.put(simpleId, post.id());
 
-            System.out.println("ID: " + simpleId);
-            System.out.println("Title: " + post.title());
-            System.out.println("Author: " + post.author());
-
-            if (post.author().equals(sessionManager.username())) {
-                System.out.println("📝 [YOUR POST]");
-            }
-
-            System.out.println("Subreddit: " + post.subreddit());
+            boolean isOwnPost = post.author().equals(sessionManager.username());
             int score = post.upvotes() - post.downvotes();
-            System.out.println("Score: " + score + " | Upvotes: " + post.upvotes() + " | Downvotes: " + post.downvotes());
-            System.out.println("Posted: " + TimeUtils.getRelativeTime(post.createdAt().toString()));
-            System.out.println("---");
+            String timeAgo = TimeUtils.getRelativeTime(post.createdAt().toString());
+
+            MenuFormatter.printPostCard(
+                simpleId,
+                post.title(),
+                post.author(),
+                isOwnPost,
+                post.subreddit(),
+                score,
+                timeAgo
+            );
         }
 
         String input = ConsoleIO.readLine("Enter post ID to view/manage (or press Enter to continue): ");
@@ -238,10 +269,10 @@ public class SubredditMenu {
                 if (actualPostId != null) {
                     postMenu.showPostManagementMenu(actualPostId);
                 } else {
-                    System.out.println("Invalid post ID! Please choose a number from the list above.");
+                    MenuFormatter.printErrorMessage("Invalid post ID! Please choose a number from the list above.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number from the post list.");
+                MenuFormatter.printErrorMessage("Please enter a valid number from the post list.");
             }
         }
     }
@@ -249,22 +280,22 @@ public class SubredditMenu {
     private void editSubreddit() {
         String subredditName = ConsoleIO.readLine("Enter the subreddit name to edit: ");
         if (subredditName.trim().isEmpty()) {
-            System.out.println("Subreddit name cannot be empty!");
+            MenuFormatter.printErrorMessage("Subreddit name cannot be empty!");
             return;
         }
 
         ApiResult<SubredditResponseDto> subredditResult = subredditClient.getSubredditByName(subredditName.trim());
         if (!subredditResult.success) {
-            System.out.println("❌ Error loading subreddit '" + subredditName + "': " + subredditResult.message);
-            System.out.println("Make sure the subreddit name is correct and exists.");
+            MenuFormatter.printErrorMessage("Error loading subreddit 'r/" + subredditName + "': " + subredditResult.message);
+            MenuFormatter.printInfoMessage("Make sure the subreddit name is correct and exists.");
             return;
         }
 
         SubredditResponseDto subreddit = subredditResult.data;
 
-        System.out.println("\n=== Edit Subreddit: " + subreddit.name() + " ===");
-        System.out.println("Current Display Name: " + subreddit.displayName());
-        System.out.println("Current Description: " + subreddit.description());
+        MenuFormatter.printMenuHeader("Edit Subreddit: r/" + subreddit.name());
+        MenuFormatter.printInfoMessage("Current Display Name: " + subreddit.displayName());
+        MenuFormatter.printInfoMessage("Current Description: " + subreddit.description());
 
         String newDisplayName = ConsoleIO.readLine("Enter new display name (or press Enter to keep current): ");
         String newDescription = ConsoleIO.readLine("Enter new description (or press Enter to keep current): ");
@@ -276,57 +307,57 @@ public class SubredditMenu {
             newIconUrl.isEmpty() ? null : newIconUrl
         );
 
-        System.out.println("Updating subreddit...");
+        MenuFormatter.printInfoMessage("Updating subreddit...");
         ApiResult<SubredditResponseDto> result = subredditClient.updateSubreddit(subredditName.trim(), updateRequest);
 
         if (result.success) {
-            System.out.println("✅ Subreddit updated successfully!");
-            System.out.println("Updated Display Name: " + result.data.displayName());
-            System.out.println("Updated Description: " + result.data.description());
+            MenuFormatter.printSuccessMessage("Subreddit updated successfully!");
+            MenuFormatter.printInfoMessage("Updated Display Name: " + result.data.displayName());
+            MenuFormatter.printInfoMessage("Updated Description: " + result.data.description());
         } else {
-            System.out.println("❌ Error updating subreddit: " + result.message);
+            MenuFormatter.printErrorMessage("Error updating subreddit: " + result.message);
         }
     }
 
     private void deleteSubreddit() {
         String subredditName = ConsoleIO.readLine("Enter the subreddit name to delete: ");
         if (subredditName.trim().isEmpty()) {
-            System.out.println("Subreddit name cannot be empty!");
+            MenuFormatter.printErrorMessage("Subreddit name cannot be empty!");
             return;
         }
 
-        // Get subreddit details first
         ApiResult<SubredditResponseDto> subredditResult = subredditClient.getSubredditByName(subredditName.trim());
         if (!subredditResult.success) {
-            System.out.println("❌ Error loading subreddit '" + subredditName + "': " + subredditResult.message);
-            System.out.println("Make sure the subreddit name is correct and exists.");
+            MenuFormatter.printErrorMessage("Error loading subreddit 'r/" + subredditName + "': " + subredditResult.message);
+            MenuFormatter.printInfoMessage("Make sure the subreddit name is correct and exists.");
             return;
         }
 
         SubredditResponseDto subreddit = subredditResult.data;
 
-        System.out.println("\n=== Delete Subreddit ===");
-        System.out.println("Subreddit: " + subreddit.name());
-        System.out.println("Display Name: " + subreddit.displayName());
-        System.out.println("Posts: " + subreddit.postCount());
+        MenuFormatter.printMenuHeader("Delete Subreddit");
+        MenuFormatter.printInfoMessage("Subreddit: r/" + subreddit.name());
+        MenuFormatter.printInfoMessage("Display Name: " + subreddit.displayName());
+        MenuFormatter.printInfoMessage("Posts: " + subreddit.postCount());
 
         if (subreddit.postCount() > 0) {
-            System.out.println("❌ Cannot delete this subreddit because it contains " + subreddit.postCount() + " post(s).");
-            System.out.println("You must delete all posts from this subreddit before you can delete it.");
+            MenuFormatter.printErrorMessage("Cannot delete this subreddit because it contains " + subreddit.postCount() + " post(s).");
+            MenuFormatter.printInfoMessage("You must delete all posts from this subreddit before you can delete it.");
             return;
         }
 
-        String confirm = ConsoleIO.readLine("Are you sure you want to delete this subreddit? (yes/no): ");
+        MenuFormatter.printWarningMessage("Are you sure you want to delete this subreddit?");
+        String confirm = ConsoleIO.readLine("Type 'yes' to confirm deletion: ");
 
         if ("yes".equalsIgnoreCase(confirm)) {
             ApiResult<String> result = subredditClient.deleteSubreddit(subredditName.trim());
             if (result.success) {
-                System.out.println("✅ Subreddit deleted successfully!");
+                MenuFormatter.printSuccessMessage("Subreddit deleted successfully!");
             } else {
-                System.out.println("❌ Error deleting subreddit: " + result.message);
+                MenuFormatter.printErrorMessage("Error deleting subreddit: " + result.message);
             }
         } else {
-            System.out.println("Delete cancelled.");
+            MenuFormatter.printInfoMessage("Delete cancelled.");
         }
     }
 }

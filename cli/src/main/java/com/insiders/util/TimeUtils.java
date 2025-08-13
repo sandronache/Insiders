@@ -1,6 +1,7 @@
 package com.insiders.util;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
@@ -12,7 +13,15 @@ public class TimeUtils {
         }
 
         try {
-            LocalDateTime dateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime dateTime;
+
+            if (dateTimeString.endsWith("Z") || dateTimeString.contains("+") || dateTimeString.matches(".*[+-]\\d{2}:\\d{2}$")) {
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(dateTimeString);
+                dateTime = zonedDateTime.toLocalDateTime();
+            } else {
+                dateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            }
+
             LocalDateTime now = LocalDateTime.now();
 
             long minutes = ChronoUnit.MINUTES.between(dateTime, now);

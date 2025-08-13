@@ -17,30 +17,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * PostMenu class handles individual post management and comment operations
- * Provides functionality for viewing, editing, deleting posts and managing comments
- */
 public class PostMenu {
     private final PostClient client;
     private final SessionManager sessionManager;
-    // Maps simple integer IDs to actual UUID comment IDs for user-friendly navigation
     private java.util.Map<Integer, UUID> commentIdMapping = new java.util.HashMap<>();
 
-    /**
-     * Constructor for PostMenu
-     * @param client Client for post and comment-related API operations
-     * @param sessionManager Manages user session information
-     */
     public PostMenu(PostClient client, SessionManager sessionManager) {
         this.client = client;
         this.sessionManager = sessionManager;
     }
 
-    /**
-     * Displays the post management menu with all available actions
-     * @param postId UUID of the post to manage
-     */
     public void showPostManagementMenu(UUID postId) {
         MenuFormatter.printMenuHeader("Post Details");
         viewPostDetails(postId);
@@ -85,10 +71,6 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Fetches and displays detailed information about a specific post
-     * @param postId UUID of the post to display
-     */
     private void viewPostDetails(UUID postId) {
         ApiResult<PostResponseDto> result = client.getPostById(postId);
         if (result.success) {
@@ -112,10 +94,6 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Handles post editing functionality with ownership validation
-     * @param postId UUID of the post to edit
-     */
     private void editPost(UUID postId) {
         ApiResult<PostResponseDto> postResult = client.getPostById(postId);
         if (!postResult.success) {
@@ -126,7 +104,6 @@ public class PostMenu {
         PostResponseDto post = postResult.data;
         String currentUser = sessionManager.username();
 
-        // Validate ownership
         if (!post.author().equals(currentUser)) {
             MenuFormatter.printErrorMessage("You can only edit your own posts!");
             MenuFormatter.printInfoMessage("This post belongs to: " + post.author());
@@ -150,11 +127,6 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Handles post deletion with ownership validation and confirmation
-     * @param postId UUID of the post to delete
-     * @return true if post was deleted (should return to previous menu), false otherwise
-     */
     private boolean deletePost(UUID postId) {
         ApiResult<PostResponseDto> postResult = client.getPostById(postId);
         if (!postResult.success) {
@@ -165,7 +137,6 @@ public class PostMenu {
         PostResponseDto post = postResult.data;
         String currentUser = sessionManager.username();
 
-        // Validate ownership
         if (!post.author().equals(currentUser)) {
             MenuFormatter.printErrorMessage("You can only delete your own posts!");
             MenuFormatter.printInfoMessage("This post belongs to: " + post.author());
@@ -188,14 +159,9 @@ public class PostMenu {
         return false;
     }
 
-    /**
-     * Handles upvoting a post, including toggle functionality for removing existing upvotes
-     * @param postId UUID of the post to upvote
-     */
     private void upvotePost(UUID postId) {
         MenuFormatter.printInfoMessage("Processing upvote...");
 
-        // Check current vote state
         ApiResult<PostResponseDto> postResult = client.getPostById(postId);
         if (!postResult.success) {
             MenuFormatter.printErrorMessage("Error checking post state: " + postResult.message);
@@ -205,7 +171,6 @@ public class PostMenu {
         String currentVote = postResult.data.userVote();
         String voteType = "up";
 
-        // Toggle logic for existing upvote
         if ("up".equals(currentVote)) {
             voteType = "none";
             MenuFormatter.printInfoMessage("Removing your upvote...");
@@ -223,14 +188,12 @@ public class PostMenu {
                 } else {
                     MenuFormatter.printSuccessMessage("Post upvoted successfully!");
                 }
-                
-                // Display updated score with colors
+
                 String scoreInfo = String.format("Score: %s%d%s↑ %s%d%s↓",
                     MenuFormatter.GREEN, vote.upvotes(), MenuFormatter.RESET,
                     MenuFormatter.RED, vote.downvotes(), MenuFormatter.RESET);
                 MenuFormatter.printInfoMessage(scoreInfo);
 
-                // Display current vote status
                 if (vote.userVote() != null && !vote.userVote().isEmpty() && !"none".equals(vote.userVote())) {
                     String voteDisplay = vote.userVote().equals("up") ? "⬆️ YOU UPVOTED" : "⬇️ YOU DOWNVOTED";
                     MenuFormatter.printInfoMessage("Your vote: " + voteDisplay);
@@ -245,14 +208,9 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Handles downvoting a post, including toggle functionality for removing existing downvotes
-     * @param postId UUID of the post to downvote
-     */
     private void downvotePost(UUID postId) {
         MenuFormatter.printInfoMessage("Processing downvote...");
 
-        // Check current vote state
         ApiResult<PostResponseDto> postResult = client.getPostById(postId);
         if (!postResult.success) {
             MenuFormatter.printErrorMessage("Error checking post state: " + postResult.message);
@@ -262,7 +220,6 @@ public class PostMenu {
         String currentVote = postResult.data.userVote();
         String voteType = "down";
 
-        // Toggle logic for existing downvote
         if ("down".equals(currentVote)) {
             voteType = "none";
             MenuFormatter.printInfoMessage("Removing your downvote...");
@@ -280,14 +237,12 @@ public class PostMenu {
                 } else {
                     MenuFormatter.printSuccessMessage("Post downvoted successfully!");
                 }
-                
-                // Display updated score with colors
+
                 String scoreInfo = String.format("Score: %s%d%s↑ %s%d%s↓",
                     MenuFormatter.GREEN, vote.upvotes(), MenuFormatter.RESET,
                     MenuFormatter.RED, vote.downvotes(), MenuFormatter.RESET);
                 MenuFormatter.printInfoMessage(scoreInfo);
 
-                // Display current vote status
                 if (vote.userVote() != null && !vote.userVote().isEmpty() && !"none".equals(vote.userVote())) {
                     String voteDisplay = vote.userVote().equals("up") ? "⬆️ YOU UPVOTED" : "⬇️ YOU DOWNVOTED";
                     MenuFormatter.printInfoMessage("Your vote: " + voteDisplay);
@@ -302,10 +257,6 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Fetches and displays all comments for a post in hierarchical format
-     * @param postId UUID of the post to load comments for
-     */
     private void viewComments(UUID postId) {
         MenuFormatter.printInfoMessage("Loading all comments for this post...");
 
@@ -328,12 +279,6 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Recursively displays comments in a hierarchical structure with proper indentation
-     * @param comments List of comments to display
-     * @param indentLevel Current indentation level for nested replies
-     * @param simpleIdCounter Counter for generating simple integer IDs
-     */
     private void displayCommentsHierarchy(List<CommentResponseDto> comments, int indentLevel, AtomicInteger simpleIdCounter) {
         for (CommentResponseDto comment : comments) {
             int simpleId = simpleIdCounter.getAndIncrement();
@@ -341,19 +286,12 @@ public class PostMenu {
 
             displaySingleComment(comment, indentLevel, simpleId);
 
-            // Recursively display replies with increased indentation
             if (comment.replies() != null && !comment.replies().isEmpty()) {
                 displayCommentsHierarchy(comment.replies(), indentLevel + 1, simpleIdCounter);
             }
         }
     }
 
-    /**
-     * Displays a single comment with proper formatting and user indicators using MenuFormatter
-     * @param comment The comment to display
-     * @param indentLevel Indentation level for nested comments
-     * @param simpleId Simple integer ID for user reference
-     */
     private void displaySingleComment(CommentResponseDto comment, int indentLevel, int simpleId) {
         boolean isOwnComment = comment.author().equals(sessionManager.username());
         String timeAgo = TimeUtils.getRelativeTime(comment.createdAt().toString());
@@ -372,10 +310,6 @@ public class PostMenu {
         );
     }
 
-    /**
-     * Displays comment management menu and handles user choices
-     * @param postId UUID of the post containing the comments
-     */
     private void commentActions(UUID postId) {
         MenuFormatter.printCommentActionsMenu();
 
@@ -393,10 +327,6 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Creates a new top-level comment on the post
-     * @param postId UUID of the post to comment on
-     */
     private void createTopLevelComment(UUID postId) {
         String content = ConsoleIO.readLine("Enter your comment: ");
         if (content.trim().isEmpty()) {
@@ -416,10 +346,6 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Creates a reply to an existing comment
-     * @param postId UUID of the post containing the parent comment
-     */
     private void createReplyComment(UUID postId) {
         String commentIdStr = ConsoleIO.readLine("Enter the comment ID you want to reply to: ");
         try {
@@ -452,20 +378,11 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Refreshes the comments display after modifications
-     * @param postId UUID of the post to refresh comments for
-     */
     private void refreshCommentsDisplay(UUID postId) {
         MenuFormatter.printMenuHeader("Updated Comments");
         viewComments(postId);
     }
 
-    /**
-     * Handles voting on comments with toggle functionality
-     * @param postId UUID of the post containing the comment
-     * @param voteType Type of vote ("UPVOTE" or "DOWNVOTE")
-     */
     private void voteOnComment(UUID postId, String voteType) {
         String commentIdStr = ConsoleIO.readLine("Enter the comment ID you want to " +
             (voteType.equals("UPVOTE") ? "upvote" : "downvote") + ": ");
@@ -478,7 +395,6 @@ public class PostMenu {
                 return;
             }
 
-            // Get current vote state
             ApiResult<List<CommentResponseDto>> commentsResult = client.getCommentsForPost(postId);
             String currentVote = null;
 
@@ -491,7 +407,6 @@ public class PostMenu {
 
             String actualVoteType = voteType.equals("UPVOTE") ? "up" : "down";
 
-            // Toggle logic for existing votes
             if (actualVoteType.equals(currentVote)) {
                 actualVoteType = "none";
                 MenuFormatter.printInfoMessage("Removing your " + (voteType.equals("UPVOTE") ? "upvote" : "downvote") + "...");
@@ -512,7 +427,6 @@ public class PostMenu {
 
                     MenuFormatter.printInfoMessage("Score: " + vote.upvotes() + "↑ " + vote.downvotes() + "↓");
 
-                    // Display current vote status
                     if (vote.userVote() != null && !vote.userVote().isEmpty() && !"none".equals(vote.userVote())) {
                         String voteDisplay = vote.userVote().equals("up") ? "⬆️ YOU UPVOTED" :
                                            vote.userVote().equals("down") ? "⬇️ YOU DOWNVOTED" : "";
@@ -534,18 +448,11 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Recursively searches for a comment in the comment hierarchy
-     * @param comments List of comments to search through
-     * @param commentId UUID of the comment to find
-     * @return The found comment or null if not found
-     */
     private CommentResponseDto findCommentInHierarchy(List<CommentResponseDto> comments, UUID commentId) {
         for (CommentResponseDto comment : comments) {
             if (comment.id().equals(commentId)) {
                 return comment;
             }
-            // Recursively search in replies
             if (comment.replies() != null && !comment.replies().isEmpty()) {
                 CommentResponseDto found = findCommentInHierarchy(comment.replies(), commentId);
                 if (found != null) {
@@ -556,10 +463,6 @@ public class PostMenu {
         return null;
     }
 
-    /**
-     * Handles comment editing with ownership validation
-     * @param postId UUID of the post containing the comment
-     */
     private void editComment(UUID postId) {
         String commentIdStr = ConsoleIO.readLine("Enter the comment ID you want to edit: ");
         try {
@@ -571,7 +474,6 @@ public class PostMenu {
                 return;
             }
 
-            // Load and validate comment
             ApiResult<List<CommentResponseDto>> commentsResult = client.getCommentsForPost(postId);
             if (!commentsResult.success) {
                 MenuFormatter.printErrorMessage("Error loading comments: " + commentsResult.message);
@@ -586,7 +488,6 @@ public class PostMenu {
 
             String currentUser = sessionManager.username();
 
-            // Validate ownership
             if (!targetComment.author().equals(currentUser)) {
                 MenuFormatter.printErrorMessage("You can only edit your own comments!");
                 MenuFormatter.printInfoMessage("This comment belongs to: " + targetComment.author());
@@ -616,10 +517,6 @@ public class PostMenu {
         }
     }
 
-    /**
-     * Handles comment deletion with ownership validation and confirmation
-     * @param postId UUID of the post containing the comment
-     */
     private void deleteComment(UUID postId) {
         String commentIdStr = ConsoleIO.readLine("Enter the comment ID you want to delete: ");
         try {
@@ -631,7 +528,6 @@ public class PostMenu {
                 return;
             }
 
-            // Load and validate comment
             ApiResult<List<CommentResponseDto>> commentsResult = client.getCommentsForPost(postId);
             if (!commentsResult.success) {
                 MenuFormatter.printErrorMessage("Error loading comments: " + commentsResult.message);
@@ -646,7 +542,6 @@ public class PostMenu {
 
             String currentUser = sessionManager.username();
 
-            // Validate ownership
             if (!targetComment.author().equals(currentUser)) {
                 MenuFormatter.printErrorMessage("You can only delete your own comments!");
                 MenuFormatter.printInfoMessage("This comment belongs to: " + targetComment.author());
