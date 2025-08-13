@@ -48,8 +48,9 @@ public class SubredditController {
     }
 
     @GetMapping("/{name}/posts")
-    public ResponseEntity<ResponseApi<List<PostModel>>> getPostsFromSubreddit(@PathVariable String name){
-        List<PostModel> response = postManagementService.getAllPosts(name);
+    public ResponseEntity<ResponseApi<List<PostModel>>> getPostsFromSubreddit(@PathVariable String name,
+                                                                              @RequestParam(defaultValue = "current_user") String username){
+        List<PostModel> response = postManagementService.getAllPosts(name, username);
         return  ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 

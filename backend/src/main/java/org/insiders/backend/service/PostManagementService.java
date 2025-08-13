@@ -49,40 +49,43 @@ public class PostManagementService {
         return postRepository.findBySubreddit_NameOrderByCreatedAtDesc(subreddit);
     }
 
-    private PostModel buildPostModel(PostModel post) {
+    private PostModel buildPostModel(PostModel post, String username) {
 
         int upVotes = votingService.countUpvotesForPost(post.getId());
         int downVotes = votingService.countDownvotesForPost(post.getId());
         int commentCount = commentService.countCommentsByPostId(post.getId());
 
+        User currentUser = userManagementService.findByUsername(username);
+        String voteType = votingService.getVoteTypeForUser(currentUser.getId(),post.getId(), null);
+
         post.setUpvotes(upVotes);
         post.setDownvotes(downVotes);
         post.setScore(upVotes - downVotes);
         post.setCommentCount(commentCount);
-        post.setUserVote(null);
+        post.setUserVote(voteType);
 
         return post;
     }
 
     @Transactional(readOnly = true)
-    public List<PostModel> getAllPosts(String subreddit) {
+    public List<PostModel> getAllPosts(String subreddit, String username) {
         List<Post> basePosts = getBasePosts(subreddit);
 
         List<PostModel> finalPosts = new LinkedList<>();
 
         basePosts.forEach(post -> {
-            finalPosts.add(buildPostModel(new PostModel(post)));
+            finalPosts.add(buildPostModel(new PostModel(post), username));
         });
 
         return finalPosts;
     }
 
     @Transactional(readOnly = true)
-    public PostModel getPostByIdModel(UUID postId) {
+    public PostModel getPostByIdModel(UUID postId, String username) {
         Post basePost = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("Postarea cu ID-ul " + postId + " nu a fost gasita"));
 
-        return buildPostModel(new PostModel(basePost));
+        return buildPostModel(new PostModel(basePost), username);
     }
 
     public Post getPostById(UUID postId) {
@@ -92,11 +95,11 @@ public class PostManagementService {
 
 
     private PostModel buildPostModelDefault(PostModel post) {
-        post.setUpvotes(1);
+        post.setUpvotes(0);
         post.setDownvotes(0);
-        post.setScore(1);
+        post.setScore(0);
         post.setCommentCount(0);
-        post.setUserVote("up");
+        post.setUserVote(null);
 
         return post;
     }
@@ -108,8 +111,6 @@ public class PostManagementService {
         Subreddit subreddit = subredditRepository.findByNameIgnoreCase(normalizedSubredditName).orElseThrow(() -> new NotFoundException("Subreddit " + normalizedSubredditName+" nu a fost gasit"));
 
         Post post = postRepository.saveAndFlush(new Post(title, content, user, subreddit));
-
-        votePost(post.getId(), "up", author);
 
         return buildPostModelDefault(new PostModel(post));
     }
@@ -137,7 +138,7 @@ public class PostManagementService {
     }
 
     @Transactional
-    public PostModel updatePost(UUID id, PostUpdateRequestDto requestDto) {
+    public PostModel updatePost(UUID id, PostUpdateRequestDto requestDto, String username) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Postarea cu ID-ul " + id + " nu a fost gasita."));
 
@@ -150,7 +151,7 @@ public class PostManagementService {
         }
 
         post = postRepository.saveAndFlush(post);
-        return buildPostModel(new PostModel(post));
+        return buildPostModel(new PostModel(post), username);
     }
 
     public void deletePostById(UUID postId) {

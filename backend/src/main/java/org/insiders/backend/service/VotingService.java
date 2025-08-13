@@ -65,8 +65,12 @@ public class VotingService {
             Optional<Vote> existingVote = voteRepository.findByUserIdAndPostId(userId, postId);
             if (existingVote.isPresent()) {
                 Vote vote = existingVote.get();
-                vote.setUpvote(isUpvote);
-                voteRepository.save(vote);
+                if (vote.isUpvote() == isUpvote) {
+                    voteRepository.delete(vote);
+                } else {
+                    vote.setUpvote(isUpvote);
+                    voteRepository.save(vote);
+                }
             } else {
                 Post post = postRepository.getPostById(postId);
                 Vote vote = new Vote(post, null, user, isUpvote);
@@ -76,8 +80,12 @@ public class VotingService {
             Optional<Vote> existingVote = voteRepository.findByUserIdAndCommentId(userId, commentId);
             if (existingVote.isPresent()) {
                 Vote vote = existingVote.get();
-                vote.setUpvote(isUpvote);
-                voteRepository.save(vote);
+                if (vote.isUpvote() == isUpvote) {
+                    voteRepository.delete(vote);
+                } else {
+                    vote.setUpvote(isUpvote);
+                    voteRepository.save(vote);
+                }
             } else {
                 Comment comment = commentRepository.findById(commentId)
                         .orElseThrow(() -> new NotFoundException("Comentariul nu a fost gasit"));

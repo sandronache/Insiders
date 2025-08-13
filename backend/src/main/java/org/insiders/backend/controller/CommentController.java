@@ -29,13 +29,14 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<ResponseApi<CommentResponseDto>> getCommentWithReplies(@PathVariable UUID commentId, @RequestParam(defaultValue = "andrei") String username) {
+    public ResponseEntity<ResponseApi<CommentResponseDto>> getCommentWithReplies(@PathVariable UUID commentId,
+                                                                                 @RequestParam(defaultValue = "current_user") String username) {
         CommentResponseDto response = commentService.getCommentWithReplies(commentId, username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<ResponseApi<CommentResponseDto>> updateComment(@PathVariable UUID commentId, @RequestBody CommentUpdateRequestDto request, @RequestParam(defaultValue = "andrei") String username) {
+    public ResponseEntity<ResponseApi<CommentResponseDto>> updateComment(@PathVariable UUID commentId, @RequestBody CommentUpdateRequestDto request, @RequestParam(defaultValue = "current_user") String username) {
         CommentResponseDto response = commentService.updateComment(commentId, request, username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
@@ -47,7 +48,7 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}/vote")
-    public ResponseEntity<ResponseApi<VoteResponseDto>> voteComment(@PathVariable UUID commentId, @RequestBody VoteRequestDto request, @RequestParam(defaultValue = "andrei") String username) {
+    public ResponseEntity<ResponseApi<VoteResponseDto>> voteComment(@PathVariable UUID commentId, @RequestBody VoteRequestDto request, @RequestParam(defaultValue = "current_user") String username) {
         VoteResponseDto response = votingService.voteComment(commentId, request, username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }

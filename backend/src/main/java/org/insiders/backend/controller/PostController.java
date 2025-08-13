@@ -44,10 +44,11 @@ public class PostController {
     }
 
     @GetMapping()
-    public ResponseEntity<ResponseApi<List<PostResponseDto>>> getAllPosts(@RequestParam(required = false) String subreddit) {
+    public ResponseEntity<ResponseApi<List<PostResponseDto>>> getAllPosts(@RequestParam(required = false) String subreddit,
+                                                                          @RequestParam(defaultValue = "current_user") String username) {
         LoggerFacade.info("GET /posts called");
 
-        List<PostModel> posts = postManagementService.getAllPosts(subreddit);
+        List<PostModel> posts = postManagementService.getAllPosts(subreddit, username);
         List<PostResponseDto> dtos = posts.stream().map(PostMapper::postModelToDto).toList();
 
         return ResponseEntity.ok(new ResponseApi<>(true, dtos));
@@ -72,8 +73,9 @@ public class PostController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseApi<PostResponseDto>> updatePost(@PathVariable UUID id,
-                                                                   @Valid @RequestBody PostUpdateRequestDto requestDto) {
-        PostModel postModel = postManagementService.updatePost(id, requestDto);
+                                                                   @Valid @RequestBody PostUpdateRequestDto requestDto,
+                                                                   @RequestParam(defaultValue = "current_user") String username) {
+        PostModel postModel = postManagementService.updatePost(id, requestDto, username);
         PostResponseDto response = PostMapper.postModelToDto(postModel);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
@@ -87,21 +89,23 @@ public class PostController {
 
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ResponseApi<PostResponseDto>> getPostById(@PathVariable UUID postId) {
-        PostModel post = postManagementService.getPostByIdModel(postId);
+    public ResponseEntity<ResponseApi<PostResponseDto>> getPostById(@PathVariable UUID postId,
+                                                                    @RequestParam(defaultValue = "current_user") String username) {
+        PostModel post = postManagementService.getPostByIdModel(postId, username);
         PostResponseDto dto = PostMapper.postModelToDto(post);
 
         return ResponseEntity.ok(new ResponseApi<>(true, dto));
     }
 
     @PutMapping("/{postId}/vote")
-    public ResponseEntity<ResponseApi<VoteResponseDto>> votePost(@PathVariable UUID postId, @RequestBody VoteRequestDto request) {
-        VoteResponseDto response = postManagementService.votePost(postId, request.voteType(), "andrei"); // si aici
+    public ResponseEntity<ResponseApi<VoteResponseDto>> votePost(@PathVariable UUID postId, @RequestBody VoteRequestDto request,
+                                                                 @RequestParam(defaultValue = "current_user") String username) {
+        VoteResponseDto response = postManagementService.votePost(postId, request.voteType(), username);
         return ResponseEntity.ok(new ResponseApi<>(true, response));
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<ResponseApi<List<CommentResponseDto>>> getCommentsForPost(@PathVariable UUID postId, @RequestParam(defaultValue = "andrei") String username) {
+    public ResponseEntity<ResponseApi<List<CommentResponseDto>>> getCommentsForPost(@PathVariable UUID postId, @RequestParam(defaultValue = "current_user") String username) {
         List<CommentResponseDto> comments = commentService.getCommentsForPost(postId, username);
         return ResponseEntity.ok(new ResponseApi<>(true, comments, comments.size()));
     }
