@@ -6,6 +6,7 @@ import com.insiders.dto.ResponseApi;
 import com.insiders.dto.post.PostResponseDto;
 import com.insiders.dto.subreddit.SubredditCreateRequestDto;
 import com.insiders.dto.subreddit.SubredditResponseDto;
+import com.insiders.dto.subreddit.SubredditUpdateRequestDto;
 import com.insiders.http.ApiClient;
 import com.insiders.http.ApiResult;
 
@@ -34,5 +35,13 @@ public class SubredditClient {
 
     public ApiResult<List<PostResponseDto>> getSubredditPosts(String subredditName) {
         return api.get("/subreddits/" + subredditName + "/posts", new TypeReference<ResponseApi<List<PostResponseDto>>>(){});
+    }
+
+    public ApiResult<SubredditResponseDto> updateSubreddit(String subredditName, SubredditUpdateRequestDto updateRequest) {
+        return api.put("/subreddits/" + subredditName, updateRequest, new TypeReference<ResponseApi<SubredditResponseDto>>(){});
+    }
+
+    public ApiResult<String> deleteSubreddit(String subredditName) {
+        return api.delete("/subreddits/" + subredditName, new TypeReference<ResponseApi<String>>(){});
     }
 }
