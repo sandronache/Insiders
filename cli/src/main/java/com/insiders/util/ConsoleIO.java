@@ -1,6 +1,4 @@
 package com.insiders.util;
-
-import java.io.Console;
 import java.util.Scanner;
 
 public class ConsoleIO {
