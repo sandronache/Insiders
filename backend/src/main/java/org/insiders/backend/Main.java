@@ -9,8 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        String logPath = "/home/ubuntu/application.log";
-        //String logPath = "backend/src/main/resources/application.log";
+        //String logPath = "/home/ubuntu/application.log";
+        String logPath = "backend/src/main/resources/application.log";
 
         LoggerFacade.addLogger(new FileLogger(logPath));
         LoggerFacade.info("new version");
