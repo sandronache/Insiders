@@ -11,6 +11,7 @@ public class OperationFactory
     {
         _operations = new Dictionary<OperationType, IImageOperation>()
         {
+            { OperationType.BlurFilter, new BlurFilter() },
             { OperationType.DoNothingFilter, new DoNothingFilter() },
             { OperationType.GrayscaleFilter, new GrayscaleFilter() },
             { OperationType.InvertFilter, new InvertFilter() },
