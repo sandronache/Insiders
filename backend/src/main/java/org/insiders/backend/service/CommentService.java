@@ -13,8 +13,11 @@ import org.insiders.backend.repository.CommentRepository;
 import org.insiders.backend.repository.PostRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
@@ -44,9 +47,15 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentResponseDto> getCommentsForPost(UUID postId, String currentUsername) {
-        List<Comment> allComments = commentRepository.findByPostId(postId);
+        List<Comment> allComments = commentRepository.findByPostIdOrderByCreatedAtDesc(postId);
+
+        Map<UUID,List<Comment>> childrenByParent = allComments.stream()
+                .filter(c -> c.getParentComment()!=null)
+                .collect(Collectors.groupingBy(c->c.getParentComment().getId()));
+
         List<Comment> rootComments = allComments.stream()
                 .filter(c -> c.getParentComment() == null)
+                .sorted(BY_DATE_DESC)
                 .toList();
 
         UUID currentUserId = (currentUsername != null)
@@ -54,7 +63,7 @@ public class CommentService {
                 : null;
 
         return rootComments.stream()
-                .map(c -> buildTreeDto(c, allComments, currentUserId))
+                .map(c -> buildTreeDto(c, childrenByParent, currentUserId))
                 .toList();
     }
 
@@ -69,7 +78,7 @@ public class CommentService {
             parent = getCommentById(request.parentId());
         }
 
-        Comment savedComment = commentRepository.saveAndFlush(new Comment(post, parent, request.content(), user));
+        Comment savedComment = commentRepository.save(new Comment(post, parent, request.content(), user));
 
         int up = 0, down = 0;
         String userVote = null;
@@ -80,13 +89,17 @@ public class CommentService {
     public CommentResponseDto getCommentWithReplies(UUID commentId, String currentUsername) {
         Comment mainComment = getCommentById(commentId);
 
-        List<Comment> allComments = commentRepository.findByPostId(mainComment.getPost().getId());
+        List<Comment> allComments = commentRepository.findByPostIdOrderByCreatedAtDesc(mainComment.getPost().getId());
+
+        Map<UUID, List<Comment>> childrenByParent = allComments.stream()
+                .filter(c -> c.getParentComment() != null)
+                .collect(Collectors.groupingBy(c -> c.getParentComment().getId()));
 
         UUID currentUserId = (currentUsername != null)
                 ? userManagementService.findByUsername(currentUsername).getId()
                 : null;
 
-        return buildTreeDto(mainComment, allComments, currentUserId);
+        return buildTreeDto(mainComment, childrenByParent, currentUserId);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -120,7 +133,7 @@ public class CommentService {
         return commentRepository.countByPostId(postId);
     }
 
-    private CommentResponseDto buildTreeDto(Comment node, List<Comment> all, UUID currentUserId) {
+    private CommentResponseDto buildTreeDto(Comment node, Map<UUID,List<Comment>> childrenByParent, UUID currentUserId) {
         int up = votingService.countUpvotesForComment(node.getId());
         int down = votingService.countDownvotesForComment(node.getId());
         String userVote = null;
@@ -128,16 +141,20 @@ public class CommentService {
             userVote = votingService.getVoteTypeForUser(currentUserId, null, node.getId());
         }
 
-        List<Comment> children = all.stream()
-                 .filter(c -> c.getParentComment() != null
-                        && node.getId().equals(c.getParentComment().getId()))
+        List<Comment> children = childrenByParent
+                .getOrDefault(node.getId(), List.of())
+                .stream()
+                .sorted(BY_DATE_DESC)
                 .toList();
 
         List<CommentResponseDto> replies = children.stream()
-                .map(ch -> buildTreeDto(ch, all, currentUserId))
-                .filter(dto -> dto != null)
+                .map(ch -> buildTreeDto(ch, childrenByParent, currentUserId))
                 .toList();
 
         return commentMapper.toDto(node, up, down, userVote, replies);
     }
+
+    private static final Comparator<Comment> BY_DATE_DESC =
+            Comparator.comparing(Comment::getCreatedAt).reversed()
+                    .thenComparing(Comment::getId);
 }

@@ -113,7 +113,8 @@ public class PostController {
     @PostMapping("/{postId}/comments")
     public ResponseEntity<ResponseApi<CommentResponseDto>> createComment(@PathVariable UUID postId, @RequestBody CommentCreateRequestDto request) {
         CommentResponseDto response = commentService.createComment(postId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, response));
+        int total = commentService.countCommentsByPostId(postId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, response,total));
     }
 
 
