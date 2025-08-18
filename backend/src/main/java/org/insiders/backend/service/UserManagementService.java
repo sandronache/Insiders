@@ -1,11 +1,8 @@
 package org.insiders.backend.service;
 
-import org.insiders.backend.dto.user.LoginRequestDto;
-import org.insiders.backend.dto.user.LoginResponseDto;
 import org.insiders.backend.dto.user.UserResponseDto;
 import org.insiders.backend.entity.User;
 import org.insiders.backend.exceptions.NotFoundException;
-import org.insiders.backend.exceptions.UnauthorizedException;
 import org.insiders.backend.mapper.UserMapper;
 import org.insiders.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

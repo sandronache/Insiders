@@ -1,6 +1,5 @@
 package org.insiders.backend.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import org.insiders.backend.dto.subreddit.SubredditCreateRequestDto;
 import org.insiders.backend.dto.subreddit.SubredditResponseDto;
 import org.insiders.backend.dto.subreddit.SubredditUpdateRequestDto;
@@ -12,6 +11,7 @@ import org.insiders.backend.mapper.SubredditMapper;
 import org.insiders.backend.repository.PostRepository;
 import org.insiders.backend.repository.SubredditRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

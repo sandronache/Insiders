@@ -1,6 +1,5 @@
 package org.insiders.backend.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import org.insiders.backend.dto.comment.CommentCreateRequestDto;
 import org.insiders.backend.dto.comment.CommentResponseDto;
 import org.insiders.backend.dto.comment.CommentUpdateRequestDto;
@@ -12,6 +11,7 @@ import org.insiders.backend.mapper.CommentMapper;
 import org.insiders.backend.repository.CommentRepository;
 import org.insiders.backend.repository.PostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
