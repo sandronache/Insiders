@@ -107,7 +107,8 @@ public class PostController {
     @GetMapping("/{postId}/comments")
     public ResponseEntity<ResponseApi<List<CommentResponseDto>>> getCommentsForPost(@PathVariable UUID postId, @RequestParam(defaultValue = "current_user") String username) {
         List<CommentResponseDto> comments = commentService.getCommentsForPost(postId, username);
-        return ResponseEntity.ok(new ResponseApi<>(true, comments, comments.size()));
+        int total = commentService.countCommentsByPostId(postId);
+        return ResponseEntity.ok(new ResponseApi<>(true, comments, total));
     }
 
     @PostMapping("/{postId}/comments")
