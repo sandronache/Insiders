@@ -269,7 +269,6 @@ public class PostMenu {
             } else if (comments.isEmpty()) {
                 MenuFormatter.printCommentsHeader(0);
             } else {
-                // Clear previous comment mappings and create new ones
                 commentIdMapping.clear();
                 MenuFormatter.printCommentsHeader(comments.size());
                 displayCommentsHierarchy(comments, 0, new AtomicInteger(1));
@@ -425,7 +424,7 @@ public class PostMenu {
                         MenuFormatter.printSuccessMessage("Comment " + (voteType.equals("UPVOTE") ? "upvoted" : "downvoted") + " successfully!");
                     }
 
-                    MenuFormatter.printInfoMessage("Score: " + vote.upvotes() + "↑ " + vote.downvotes() + "↓");
+                    MenuFormatter.printInfoMessage("Score: " + " ↑" + vote.upvotes() + " " + vote.downvotes() + "↓");
 
                     if (vote.userVote() != null && !vote.userVote().isEmpty() && !"none".equals(vote.userVote())) {
                         String voteDisplay = vote.userVote().equals("up") ? "⬆️ YOU UPVOTED" :

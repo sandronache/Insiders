@@ -33,17 +33,17 @@ public class ProcessingRequestDto
         "Parameters": {}
     }
 ]
-
 ```
 
 ### Supported Operations
 
 | Operation | Parameters | Description |
 |-----------|------------|-------------|
+| `BlurFilter` | None | Blur effect. |
 | `GrayscaleFilter` | None | Monochrome effect. |
 | `InvertFilter` | None | Photographic negative. |
 | `SepiaFilter` | None | Sepia tone effect. |
-| `SharpenFilter` | None | Sharpen tone effect. |
+| `SharpenFilter` | `Intensity` (0.1 - 3.0)| Sharpen effect. |
 
 
 ### Examples Request

@@ -11,7 +11,7 @@ import com.insiders.util.MenuFormatter;
 
 public class Main {
     public static void main(String[] args) {
-        String base = System.getenv().getOrDefault("API_BASE_URL", "http://localhost:8080");
+        String base = System.getenv().getOrDefault("API_BASE_URL", "http://ec2-3-74-161-90.eu-central-1.compute.amazonaws.com:8080");
 
         var session = new SessionManager();
         var authClient = new AuthClient(base, session::authHeaders);

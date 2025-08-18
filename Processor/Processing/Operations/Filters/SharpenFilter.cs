@@ -6,15 +6,27 @@ namespace Processing.Operations;
 
 public class SharpenFilter : IImageOperation
 {
-    /* Parameters: none. */
+    /* Parameters: intensity (float, default: 1.0, range: 0.1-3.0) */
     public void Apply(Image<Rgba32> image, Dictionary<string, string> parameters)
     {
-        /* Kernel 3x3. */
+        float intensity = 1.0f;
+        if (parameters != null && parameters.TryGetValue("Intensity", out string intensityValue))
+        {
+            if (!string.IsNullOrEmpty(intensityValue) && float.TryParse(intensityValue, out float parsedIntensity) && parsedIntensity >= 0.1f && parsedIntensity <= 3.0f)
+            {
+                intensity = parsedIntensity;
+            }
+        }
+
+        float centerValue = 1 + (4 * intensity);
+        float neighborValue = -intensity;
+
         float[,] kernel = {
-            { 0, -1,  0 },
-            {-1,  5, -1 },
-            { 0, -1,  0 }
+            { 0, neighborValue,  0 },
+            { neighborValue, centerValue, neighborValue },
+            { 0, neighborValue,  0 }
         };
+        
         ApplyConvolution(image, kernel);
     }
 
@@ -51,5 +63,7 @@ public class SharpenFilter : IImageOperation
                 }
             }
         });
+
+        copy.Dispose();
     }
 }

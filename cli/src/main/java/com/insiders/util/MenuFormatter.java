@@ -73,7 +73,7 @@ public class MenuFormatter {
         printBoxLine(titleLine, width);
 
         String authorDisplay = isOwnPost ?
-            String.format("%s%s%s %s📝 [YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
+            String.format("%s%s%s %s📝[YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
             String.format("%s%s%s", GREEN, author, RESET);
         String authorLine = "Author: " + authorDisplay;
         printBoxLine(authorLine, width);
@@ -156,8 +156,8 @@ public class MenuFormatter {
 
         if (userVote != null && !userVote.isEmpty() && !"none".equals(userVote)) {
             String voteDisplay = userVote.equals("up") ?
-                String.format("%s⬆️ YOU UPVOTED%s", GREEN + BOLD, RESET) :
-                String.format("%s⬇️ YOU DOWNVOTED%s", RED + BOLD, RESET);
+                String.format("%s⬆️YOU UPVOTED%s", GREEN + BOLD, RESET) :
+                String.format("%s⬇️YOU DOWNVOTED%s", RED + BOLD, RESET);
             String userVoteLine = "Your vote: " + voteDisplay;
             printBoxLine(userVoteLine, width);
         }
@@ -191,7 +191,7 @@ public class MenuFormatter {
         printCommentLine(idLine, width, indent);
 
         String authorDisplay = isOwnComment ?
-            String.format("%s%s%s %s💬 [YOUR COMMENT]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
+            String.format("%s%s%s %s💬[YOUR COMMENT]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
             String.format("%s%s%s", GREEN, author, RESET);
         String authorLine = "Author: " + authorDisplay;
         printCommentLine(authorLine, width, indent);
@@ -207,8 +207,8 @@ public class MenuFormatter {
 
         if (userVote != null && !userVote.isEmpty() && !"none".equals(userVote)) {
             String voteDisplay = userVote.equals("up") ?
-                String.format(" %s⬆️ [YOU UPVOTED]%s", GREEN + BOLD, RESET) :
-                String.format(" %s⬇️ [YOU DOWNVOTED]%s", RED + BOLD, RESET);
+                String.format(" %s⬆️[YOU UPVOTED]%s", GREEN + BOLD, RESET) :
+                String.format(" %s⬇️[YOU DOWNVOTED]%s", RED + BOLD, RESET);
             scoreLine += voteDisplay;
         }
         printCommentLine(scoreLine, width, indent);
