@@ -14,6 +14,7 @@ D:\cognyte\Insiders\cli\src\main\java\com\insiders\dto\post\PostUpdateRequestDto
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\dto\ResponseApi.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\dto\subreddit\SubredditCreateRequestDto.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\dto\subreddit\SubredditResponseDto.java
+D:\cognyte\Insiders\cli\src\main\java\com\insiders\dto\subreddit\SubredditUpdateRequestDto.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\dto\vote\VoteRequestDto.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\dto\vote\VoteResponseDto.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\http\ApiClient.java
@@ -22,5 +23,8 @@ D:\cognyte\Insiders\cli\src\main\java\com\insiders\Main.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\menu\AuthMenu.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\menu\FeedMenu.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\menu\PostMenu.java
+D:\cognyte\Insiders\cli\src\main\java\com\insiders\menu\SubredditMenu.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\session\SessionManager.java
 D:\cognyte\Insiders\cli\src\main\java\com\insiders\util\ConsoleIO.java
+D:\cognyte\Insiders\cli\src\main\java\com\insiders\util\MenuFormatter.java
+D:\cognyte\Insiders\cli\src\main\java\com\insiders\util\TimeUtils.java

@@ -20,6 +20,9 @@ public class Post {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Column(columnDefinition = "TEXT")
+    private String photoPath;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -39,10 +42,12 @@ public class Post {
     public Post() {
     }
 
-    public Post(String title, String content, User user, Subreddit subreddit) {
+    public Post(String title, String content, User user, Subreddit subreddit,
+                String photoPath) {
         this.id = UUID.randomUUID();
         this.title = title;
         this.content = content;
+        this.photoPath = photoPath;
         this.user = user;
         this.subreddit = subreddit;
     }
@@ -81,5 +86,13 @@ public class Post {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
     }
 }

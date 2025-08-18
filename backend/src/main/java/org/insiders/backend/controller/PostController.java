@@ -3,13 +3,10 @@ package org.insiders.backend.controller;
 import jakarta.validation.Valid;
 import org.insiders.backend.dto.comment.CommentCreateRequestDto;
 import org.insiders.backend.dto.comment.CommentResponseDto;
-import org.insiders.backend.dto.post.PRDto;
-import org.insiders.backend.dto.post.PostCreateRequestDto;
 import org.insiders.backend.dto.post.PostResponseDto;
 import org.insiders.backend.dto.post.PostUpdateRequestDto;
 import org.insiders.backend.dto.vote.VoteRequestDto;
 import org.insiders.backend.dto.vote.VoteResponseDto;
-import org.insiders.backend.entity.User;
 import org.insiders.backend.logger.LoggerFacade;
 import org.insiders.backend.mapper.PostMapper;
 import org.insiders.backend.model.PostModel;
@@ -17,8 +14,10 @@ import org.insiders.backend.service.CommentService;
 import org.insiders.backend.service.PostManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -55,16 +54,21 @@ public class PostController {
 
     }
 
-    @PostMapping
-    public ResponseEntity<ResponseApi<PostResponseDto>> createPost(@Valid @RequestBody PostCreateRequestDto requestDto) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseApi<PostResponseDto>> createPost(@RequestParam("title") String title,
+                                                                   @RequestParam(value = "content", required = false) String content,
+                                                                   @RequestParam("author") String author,
+                                                                   @RequestParam("subreddit") String subreddit,
+                                                                   @RequestPart(value = "image", required = false) MultipartFile image,
+                                                                   @RequestParam(value = "filter", required = false) Integer filter) {
 
         PostModel post = postManagementService.createPost(
-                requestDto.title(),
-                requestDto.content(),
-                requestDto.author(),
-                requestDto.subreddit()
+                title,
+                content,
+                author,
+                subreddit,
+                image
         );
-
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, PostMapper.postModelToDto(post)));
 

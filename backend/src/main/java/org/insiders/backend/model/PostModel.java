@@ -9,6 +9,7 @@ public class PostModel {
     private UUID id;
     private String title;
     private String content;
+    private String photoPath;
     private String author;
     private String subreddit;
     private int upvotes;
@@ -23,6 +24,7 @@ public class PostModel {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
+        this.photoPath = post.getPhotoPath();
         this.author = post.getUser().getUsername();
         this.subreddit = post.getSubreddit().getName();
         this.createdAt = post.getCreatedAt();
@@ -123,5 +125,13 @@ public class PostModel {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
     }
 }

@@ -1,10 +1,9 @@
 package org.insiders.backend.service;
 
 // TODO: Service is using Dto objects but they must never get past Controller layer. Must only use from "model" package
-import org.springframework.transaction.annotation.Transactional;
+
 import org.insiders.backend.dto.post.PostUpdateRequestDto;
 import org.insiders.backend.dto.vote.VoteResponseDto;
-
 import org.insiders.backend.entity.Post;
 import org.insiders.backend.entity.Subreddit;
 import org.insiders.backend.entity.User;
@@ -16,7 +15,11 @@ import org.insiders.backend.repository.PostRepository;
 import org.insiders.backend.repository.SubredditRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -105,12 +108,35 @@ public class PostManagementService {
     }
 
     @Transactional
-    public PostModel createPost(String title, String content, String author, String subredditName) {
+    public PostModel createPost(String title, String content, String author, String subredditName, MultipartFile image) {
         User user = userManagementService.findByUsername(author);
         String normalizedSubredditName = subredditName.trim().toLowerCase();
-        Subreddit subreddit = subredditRepository.findByNameIgnoreCase(normalizedSubredditName).orElseThrow(() -> new NotFoundException("Subreddit " + normalizedSubredditName+" nu a fost gasit"));
+        Subreddit subreddit = subredditRepository.findByNameIgnoreCase(normalizedSubredditName).orElseThrow
+                (() -> new NotFoundException("Subreddit " + normalizedSubredditName+" nu a fost gasit"));
 
-        Post post = postRepository.saveAndFlush(new Post(title, content, user, subreddit));
+        String imagePath = null;
+
+        if (image != null && !image.isEmpty()) {
+            String uploadsDir = "/home/ubuntu/images/";
+
+            File dir = new File(uploadsDir);
+            if (!dir.exists() && !dir.mkdirs()) {
+                throw new RuntimeException("Could not create upload directory!");
+            }
+
+            String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
+            File file = new File(dir, filename);
+
+            try {
+                image.transferTo(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            imagePath = "http://ec2-3-74-161-90.eu-central-1.compute.amazonaws.com/images/" + filename;
+        }
+
+        Post post = postRepository.saveAndFlush(new Post(title, content, user, subreddit, imagePath));
 
         return buildPostModelDefault(new PostModel(post));
     }
