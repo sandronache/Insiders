@@ -87,7 +87,8 @@ public class PostMenu {
                 post.upvotes(),
                 post.downvotes(),
                 post.userVote(),
-                timeAgo
+                timeAgo,
+                post.imageUrl()
             );
         } else {
             MenuFormatter.printErrorMessage("Error loading post: " + result.message);

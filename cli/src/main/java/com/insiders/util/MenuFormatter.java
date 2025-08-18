@@ -63,7 +63,7 @@ public class MenuFormatter {
     }
 
     public static void printPostCard(int id, String title, String author, boolean isOwnPost,
-                                   String subreddit, int score, int commentCount, String timeAgo) {
+                                   String subreddit, int score, int commentCount, String timeAgo, String imageUrl) {
         int width = 80;
         System.out.println(TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT);
 
@@ -87,11 +87,23 @@ public class MenuFormatter {
         String commentsLine = String.format("Comments: %s%d%s", CYAN, commentCount, RESET);
         printBoxLine(commentsLine, width);
 
+        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            String filename = extractFilename(imageUrl);
+            String imageLine = String.format("Image: %s📷 %s%s", PURPLE, filename, RESET);
+            printBoxLine(imageLine, width);
+        }
+
         String timeLine = String.format("Posted: %s%s%s", PURPLE, timeAgo, RESET);
         printBoxLine(timeLine, width);
 
         System.out.println(BOTTOM_LEFT + HORIZONTAL_LINE.repeat(width - 2) + BOTTOM_RIGHT);
         System.out.println();
+    }
+
+    // Overloaded method for backward compatibility
+    public static void printPostCard(int id, String title, String author, boolean isOwnPost,
+                                   String subreddit, int score, int commentCount, String timeAgo) {
+        printPostCard(id, title, author, isOwnPost, subreddit, score, commentCount, timeAgo, null);
     }
 
     public static void printCreatePostHeader() {
@@ -125,7 +137,7 @@ public class MenuFormatter {
     }
 
     public static void printPostDetails(String title, String content, String author, boolean isOwnPost,
-                                      String subreddit, int upvotes, int downvotes, String userVote, String timeAgo) {
+                                      String subreddit, int upvotes, int downvotes, String userVote, String timeAgo, String imageUrl) {
         int width = 80;
 
         System.out.println(TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT);
@@ -144,6 +156,13 @@ public class MenuFormatter {
 
         String subredditLine = String.format("Subreddit: %s%s%s", BLUE, subreddit, RESET);
         printBoxLine(subredditLine, width);
+
+        // Add image filename if present
+        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            String filename = extractFilename(imageUrl);
+            String imageLine = String.format("Image: %s📷 %s%s", PURPLE, filename, RESET);
+            printBoxLine(imageLine, width);
+        }
 
         int score = upvotes - downvotes;
         String scoreColor = score >= 0 ? GREEN : RED;
@@ -167,6 +186,12 @@ public class MenuFormatter {
 
         System.out.println(BOTTOM_LEFT + HORIZONTAL_LINE.repeat(width - 2) + BOTTOM_RIGHT);
         printEmptyLine();
+    }
+
+    // Overloaded method for backward compatibility
+    public static void printPostDetails(String title, String content, String author, boolean isOwnPost,
+                                      String subreddit, int upvotes, int downvotes, String userVote, String timeAgo) {
+        printPostDetails(title, content, author, isOwnPost, subreddit, upvotes, downvotes, userVote, timeAgo, null);
     }
 
     public static void printCommentsHeader(int commentCount) {
@@ -287,5 +312,29 @@ public class MenuFormatter {
             System.out.print(prompt);
             return new java.util.Scanner(System.in).nextLine();
         }
+    }
+
+    private static String extractFilename(String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return "unknown";
+        }
+        int lastSlash = imageUrl.lastIndexOf('/');
+        String filename;
+        if (lastSlash >= 0 && lastSlash < imageUrl.length() - 1) {
+            filename = imageUrl.substring(lastSlash + 1);
+        } else {
+            filename = imageUrl;
+        }
+
+        if (filename.contains("_")) {
+            int underscoreIndex = filename.indexOf('_');
+            String beforeUnderscore = filename.substring(0, underscoreIndex);
+
+            if (beforeUnderscore.length() == 36 && beforeUnderscore.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) {
+                filename = filename.substring(underscoreIndex + 1);
+            }
+        }
+
+        return filename;
     }
 }

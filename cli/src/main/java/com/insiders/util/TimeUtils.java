@@ -2,6 +2,7 @@ package com.insiders.util;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
@@ -19,10 +20,12 @@ public class TimeUtils {
                 ZonedDateTime zonedDateTime = ZonedDateTime.parse(dateTimeString);
                 dateTime = zonedDateTime.toLocalDateTime();
             } else {
-                dateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                LocalDateTime utcDateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                ZonedDateTime utcZoned = utcDateTime.atZone(ZoneId.of("UTC"));
+                dateTime = utcZoned.withZoneSameInstant(ZoneId.of("Europe/Bucharest")).toLocalDateTime();
             }
 
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Bucharest"));
 
             long minutes = ChronoUnit.MINUTES.between(dateTime, now);
             long hours = ChronoUnit.HOURS.between(dateTime, now);

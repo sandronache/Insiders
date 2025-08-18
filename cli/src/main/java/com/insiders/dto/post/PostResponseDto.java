@@ -7,6 +7,7 @@ public record PostResponseDto(
         UUID id,
         String title,
         String content,
+        String imageUrl,
         String author,
         String subreddit,
         int upvotes,

@@ -1,0 +1,239 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.0.6 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36" version="28.0.6">
+  <diagram name="Insiders Architecture" id="architecture">
+    <mxGraphModel dx="1181" dy="757" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="cli-layer" value="CLI Frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontSize=14;fontStyle=1;verticalAlign=top;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="80" y="80" width="300" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="cli-main" value="CLI Application&#xa;(Main.java)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;" parent="1" vertex="1">
+          <mxGeometry x="110" y="110" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-menu" value="Auth Menu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;" parent="1" vertex="1">
+          <mxGeometry x="260" y="110" width="90" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="feed-menu" value="Feed Menu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;" parent="1" vertex="1">
+          <mxGeometry x="260" y="155" width="90" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="post-menu" value="Post Menu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;" parent="1" vertex="1">
+          <mxGeometry x="260" y="200" width="90" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="clients-layer" value="HTTP Clients" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontSize=14;fontStyle=1;verticalAlign=top;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="480" y="80" width="320" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-client" value="AuthClient" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;" parent="1" vertex="1">
+          <mxGeometry x="510" y="110" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="post-client" value="PostClient" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;" parent="1" vertex="1">
+          <mxGeometry x="620" y="110" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="subreddit-client" value="SubredditClient" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;" parent="1" vertex="1">
+          <mxGeometry x="510" y="180" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="comment-client" value="CommentClient" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;" parent="1" vertex="1">
+          <mxGeometry x="640" y="180" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="controllers-layer" value="Spring Boot Backend (REST API)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#2e7d32;fontSize=14;fontStyle=1;verticalAlign=top;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="80" y="320" width="720" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="welcome-ctrl" value="Welcome&#xa;Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;" parent="1" vertex="1">
+          <mxGeometry x="110" y="360" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="user-ctrl" value="User&#xa;Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;" parent="1" vertex="1">
+          <mxGeometry x="230" y="360" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="post-ctrl" value="Post&#xa;Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;" parent="1" vertex="1">
+          <mxGeometry x="350" y="360" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="subreddit-ctrl" value="Subreddit&#xa;Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;" parent="1" vertex="1">
+          <mxGeometry x="470" y="360" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="comment-ctrl" value="Comment&#xa;Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;" parent="1" vertex="1">
+          <mxGeometry x="590" y="360" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="services-layer" value="Services Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#ef6c00;fontSize=14;fontStyle=1;verticalAlign=top;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="80" y="480" width="720" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-svc" value="AuthService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc02;strokeColor=#ef6c00;" parent="1" vertex="1">
+          <mxGeometry x="110" y="520" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="user-svc" value="UserService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc02;strokeColor=#ef6c00;" parent="1" vertex="1">
+          <mxGeometry x="230" y="520" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="post-svc" value="Post&#xa;ManagementService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc02;strokeColor=#ef6c00;" parent="1" vertex="1">
+          <mxGeometry x="350" y="520" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="subreddit-svc" value="SubredditService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc02;strokeColor=#ef6c00;" parent="1" vertex="1">
+          <mxGeometry x="500" y="520" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="comment-svc" value="CommentService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc02;strokeColor=#ef6c00;" parent="1" vertex="1">
+          <mxGeometry x="630" y="520" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="data-layer" value="Data Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontSize=14;fontStyle=1;verticalAlign=top;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="80" y="640" width="400" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="repositories" value="Repositories&#xa;(JPA/Hibernate)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8bbd9;strokeColor=#c2185b;" parent="1" vertex="1">
+          <mxGeometry x="110" y="680" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="database" value="Database&#xa;(H2/PostgreSQL)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8bbd9;strokeColor=#c2185b;" parent="1" vertex="1">
+          <mxGeometry x="290" y="680" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="external-layer" value="External Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#d32f2f;fontSize=14;fontStyle=1;verticalAlign=top;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="520" y="640" width="280" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="processor" value="Image Processor&#xa;(.NET Core)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#d32f2f;" parent="1" vertex="1">
+          <mxGeometry x="550" y="680" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="image-filter" value="ImageFilter&#xa;(C# Library)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#d32f2f;" parent="1" vertex="1">
+          <mxGeometry x="680" y="680" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="conn1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#1976d2;strokeWidth=2;" parent="1" source="auth-menu" target="auth-client" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="127" as="sourcePoint" />
+            <mxPoint x="510" y="135" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn2" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#1976d2;strokeWidth=2;" parent="1" source="feed-menu" target="post-client" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="172" as="sourcePoint" />
+            <mxPoint x="620" y="135" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="600" y="170" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn3" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#1976d2;strokeWidth=2;" parent="1" source="post-menu" target="subreddit-client" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="217" as="sourcePoint" />
+            <mxPoint x="510" y="205" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn4" value="HTTP/REST" style="endArrow=classic;html=1;rounded=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#7b1fa2;strokeWidth=2;dashed=1;curved=1;" parent="1" source="auth-client" target="user-ctrl" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="555" y="170" as="sourcePoint" />
+            <mxPoint x="275" y="360" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="555" y="290" />
+              <mxPoint x="410" y="270" />
+              <mxPoint x="275" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn5" value="HTTP/REST" style="endArrow=classic;html=1;rounded=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#7b1fa2;strokeWidth=2;dashed=1;" parent="1" source="post-client" target="post-ctrl" edge="1">
+          <mxGeometry x="-0.314" y="10" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="665" y="170" as="sourcePoint" />
+            <mxPoint x="395" y="360" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="630" y="180" />
+              <mxPoint x="610" y="290" />
+              <mxPoint x="550" y="300" />
+              <mxPoint x="395" y="290" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn6" value="HTTP/REST" style="endArrow=classic;html=1;rounded=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#7b1fa2;strokeWidth=2;dashed=1;" parent="1" source="subreddit-client" target="subreddit-ctrl" edge="1">
+          <mxGeometry x="-0.3226" y="7" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="565" y="240" as="sourcePoint" />
+            <mxPoint x="520" y="360" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="560" y="270" />
+              <mxPoint x="550" y="280" />
+              <mxPoint x="560" y="340" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn6b" value="HTTP/REST" style="endArrow=classic;html=1;rounded=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#7b1fa2;strokeWidth=2;dashed=1;" parent="1" source="comment-client" target="comment-ctrl" edge="1">
+          <mxGeometry x="-0.329" y="5" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="695" y="240" as="sourcePoint" />
+            <mxPoint x="640" y="360" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="695" y="290" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn7" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#2e7d32;strokeWidth=2;" parent="1" source="user-ctrl" target="auth-svc" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="275" y="430" as="sourcePoint" />
+            <mxPoint x="155" y="520" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="275" y="460" />
+              <mxPoint x="155" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn7b" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#2e7d32;strokeWidth=2;" parent="1" source="user-ctrl" target="user-svc" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="275" y="430" as="sourcePoint" />
+            <mxPoint x="275" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn8" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;entryX=0.218;entryY=0.014;strokeColor=#2e7d32;strokeWidth=2;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="post-ctrl" target="post-svc" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="395" y="430" as="sourcePoint" />
+            <mxPoint x="410" y="520" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="380" y="500" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn9" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#2e7d32;strokeWidth=2;" parent="1" source="subreddit-ctrl" target="subreddit-svc" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="520" y="430" as="sourcePoint" />
+            <mxPoint x="550" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn9b" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#2e7d32;strokeWidth=2;" parent="1" source="comment-ctrl" target="comment-svc" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="430" as="sourcePoint" />
+            <mxPoint x="680" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn10" value="" style="endArrow=classic;html=1;rounded=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#ef6c00;strokeWidth=2;curved=1;" parent="1" source="auth-svc" target="repositories" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="155" y="580" as="sourcePoint" />
+            <mxPoint x="175" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn10b" value="" style="endArrow=classic;html=1;rounded=1;exitX=0.5;exitY=1;entryX=0.693;entryY=-0.002;strokeColor=#ef6c00;strokeWidth=2;curved=1;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="user-svc" target="repositories" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="275" y="580" as="sourcePoint" />
+            <mxPoint x="175" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn11" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#c2185b;strokeWidth=2;" parent="1" source="repositories" target="database" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="250" y="710" as="sourcePoint" />
+            <mxPoint x="290" y="715" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn12" value="Image Processing" style="endArrow=classic;html=1;rounded=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#d32f2f;strokeWidth=2;dashed=1;curved=1;" parent="1" source="post-svc" target="processor" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="480" y="545" as="sourcePoint" />
+            <mxPoint x="550" y="710" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="500" y="545" />
+              <mxPoint x="500" y="710" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn13" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#d32f2f;strokeWidth=2;" parent="1" source="processor" target="image-filter" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="680" y="710" as="sourcePoint" />
+            <mxPoint x="680" y="710" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="koijW9FGMBTH0_EdeWTN-1" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.25;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;strokeColor=light-dark(#EF6C00,#EDEDED);strokeWidth=2;" edge="1" parent="1" source="post-svc" target="repositories">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="670" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
