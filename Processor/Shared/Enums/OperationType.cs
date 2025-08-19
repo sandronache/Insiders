@@ -6,6 +6,7 @@ public enum OperationType
     DoNothingFilter,
     GrayscaleFilter,
     InvertFilter,
+    NoiseFilter,
     SepiaFilter,
     SharpenFilter,
     MirrorTransform

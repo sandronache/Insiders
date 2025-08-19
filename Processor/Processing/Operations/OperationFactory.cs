@@ -15,6 +15,7 @@ public class OperationFactory
             { OperationType.DoNothingFilter, new DoNothingFilter() },
             { OperationType.GrayscaleFilter, new GrayscaleFilter() },
             { OperationType.InvertFilter, new InvertFilter() },
+            { OperationType.NoiseFilter, new NoiseFilter() },
             { OperationType.SepiaFilter, new SepiaFilter() },
             { OperationType.SharpenFilter, new SharpenFilter() },
             { OperationType.MirrorTransform, new MirrorTransform() }
