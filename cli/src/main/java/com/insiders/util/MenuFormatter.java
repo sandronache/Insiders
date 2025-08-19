@@ -63,7 +63,7 @@ public class MenuFormatter {
     }
 
     public static void printPostCard(int id, String title, String author, boolean isOwnPost,
-                                   String subreddit, int score, int commentCount, String timeAgo, String imageUrl) {
+                                     String subreddit, int score, int commentCount, String timeAgo, String imageUrl) {
         int width = 80;
         System.out.println(TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT);
 
@@ -73,8 +73,8 @@ public class MenuFormatter {
         printBoxLine(titleLine, width);
 
         String authorDisplay = isOwnPost ?
-            String.format("%s%s%s %s📝[YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
-            String.format("%s%s%s", GREEN, author, RESET);
+                String.format("%s%s%s %s[YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
+                String.format("%s%s%s", GREEN, author, RESET);
         String authorLine = "Author: " + authorDisplay;
         printBoxLine(authorLine, width);
 
@@ -100,9 +100,8 @@ public class MenuFormatter {
         System.out.println();
     }
 
-    // Overloaded method for backward compatibility
     public static void printPostCard(int id, String title, String author, boolean isOwnPost,
-                                   String subreddit, int score, int commentCount, String timeAgo) {
+                                     String subreddit, int score, int commentCount, String timeAgo) {
         printPostCard(id, title, author, isOwnPost, subreddit, score, commentCount, timeAgo, null);
     }
 
@@ -137,7 +136,7 @@ public class MenuFormatter {
     }
 
     public static void printPostDetails(String title, String content, String author, boolean isOwnPost,
-                                      String subreddit, int upvotes, int downvotes, String userVote, String timeAgo, String imageUrl) {
+                                        String subreddit, int upvotes, int downvotes, String userVote, String timeAgo, String imageUrl) {
         int width = 80;
 
         System.out.println(TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT);
@@ -149,15 +148,14 @@ public class MenuFormatter {
         printBoxLine(contentLine, width);
 
         String authorDisplay = isOwnPost ?
-            String.format("%s%s%s %s📝 [YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
-            String.format("%s%s%s", GREEN, author, RESET);
+                String.format("%s%s%s %s[YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
+                String.format("%s%s%s", GREEN, author, RESET);
         String authorLine = "Author: " + authorDisplay;
         printBoxLine(authorLine, width);
 
         String subredditLine = String.format("Subreddit: %s%s%s", BLUE, subreddit, RESET);
         printBoxLine(subredditLine, width);
 
-        // Add image filename if present
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             String filename = extractFilename(imageUrl);
             String imageLine = String.format("Image: %s📷 %s%s", PURPLE, filename, RESET);
@@ -170,13 +168,13 @@ public class MenuFormatter {
         printBoxLine(scoreLine, width);
 
         String votesLine = String.format("Votes: %s%d%s↑ %s%d%s↓",
-            GREEN, upvotes, RESET, RED, downvotes, RESET);
+                GREEN, upvotes, RESET, RED, downvotes, RESET);
         printBoxLine(votesLine, width);
 
         if (userVote != null && !userVote.isEmpty() && !"none".equals(userVote)) {
             String voteDisplay = userVote.equals("up") ?
-                String.format("%s⬆️YOU UPVOTED%s", GREEN + BOLD, RESET) :
-                String.format("%s⬇️YOU DOWNVOTED%s", RED + BOLD, RESET);
+                    String.format("%sYOU UPVOTED%s", GREEN + BOLD, RESET) :
+                    String.format("%sYOU DOWNVOTED%s", RED + BOLD, RESET);
             String userVoteLine = "Your vote: " + voteDisplay;
             printBoxLine(userVoteLine, width);
         }
@@ -190,22 +188,22 @@ public class MenuFormatter {
 
     // Overloaded method for backward compatibility
     public static void printPostDetails(String title, String content, String author, boolean isOwnPost,
-                                      String subreddit, int upvotes, int downvotes, String userVote, String timeAgo) {
+                                        String subreddit, int upvotes, int downvotes, String userVote, String timeAgo) {
         printPostDetails(title, content, author, isOwnPost, subreddit, upvotes, downvotes, userVote, timeAgo, null);
     }
 
     public static void printCommentsHeader(int commentCount) {
         System.out.println();
         String title = commentCount > 0 ?
-            "All Comments (" + commentCount + ")" :
-            "No Comments";
+                "All Comments (" + commentCount + ")" :
+                "No Comments";
         printBoxedHeader(title, null, 80, PURPLE, BOLD);
         System.out.println();
     }
 
     public static void printCommentCard(int id, String author, boolean isOwnComment,
-                                      String content, int score, int upvotes, int downvotes,
-                                      String userVote, String timeAgo, int indentLevel) {
+                                        String content, int score, int upvotes, int downvotes,
+                                        String userVote, String timeAgo, int indentLevel) {
         String indent = "  ".repeat(indentLevel);
         String replyIndicator = indentLevel > 0 ? "↳ " : "";
         int width = 80 - (indentLevel * 2);
@@ -216,8 +214,8 @@ public class MenuFormatter {
         printCommentLine(idLine, width, indent);
 
         String authorDisplay = isOwnComment ?
-            String.format("%s%s%s %s💬[YOUR COMMENT]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
-            String.format("%s%s%s", GREEN, author, RESET);
+                String.format("%s%s%s %s[YOUR COMMENT]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
+                String.format("%s%s%s", GREEN, author, RESET);
         String authorLine = "Author: " + authorDisplay;
         printCommentLine(authorLine, width, indent);
 
@@ -226,14 +224,14 @@ public class MenuFormatter {
 
         String scoreColor = score >= 0 ? GREEN : RED;
         String scoreLine = String.format("Score: %s%d%s (%s%d%s↑ %s%d%s↓)",
-            scoreColor, score, RESET,
-            GREEN, upvotes, RESET,
-            RED, downvotes, RESET);
+                scoreColor, score, RESET,
+                GREEN, upvotes, RESET,
+                RED, downvotes, RESET);
 
         if (userVote != null && !userVote.isEmpty() && !"none".equals(userVote)) {
             String voteDisplay = userVote.equals("up") ?
-                String.format(" %s⬆️[YOU UPVOTED]%s", GREEN + BOLD, RESET) :
-                String.format(" %s⬇️[YOU DOWNVOTED]%s", RED + BOLD, RESET);
+                    String.format(" %s[YOU UPVOTED]%s", GREEN + BOLD, RESET) :
+                    String.format(" %s[YOU DOWNVOTED]%s", RED + BOLD, RESET);
             scoreLine += voteDisplay;
         }
         printCommentLine(scoreLine, width, indent);
@@ -291,13 +289,13 @@ public class MenuFormatter {
     public static void printCommentActionsMenu() {
         printMenuHeader("Comment Actions");
         printMenuOptions(
-            "1. Add comment",
-            "2. Reply to existing comment",
-            "3. Edit comment",
-            "4. Delete comment",
-            "5. Upvote comment",
-            "6. Downvote comment",
-            "0. Back"
+                "1. Add comment",
+                "2. Reply to existing comment",
+                "3. Edit comment",
+                "4. Delete comment",
+                "5. Upvote comment",
+                "6. Downvote comment",
+                "0. Back"
         );
     }
 
@@ -334,6 +332,28 @@ public class MenuFormatter {
                 filename = filename.substring(underscoreIndex + 1);
             }
         }
+
+        filename = cleanImageFilename(filename);
+
+        if (filename.length() > 40) {
+            filename = filename.substring(0, 37) + "...";
+        }
+
+        return filename;
+    }
+
+    private static String cleanImageFilename(String filename) {
+        filename = filename.replaceAll("-v\\d+", "");
+        filename = filename.replaceAll("-t\\d+[a-z]*", "");
+
+        filename = filename.replaceAll("-\\d+[a-z]*\\.", ".");
+        filename = filename.replaceAll("-[a-f0-9]{8,}", "");
+
+        filename = filename.replaceAll("\\.(jpeg|jpg|png|gif|webp)\\.(jpeg|jpg|png|gif|webp)", ".$2");
+        filename = filename.replaceAll("\\.(jpeg|jpg|png|gif|webp)\\.(jpeg|jpg|png|gif|webp)\\.(jpeg|jpg|png|gif|webp)", ".$3");
+
+        filename = filename.replaceAll("-+", "-");
+        filename = filename.replaceAll("^-|-$", "");
 
         return filename;
     }

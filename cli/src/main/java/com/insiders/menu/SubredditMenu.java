@@ -589,6 +589,21 @@ public class SubredditMenu {
             ApiResult<String> result = subredditClient.deleteSubreddit(subredditName);
             if (result.success) {
                 MenuFormatter.printSuccessMessage("Subreddit deleted successfully!");
+                MenuFormatter.printInfoMessage("Refreshing subreddits list...");
+                ApiResult<List<SubredditResponseDto>> refreshResult = subredditClient.getAllSubreddits();
+                if (refreshResult.success) {
+                    allSubreddits = refreshResult.data;
+                    applySubredditSort();
+
+                    int totalPages = (int) Math.ceil((double) allSubreddits.size() / SUBREDDITS_PER_PAGE);
+                    if (currentSubredditPage >= totalPages && totalPages > 0) {
+                        currentSubredditPage = totalPages - 1;
+                    }
+
+                    MenuFormatter.printSuccessMessage("Subreddits list updated!");
+                } else {
+                    MenuFormatter.printWarningMessage("Subreddit deleted but failed to refresh list. Please exit and re-enter to see changes.");
+                }
             } else {
                 MenuFormatter.printErrorMessage("Failed to delete subreddit!");
 
