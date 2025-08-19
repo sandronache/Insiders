@@ -29,11 +29,9 @@ public class Comment {
     private User user;
     @Column(name = "is_edited", nullable = false)
     private boolean edited = false;
-    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    @UpdateTimestamp
-    @Column(nullable = false)
+    @Column
     private LocalDateTime updatedAt;
 
     public Comment() {
@@ -86,5 +84,16 @@ public class Comment {
 
     public void setEdited(boolean edited) {
         this.edited = edited;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = null;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }

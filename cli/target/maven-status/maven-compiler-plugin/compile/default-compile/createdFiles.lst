@@ -12,6 +12,7 @@ com\insiders\clients\PostClient$6.class
 com\insiders\dto\comment\CommentCreateRequestDto.class
 com\insiders\http\ApiClient.class
 com\insiders\clients\PostClient$10.class
+com\insiders\menu\SubredditMenu$PostSortType.class
 com\insiders\util\ConsoleIO.class
 com\insiders\clients\SubredditClient.class
 com\insiders\dto\comment\CommentResponseDto.class
@@ -29,11 +30,13 @@ com\insiders\dto\ResponseApi$ErrorBody.class
 com\insiders\clients\SubredditClient$2.class
 com\insiders\menu\PostMenu.class
 com\insiders\menu\SubredditMenu.class
+com\insiders\menu\FeedMenu$SortType.class
 com\insiders\session\SessionManager.class
 com\insiders\menu\AuthMenu.class
 com\insiders\clients\PostClient$1.class
 com\insiders\dto\post\PostCreateRequestDto.class
 com\insiders\dto\auth\LoginRequestDto.class
+com\insiders\menu\SubredditMenu$1.class
 com\insiders\clients\SubredditClient$6.class
 com\insiders\clients\PostClient$9.class
 com\insiders\dto\post\PostResponseDto.class
@@ -46,6 +49,8 @@ com\insiders\clients\SubredditClient$3.class
 com\insiders\dto\subreddit\SubredditResponseDto.class
 com\insiders\dto\vote\VoteRequestDto.class
 com\insiders\dto\ResponseApi.class
+com\insiders\menu\FeedMenu$1.class
 com\insiders\dto\vote\VoteResponseDto.class
 com\insiders\clients\PostClient$12.class
+com\insiders\menu\SubredditMenu$SubredditSortType.class
 com\insiders\dto\auth\LoginResponseDto.class

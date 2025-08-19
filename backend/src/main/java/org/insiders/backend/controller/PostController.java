@@ -3,6 +3,7 @@ package org.insiders.backend.controller;
 import jakarta.validation.Valid;
 import org.insiders.backend.dto.comment.CommentCreateRequestDto;
 import org.insiders.backend.dto.comment.CommentResponseDto;
+import org.insiders.backend.dto.post.PostCreateRequestDto;
 import org.insiders.backend.dto.post.PostResponseDto;
 import org.insiders.backend.dto.post.PostUpdateRequestDto;
 import org.insiders.backend.dto.vote.VoteRequestDto;
@@ -54,8 +55,8 @@ public class PostController {
 
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseApi<PostResponseDto>> createPost(@RequestParam("title") String title,
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, headers = "Content-Type=multipart/form-data")
+    public ResponseEntity<ResponseApi<PostResponseDto>> createPostMultipart(@RequestParam("title") String title,
                                                                    @RequestParam(value = "content", required = false) String content,
                                                                    @RequestParam("author") String author,
                                                                    @RequestParam("subreddit") String subreddit,
@@ -74,6 +75,20 @@ public class PostController {
 
     }
 
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, headers = "Content-Type=application/json")
+    public ResponseEntity<ResponseApi<PostResponseDto>> createPostJson(@RequestBody PostCreateRequestDto requestDto) {
+
+        PostModel post = postManagementService.createPost(
+                requestDto.title(),
+                requestDto.content(),
+                requestDto.author(),
+                requestDto.subreddit(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, PostMapper.postModelToDto(post)));
+
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseApi<PostResponseDto>> updatePost(@PathVariable UUID id,
