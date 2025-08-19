@@ -14,6 +14,7 @@ import com.insiders.dto.vote.VoteResponseDto;
 import com.insiders.http.ApiClient;
 import com.insiders.http.ApiResult;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,7 +36,24 @@ public class PostClient {
     }
 
     public ApiResult<PostResponseDto> createPost(PostCreateRequestDto createRequest) {
-        return api.post("/posts", createRequest, new TypeReference<ResponseApi<PostResponseDto>>(){});
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("title", createRequest.title());
+        formData.put("author", createRequest.author());
+        formData.put("subreddit", createRequest.subreddit());
+
+        if (createRequest.content() != null && !createRequest.content().isBlank()) {
+            formData.put("content", createRequest.content());
+        }
+
+        if (createRequest.image() != null) {
+            formData.put("image", createRequest.image());
+        }
+
+        if (createRequest.filter() != null) {
+            formData.put("filter", createRequest.filter());
+        }
+
+        return api.postMultipart("/posts", formData, new TypeReference<ResponseApi<PostResponseDto>>(){});
     }
 
     public ApiResult<PostResponseDto> updatePost(UUID postId, PostUpdateRequestDto updateRequest) {

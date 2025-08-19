@@ -169,20 +169,21 @@ public class FeedMenu {
             String timeAgo = TimeUtils.getRelativeTime(post.createdAt().toString());
 
             MenuFormatter.printPostCard(
-                simpleId,
-                post.title(),
-                post.author(),
-                isOwnPost,
-                post.subreddit(),
-                score,
-                post.commentCount(),
-                timeAgo
+                    simpleId,
+                    post.title(),
+                    post.author(),
+                    isOwnPost,
+                    post.subreddit(),
+                    score,
+                    post.commentCount(),
+                    timeAgo,
+                    post.imageUrl()
             );
         }
 
         int totalPages = (int) Math.ceil((double) allPosts.size() / POSTS_PER_PAGE);
         MenuFormatter.printInfoMessage(String.format("Showing page %d of %d (%d total posts)",
-            currentPage + 1, totalPages, allPosts.size()));
+                currentPage + 1, totalPages, allPosts.size()));
 
         MenuFormatter.printInfoMessage("Currently sorted by: " + currentSortType.getDisplayName());
     }

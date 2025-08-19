@@ -34,7 +34,7 @@ public class SubredditClient {
     }
 
     public ApiResult<List<PostResponseDto>> getSubredditPosts(String subredditName) {
-        return api.get("/subreddits/" + subredditName + "/posts", new TypeReference<ResponseApi<List<PostResponseDto>>>(){});
+        return api.get("/posts?subreddit=" + subredditName, new TypeReference<ResponseApi<List<PostResponseDto>>>(){});
     }
 
     public ApiResult<SubredditResponseDto> updateSubreddit(String subredditName, SubredditUpdateRequestDto updateRequest) {

@@ -446,7 +446,8 @@ public class SubredditMenu {
                 post.subreddit(),
                 score,
                 post.commentCount(),
-                timeAgo
+                timeAgo,
+                post.imageUrl()
             );
         }
 
