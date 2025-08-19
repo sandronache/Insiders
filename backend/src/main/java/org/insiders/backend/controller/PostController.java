@@ -61,14 +61,15 @@ public class PostController {
                                                                    @RequestParam("author") String author,
                                                                    @RequestParam("subreddit") String subreddit,
                                                                    @RequestPart(value = "image", required = false) MultipartFile image,
-                                                                   @RequestParam(value = "filter", required = false) Integer filter) {
+                                                                   @RequestParam(value = "filter", required = false) String filterName) {
 
         PostModel post = postManagementService.createPost(
                 title,
                 content,
                 author,
                 subreddit,
-                image
+                image,
+                filterName
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, PostMapper.postModelToDto(post)));
@@ -83,7 +84,8 @@ public class PostController {
                 requestDto.content(),
                 requestDto.author(),
                 requestDto.subreddit(),
-                null
+                requestDto.image(),
+                requestDto.filterName()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi<>(true, PostMapper.postModelToDto(post)));

@@ -23,6 +23,7 @@ public record PostCreateRequestDto(
         @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Subreddit-ul poate contine doar caractere alfanumerice si underscore")
         String subreddit,
 
-        MultipartFile image
+        MultipartFile image,
+        String filterName
 ) {
 }
