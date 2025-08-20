@@ -184,7 +184,6 @@ public class MenuFormatter {
         printEmptyLine();
     }
 
-    // Overloaded method for backward compatibility
     public static void printPostDetails(String title, String content, String author, boolean isOwnPost,
                                         String subreddit, int upvotes, int downvotes, String userVote, String timeAgo) {
         printPostDetails(title, content, author, isOwnPost, subreddit, upvotes, downvotes, userVote, timeAgo, null);
@@ -217,8 +216,7 @@ public class MenuFormatter {
         String authorLine = "Author: " + authorDisplay;
         printCommentLine(authorLine, width, indent);
 
-        String contentLine = String.format("Content: %s%s%s", WHITE, content, RESET);
-        printCommentLine(contentLine, width, indent);
+        printWrappedCommentLine("Content: ", content != null ? content : "", WHITE, width, indent);
 
         String scoreColor = score >= 0 ? GREEN : RED;
         String scoreLine = String.format("Score: %s%d%s (%s%d%s↑ %s%d%s↓)",
@@ -333,18 +331,75 @@ public class MenuFormatter {
         }
     }
 
+    private static void printCommentLine(String text, int width, String indent) {
+        String cleanText = text.replaceAll("\u001B\\[[;\\d]*m", "");
+        String padding = " ".repeat(Math.max(0, width - 4 - cleanText.length()));
+        System.out.println(indent + VERTICAL_LINE + " " + text + padding + " " + VERTICAL_LINE);
+    }
+
+    private static void printWrappedCommentLine(String prefix, String text, String colorCode, int width, String indent) {
+        if (text == null || text.isEmpty()) {
+            text = "";
+        }
+
+        int availableWidth = width - 4;
+        int prefixLength = prefix.replaceAll("\u001B\\[[;\\d]*m", "").length();
+        int firstLineWidth = availableWidth - prefixLength;
+
+        String[] words = text.split("\\s+");
+        StringBuilder currentLine = new StringBuilder();
+        boolean isFirstLine = true;
+
+        for (String word : words) {
+            int lineLimit = isFirstLine ? firstLineWidth : availableWidth;
+
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            if (testLine.length() > lineLimit && currentLine.length() > 0) {
+                if (isFirstLine) {
+                    String fullLine = prefix + colorCode + currentLine + RESET;
+                    String cleanLine = (prefix + currentLine.toString()).replaceAll("\u001B\\[[;\\d]*m", "");
+                    String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
+                    System.out.println(indent + VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+                    isFirstLine = false;
+                } else {
+                    String fullLine = colorCode + currentLine + RESET;
+                    String padding = " ".repeat(Math.max(0, availableWidth - currentLine.length()));
+                    System.out.println(indent + VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+                }
+                currentLine = new StringBuilder(word);
+            } else {
+                if (currentLine.length() > 0) {
+                    currentLine.append(" ");
+                }
+                currentLine.append(word);
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            if (isFirstLine) {
+                String fullLine = prefix + colorCode + currentLine + RESET;
+                String cleanLine = (prefix + currentLine.toString()).replaceAll("\u001B\\[[;\\d]*m", "");
+                String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
+                System.out.println(indent + VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+            } else {
+                String fullLine = colorCode + currentLine + RESET;
+                String padding = " ".repeat(Math.max(0, availableWidth - currentLine.length()));
+                System.out.println(indent + VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+            }
+        } else if (isFirstLine) {
+            String fullLine = prefix + colorCode + RESET;
+            String cleanLine = prefix.replaceAll("\u001B\\[[;\\d]*m", "");
+            String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
+            System.out.println(indent + VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+        }
+    }
+
     public static void printSeparator(int width, String character) {
         System.out.println(character.repeat(width));
     }
 
     public static void printEmptyLine() {
         System.out.println();
-    }
-
-    private static void printCommentLine(String text, int width, String indent) {
-        String cleanText = text.replaceAll("\u001B\\[[;\\d]*m", "");
-        String padding = " ".repeat(Math.max(0, width - 4 - cleanText.length()));
-        System.out.println(indent + VERTICAL_LINE + " " + text + padding + " " + VERTICAL_LINE);
     }
 
     public static void printCommentActionsMenu() {
