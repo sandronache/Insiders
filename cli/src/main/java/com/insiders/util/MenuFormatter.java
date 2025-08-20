@@ -7,17 +7,9 @@ public class MenuFormatter {
     public static final String TOP_RIGHT = "╗";
     public static final String BOTTOM_LEFT = "╚";
     public static final String BOTTOM_RIGHT = "╝";
-    private static final String CROSS = "╬";
-    private static final String TOP_CROSS = "╦";
-    private static final String BOTTOM_CROSS = "╩";
-    private static final String LEFT_CROSS = "╠";
-    private static final String RIGHT_CROSS = "╣";
-
     public static final String RESET = "\u001B[0m";
     public static final String BOLD = "\u001B[1m";
-    public static final String UNDERLINE = "\u001B[4m";
 
-    public static final String BLACK = "\u001B[30m";
     public static final String RED = "\u001B[31m";
     public static final String GREEN = "\u001B[32m";
     public static final String YELLOW = "\u001B[33m";
@@ -25,6 +17,7 @@ public class MenuFormatter {
     public static final String PURPLE = "\u001B[35m";
     public static final String CYAN = "\u001B[36m";
     public static final String WHITE = "\u001B[37m";
+    public static final String BRIGHT_WHITE = "\u001B[97m";
 
 
     public static void printWelcomeHeader(String username) {
@@ -100,11 +93,6 @@ public class MenuFormatter {
         System.out.println();
     }
 
-    public static void printPostCard(int id, String title, String author, boolean isOwnPost,
-                                     String subreddit, int score, int commentCount, String timeAgo) {
-        printPostCard(id, title, author, isOwnPost, subreddit, score, commentCount, timeAgo, null);
-    }
-
     public static void printCreatePostHeader() {
         System.out.println();
         printBoxedHeader("Create New Post", null, 60, GREEN, BOLD);
@@ -143,7 +131,7 @@ public class MenuFormatter {
 
         printWrappedBoxLine("Title: ", title, CYAN + BOLD, width);
 
-        printWrappedBoxLine("Content: ", content != null ? content : "", WHITE, width);
+        printWrappedBoxLine("Content: ", content != null ? content : "", BRIGHT_WHITE, width);
 
         String authorDisplay = isOwnPost ?
                 String.format("%s%s%s %s[YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
@@ -184,11 +172,6 @@ public class MenuFormatter {
         printEmptyLine();
     }
 
-    public static void printPostDetails(String title, String content, String author, boolean isOwnPost,
-                                        String subreddit, int upvotes, int downvotes, String userVote, String timeAgo) {
-        printPostDetails(title, content, author, isOwnPost, subreddit, upvotes, downvotes, userVote, timeAgo, null);
-    }
-
     public static void printCommentsHeader(int commentCount) {
         System.out.println();
         String title = commentCount > 0 ?
@@ -216,7 +199,7 @@ public class MenuFormatter {
         String authorLine = "Author: " + authorDisplay;
         printCommentLine(authorLine, width, indent);
 
-        printWrappedCommentLine("Content: ", content != null ? content : "", WHITE, width, indent);
+        printWrappedCommentLine("Content: ", content != null ? content : "", BRIGHT_WHITE, width, indent);
 
         String scoreColor = score >= 0 ? GREEN : RED;
         String scoreLine = String.format("Score: %s%d%s (%s%d%s↑ %s%d%s↓)",
@@ -268,7 +251,6 @@ public class MenuFormatter {
         return leftPad + text + rightPad;
     }
 
-    // New method to handle wrapped text
     private static void printWrappedBoxLine(String prefix, String text, String colorCode, int width) {
         if (text == null || text.isEmpty()) {
             text = "";
@@ -278,7 +260,6 @@ public class MenuFormatter {
         int prefixLength = prefix.replaceAll("\u001B\\[[;\\d]*m", "").length();
         int firstLineWidth = availableWidth - prefixLength;
 
-        // Split text into words
         String[] words = text.split("\\s+");
         StringBuilder currentLine = new StringBuilder();
         boolean isFirstLine = true;
@@ -286,13 +267,11 @@ public class MenuFormatter {
         for (String word : words) {
             int lineLimit = isFirstLine ? firstLineWidth : availableWidth;
 
-            // Check if adding this word would exceed the line limit
-            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
-            if (testLine.length() > lineLimit && currentLine.length() > 0) {
-                // Print current line and start a new one
+            String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
+            if (testLine.length() > lineLimit && !currentLine.isEmpty()) {
                 if (isFirstLine) {
                     String fullLine = prefix + colorCode + currentLine + RESET;
-                    String cleanLine = (prefix + currentLine.toString()).replaceAll("\u001B\\[[;\\d]*m", "");
+                    String cleanLine = (prefix + currentLine).replaceAll("\u001B\\[[;\\d]*m", "");
                     String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
                     System.out.println(VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
                     isFirstLine = false;
@@ -303,18 +282,17 @@ public class MenuFormatter {
                 }
                 currentLine = new StringBuilder(word);
             } else {
-                if (currentLine.length() > 0) {
+                if (!currentLine.isEmpty()) {
                     currentLine.append(" ");
                 }
                 currentLine.append(word);
             }
         }
 
-        // Print the last line
-        if (currentLine.length() > 0) {
+        if (!currentLine.isEmpty()) {
             if (isFirstLine) {
                 String fullLine = prefix + colorCode + currentLine + RESET;
-                String cleanLine = (prefix + currentLine.toString()).replaceAll("\u001B\\[[;\\d]*m", "");
+                String cleanLine = (prefix + currentLine).replaceAll("\u001B\\[[;\\d]*m", "");
                 String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
                 System.out.println(VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
             } else {
@@ -353,11 +331,11 @@ public class MenuFormatter {
         for (String word : words) {
             int lineLimit = isFirstLine ? firstLineWidth : availableWidth;
 
-            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
-            if (testLine.length() > lineLimit && currentLine.length() > 0) {
+            String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
+            if (testLine.length() > lineLimit && !currentLine.isEmpty()) {
                 if (isFirstLine) {
                     String fullLine = prefix + colorCode + currentLine + RESET;
-                    String cleanLine = (prefix + currentLine.toString()).replaceAll("\u001B\\[[;\\d]*m", "");
+                    String cleanLine = (prefix + currentLine).replaceAll("\u001B\\[[;\\d]*m", "");
                     String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
                     System.out.println(indent + VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
                     isFirstLine = false;
@@ -368,17 +346,17 @@ public class MenuFormatter {
                 }
                 currentLine = new StringBuilder(word);
             } else {
-                if (currentLine.length() > 0) {
+                if (!currentLine.isEmpty()) {
                     currentLine.append(" ");
                 }
                 currentLine.append(word);
             }
         }
 
-        if (currentLine.length() > 0) {
+        if (!currentLine.isEmpty()) {
             if (isFirstLine) {
                 String fullLine = prefix + colorCode + currentLine + RESET;
-                String cleanLine = (prefix + currentLine.toString()).replaceAll("\u001B\\[[;\\d]*m", "");
+                String cleanLine = (prefix + currentLine).replaceAll("\u001B\\[[;\\d]*m", "");
                 String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
                 System.out.println(indent + VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
             } else {

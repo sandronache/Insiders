@@ -190,19 +190,12 @@ public class PostMenu {
                     MenuFormatter.printSuccessMessage("Post upvoted successfully!");
                 }
 
-                String scoreInfo = String.format("Score: %s%d%s↑ %s%d%s↓",
-                    MenuFormatter.GREEN, vote.upvotes(), MenuFormatter.RESET,
-                    MenuFormatter.RED, vote.downvotes(), MenuFormatter.RESET);
-                MenuFormatter.printInfoMessage(scoreInfo);
-
-                if (vote.userVote() != null && !vote.userVote().isEmpty() && !"none".equals(vote.userVote())) {
-                    String voteDisplay = vote.userVote().equals("up") ? "⬆️ YOU UPVOTED" : "⬇️ YOU DOWNVOTED";
-                    MenuFormatter.printInfoMessage("Your vote: " + voteDisplay);
-                } else {
-                    MenuFormatter.printInfoMessage("Your vote: None");
-                }
+                MenuFormatter.printInfoMessage("Refreshing post...");
+                viewPostDetails(postId);
             } else {
                 MenuFormatter.printSuccessMessage("Vote successful but no vote data received.");
+                MenuFormatter.printInfoMessage("Refreshing post...");
+                viewPostDetails(postId);
             }
         } else {
             MenuFormatter.printErrorMessage("Error voting: " + result.message + " (Status: " + result.status + ")");
@@ -239,19 +232,14 @@ public class PostMenu {
                     MenuFormatter.printSuccessMessage("Post downvoted successfully!");
                 }
 
-                String scoreInfo = String.format("Score: %s%d%s↑ %s%d%s↓",
-                    MenuFormatter.GREEN, vote.upvotes(), MenuFormatter.RESET,
-                    MenuFormatter.RED, vote.downvotes(), MenuFormatter.RESET);
-                MenuFormatter.printInfoMessage(scoreInfo);
-
-                if (vote.userVote() != null && !vote.userVote().isEmpty() && !"none".equals(vote.userVote())) {
-                    String voteDisplay = vote.userVote().equals("up") ? "⬆️ YOU UPVOTED" : "⬇️ YOU DOWNVOTED";
-                    MenuFormatter.printInfoMessage("Your vote: " + voteDisplay);
-                } else {
-                    MenuFormatter.printInfoMessage("Your vote: None");
-                }
+                // Refresh the post display after successful vote
+                MenuFormatter.printInfoMessage("Refreshing post...");
+                viewPostDetails(postId);
             } else {
                 MenuFormatter.printSuccessMessage("Vote successful but no vote data received.");
+                // Still refresh even if no vote data received
+                MenuFormatter.printInfoMessage("Refreshing post...");
+                viewPostDetails(postId);
             }
         } else {
             MenuFormatter.printErrorMessage("Error voting: " + result.message + " (Status: " + result.status + ")");
