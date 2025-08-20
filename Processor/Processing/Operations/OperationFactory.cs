@@ -12,12 +12,14 @@ public class OperationFactory
         _operations = new Dictionary<OperationType, IImageOperation>()
         {
             { OperationType.BlurFilter, new BlurFilter() },
+            { OperationType.BrightnessFilter, new BrightnessFilter() },
             { OperationType.DoNothingFilter, new DoNothingFilter() },
             { OperationType.GrayscaleFilter, new GrayscaleFilter() },
             { OperationType.InvertFilter, new InvertFilter() },
             { OperationType.NoiseFilter, new NoiseFilter() },
             { OperationType.SepiaFilter, new SepiaFilter() },
             { OperationType.SharpenFilter, new SharpenFilter() },
+            { OperationType.TintFilter, new TintFilter() },
             { OperationType.MirrorTransform, new MirrorTransform() }
         };
     }
