@@ -21,13 +21,16 @@ public class ProcessingController : ControllerBase
 
    [HttpPost]
    public async Task<IActionResult> Process([FromForm] ProcessingRequestDto request)
-   {
-       var requestModel = await _mapper.ToRequestModel(request);
-       var result = _service.Process(requestModel);
+{
+    var requestModel = await _mapper.ToRequestModel(request);
+    var result = _service.Process(requestModel);
+    var response = await _mapper.ToResponseDto(result);
 
-       using var stream = new MemoryStream();
-       await result.Image.SaveAsJpegAsync(stream);
+    if (!response.Success)
+    {
+        return BadRequest(response.Message);
+    }
 
-       return File(stream.ToArray(), "image/jpeg");
-   }
+    return File(response.ImageData, "image/jpeg");
+}
 }

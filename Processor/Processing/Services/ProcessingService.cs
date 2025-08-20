@@ -24,6 +24,11 @@ public class ProcessingService : IProcessingService
     {
         Image<Rgba32> currentImage = request.Image;
 
+        if (!_validator.Validate(currentImage))
+        {
+            return new ProcessingResult(false, _validator.ErrorMessage, currentImage);
+        }
+
         foreach (OperationDescriptor descriptor in request.OperationsDescriptors)
         {
             IImageOperation operation = _factory.GetOperation(descriptor.Type);

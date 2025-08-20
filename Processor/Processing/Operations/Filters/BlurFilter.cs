@@ -7,7 +7,7 @@ public class BlurFilter : IImageOperation
     /* Parameters: none. */
     public void Apply(Image<Rgba32> image, Dictionary<string, string> parameters)
     {
-        int blurRadius = 7;
+        int blurRadius = 10;
         float sigma = blurRadius / 3f;
 
         int size = blurRadius * 2 + 1;

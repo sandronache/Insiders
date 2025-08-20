@@ -9,7 +9,6 @@ namespace Api.Utils;
 
 public class Mapper
 {
-
     public async Task<ProcessingRequest> ToRequestModel(ProcessingRequestDto request)
     {
         using var stream = new MemoryStream();
@@ -24,5 +23,24 @@ public class Mapper
         List<OperationDescriptor> operations = JsonSerializer.Deserialize<List<OperationDescriptor>>(request.Operations, options);
 
         return new ProcessingRequest(image, operations);
+    }
+
+    public async Task<ProcessingResponseDto> ToResponseDto(ProcessingResult result)
+    {
+        byte[] imageData = null;
+        
+        if (result.Success && result.Image != null)
+        {
+            using var stream = new MemoryStream();
+            await result.Image.SaveAsJpegAsync(stream);
+            imageData = stream.ToArray();
+        }
+
+        return new ProcessingResponseDto
+        {
+            Success = result.Success,
+            Message = result.Message,
+            ImageData = imageData
+        };
     }
 }

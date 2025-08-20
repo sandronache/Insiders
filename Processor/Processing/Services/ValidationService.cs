@@ -15,14 +15,16 @@ public class ValidationService
         ErrorMessage = null;
     }
 
-    public void Validate(Image<Rgba32> image)
+    public bool Validate(Image<Rgba32> image)
     {
         foreach (IImageValidator validator in _validators)
         {
             if (!validator.Validate(image))
             {
                 ErrorMessage = validator.GetErrorMessage();
+                return false;
             }
         }
+        return true;
     }
 }

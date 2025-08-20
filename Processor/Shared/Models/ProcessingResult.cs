@@ -5,13 +5,13 @@ namespace Shared.Models;
 
 public class ProcessingResult
 {
-    public bool Succes { get; }
+    public bool Success { get; }
     public string Message { get; }
     public Image<Rgba32> Image { get; }
 
     public ProcessingResult(bool success, string message, Image<Rgba32> image)
     {
-        Succes = Succes;
+        Success = success;
         Message = message;
         Image = image;
     }
