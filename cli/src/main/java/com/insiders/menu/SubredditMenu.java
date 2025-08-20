@@ -302,8 +302,17 @@ public class SubredditMenu {
         String displayNameLine = String.format("Display Name: %s%s%s", MenuFormatter.GREEN + MenuFormatter.BOLD, subreddit.displayName(), MenuFormatter.RESET);
         printSubredditLine(displayNameLine, width);
 
-        String descriptionLine = String.format("Description: %s%s%s", MenuFormatter.WHITE, subreddit.description(), MenuFormatter.RESET);
+        String description = subreddit.description();
+        if (description == null) {
+            description = "No description available";
+        }
+        int maxDescriptionLength = width - 18;
+        if (description.length() > maxDescriptionLength) {
+            description = description.substring(0, maxDescriptionLength - 3) + "...";
+        }
+        String descriptionLine = String.format("Description: %s%s%s", MenuFormatter.WHITE, description, MenuFormatter.RESET);
         printSubredditLine(descriptionLine, width);
+
         String postsLine = String.format("Posts: %s%d%s", MenuFormatter.PURPLE, subreddit.postCount(), MenuFormatter.RESET);
         printSubredditLine(postsLine, width);
 

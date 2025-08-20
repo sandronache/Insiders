@@ -89,7 +89,7 @@ public class MenuFormatter {
 
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             String filename = extractFilename(imageUrl);
-            String imageLine = String.format("Image: %s📷 %s%s", PURPLE, filename, RESET);
+            String imageLine = String.format("Image: %s%s%s", PURPLE, filename, RESET);
             printBoxLine(imageLine, width);
         }
 
@@ -141,11 +141,9 @@ public class MenuFormatter {
 
         System.out.println(TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT);
 
-        String titleLine = String.format("Title: %s%s%s", CYAN + BOLD, title, RESET);
-        printBoxLine(titleLine, width);
+        printWrappedBoxLine("Title: ", title, CYAN + BOLD, width);
 
-        String contentLine = String.format("Content: %s%s%s", WHITE, content != null ? content : "", RESET);
-        printBoxLine(contentLine, width);
+        printWrappedBoxLine("Content: ", content != null ? content : "", WHITE, width);
 
         String authorDisplay = isOwnPost ?
                 String.format("%s%s%s %s[YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :
@@ -158,7 +156,7 @@ public class MenuFormatter {
 
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             String filename = extractFilename(imageUrl);
-            String imageLine = String.format("Image: %s📷 %s%s", PURPLE, filename, RESET);
+            String imageLine = String.format("Image: %s%s%s", PURPLE, filename, RESET);
             printBoxLine(imageLine, width);
         }
 
@@ -270,6 +268,69 @@ public class MenuFormatter {
         String leftPad = " ".repeat(padding);
         String rightPad = " ".repeat(width - text.length() - padding);
         return leftPad + text + rightPad;
+    }
+
+    // New method to handle wrapped text
+    private static void printWrappedBoxLine(String prefix, String text, String colorCode, int width) {
+        if (text == null || text.isEmpty()) {
+            text = "";
+        }
+
+        int availableWidth = width - 4; // Account for borders and spaces
+        int prefixLength = prefix.replaceAll("\u001B\\[[;\\d]*m", "").length();
+        int firstLineWidth = availableWidth - prefixLength;
+
+        // Split text into words
+        String[] words = text.split("\\s+");
+        StringBuilder currentLine = new StringBuilder();
+        boolean isFirstLine = true;
+
+        for (String word : words) {
+            int lineLimit = isFirstLine ? firstLineWidth : availableWidth;
+
+            // Check if adding this word would exceed the line limit
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            if (testLine.length() > lineLimit && currentLine.length() > 0) {
+                // Print current line and start a new one
+                if (isFirstLine) {
+                    String fullLine = prefix + colorCode + currentLine + RESET;
+                    String cleanLine = (prefix + currentLine.toString()).replaceAll("\u001B\\[[;\\d]*m", "");
+                    String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
+                    System.out.println(VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+                    isFirstLine = false;
+                } else {
+                    String fullLine = colorCode + currentLine + RESET;
+                    String padding = " ".repeat(Math.max(0, availableWidth - currentLine.length()));
+                    System.out.println(VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+                }
+                currentLine = new StringBuilder(word);
+            } else {
+                if (currentLine.length() > 0) {
+                    currentLine.append(" ");
+                }
+                currentLine.append(word);
+            }
+        }
+
+        // Print the last line
+        if (currentLine.length() > 0) {
+            if (isFirstLine) {
+                String fullLine = prefix + colorCode + currentLine + RESET;
+                String cleanLine = (prefix + currentLine.toString()).replaceAll("\u001B\\[[;\\d]*m", "");
+                String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
+                System.out.println(VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+            } else {
+                String fullLine = colorCode + currentLine + RESET;
+                String padding = " ".repeat(Math.max(0, availableWidth - currentLine.length()));
+                System.out.println(VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+            }
+        } else if (isFirstLine) {
+            // Handle case where text is empty
+            String fullLine = prefix + colorCode + RESET;
+            String cleanLine = prefix.replaceAll("\u001B\\[[;\\d]*m", "");
+            String padding = " ".repeat(Math.max(0, availableWidth - cleanLine.length()));
+            System.out.println(VERTICAL_LINE + " " + fullLine + padding + " " + VERTICAL_LINE);
+        }
     }
 
     public static void printSeparator(int width, String character) {
