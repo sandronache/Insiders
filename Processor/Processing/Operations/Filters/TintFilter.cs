@@ -6,11 +6,11 @@ namespace Processing.Operations;
 
 public class TintFilter : IImageOperation
 {
-    // small blue tint
     public const byte rTint = 0;
     public const byte gTint = 50;
     public const byte bTint = 150;
 
+    /* Parameters: none. */
     public void Apply(Image<Rgba32> image, Dictionary<string, string> parameters)
     {
         for (int y = 0; y < image.Height; y++)
