@@ -6,6 +6,7 @@ import com.insiders.dto.auth.RegisterRequestDto;
 import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
 import com.insiders.util.EmailValidator;
+import com.insiders.util.InputValidator;
 import com.insiders.util.MenuFormatter;
 import com.insiders.util.PasswordValidator;
 import com.insiders.util.UsernameValidator;
@@ -53,7 +54,16 @@ public class AuthMenu {
 
         String username;
         while (true) {
-            username = ConsoleIO.readLine("Username: ");
+            String rawUsername = ConsoleIO.readLine("Username: ");
+            username = InputValidator.sanitizeInput(rawUsername);
+
+            // Use focused security validation
+            if (!InputValidator.isSafeInput(username)) {
+                MenuFormatter.printErrorMessage("Username contains unsafe content!");
+                MenuFormatter.printInfoMessage("Please avoid special characters that could be security risks.");
+                continue;
+            }
+
             if (UsernameValidator.isValidUsername(username)) {
                 break;
             } else {
@@ -64,7 +74,16 @@ public class AuthMenu {
 
         String email;
         while (true) {
-            email = ConsoleIO.readLine("Email: ");
+            String rawEmail = ConsoleIO.readLine("Email: ");
+            email = InputValidator.sanitizeInput(rawEmail);
+
+            // Use focused security validation
+            if (!InputValidator.isSafeInput(email)) {
+                MenuFormatter.printErrorMessage("Email contains unsafe content!");
+                MenuFormatter.printInfoMessage("Please enter a valid email without security risks.");
+                continue;
+            }
+
             if (EmailValidator.isValidEmail(email)) {
                 break;
             } else {
@@ -124,7 +143,16 @@ public class AuthMenu {
 
         String email;
         while (true) {
-            email = ConsoleIO.readLine("Email: ");
+            String rawEmail = ConsoleIO.readLine("Email: ");
+            email = InputValidator.sanitizeInput(rawEmail);
+
+            // Use focused security validation
+            if (!InputValidator.isSafeInput(email)) {
+                MenuFormatter.printErrorMessage("Email contains unsafe content!");
+                MenuFormatter.printInfoMessage("Please enter a valid email without security risks.");
+                continue;
+            }
+
             if (EmailValidator.isValidEmail(email)) {
                 break;
             } else {

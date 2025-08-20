@@ -13,6 +13,7 @@ import com.insiders.util.ConsoleIO;
 import com.insiders.util.TimeUtils;
 import com.insiders.util.MenuFormatter;
 import com.insiders.util.ContentValidator;
+import com.insiders.util.InputValidator;
 
 import java.util.List;
 import java.util.UUID;
@@ -117,6 +118,15 @@ public class PostMenu {
         String titleInput = ConsoleIO.readLine("Enter new title (or press Enter to keep current): ");
         if (!titleInput.trim().isEmpty()) {
             while (true) {
+                titleInput = InputValidator.sanitizeInput(titleInput);
+
+                if (!InputValidator.isSafeInput(titleInput)) {
+                    MenuFormatter.printErrorMessage("Title contains unsafe content!");
+                    MenuFormatter.printInfoMessage("Please avoid special characters that could be security risks.");
+                    titleInput = ConsoleIO.readLine("Enter a safe title: ");
+                    continue;
+                }
+
                 if (ContentValidator.isValidTitle(titleInput)) {
                     title = titleInput.trim();
                     break;

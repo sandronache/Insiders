@@ -20,4 +20,15 @@ public class ConsoleIO {
             }
         }
     }
+
+    public static int readIntInRange(String prompt, int min, int max) {
+        while (true) {
+            String input = readLine(prompt);
+            if (InputValidator.isValidNumberInRange(input, min, max)) {
+                return Integer.parseInt(input.trim());
+            } else {
+                System.out.println("Please enter a number between " + min + " and " + max + ".");
+            }
+        }
+    }
 }

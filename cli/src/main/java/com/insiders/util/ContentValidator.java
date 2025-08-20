@@ -18,10 +18,9 @@ public class ContentValidator {
     // Subreddit name pattern (alphanumeric și underscore)
     private static final Pattern SUBREDDIT_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+$");
 
-    // Basic profanity filter (expandable)
+    // Basic profanity filter
     private static final Set<String> PROFANITY_WORDS = new HashSet<>(Arrays.asList(
         "spam", "scam", "fake", "hate", "abuse", "harassment", "troll"
-        // Add more words as needed - keeping it minimal for demo
     ));
 
     // URL pattern for HTTP/HTTPS validation
@@ -94,17 +93,16 @@ public class ContentValidator {
 
     public static boolean isValidImageUrl(String url) {
         if (url == null || url.trim().isEmpty()) {
-            return true; // Optional field
+            return true;
         }
 
         url = url.trim();
 
-        // HTTP/HTTPS URL validation
-        if (!URL_PATTERN.matcher(url).matches()) {
+        if (!isValidUrl(url)) {
             return false;
         }
 
-        // Check if it's an image URL
+        // Then check if it's specifically an image URL
         String lowerUrl = url.toLowerCase();
         return lowerUrl.endsWith(".jpg") ||
                lowerUrl.endsWith(".jpeg") ||
@@ -160,8 +158,8 @@ public class ContentValidator {
 
         content = content.trim();
 
-        if (content.length() < MIN_CONTENT_LENGTH) {
-            return "Content must be at least " + MIN_CONTENT_LENGTH + " character long!";
+        if (content.isEmpty()) {
+            return "Content cannot be empty!";
         }
 
         if (content.length() > MAX_CONTENT_LENGTH) {
@@ -182,8 +180,8 @@ public class ContentValidator {
 
         comment = comment.trim();
 
-        if (comment.length() < MIN_COMMENT_LENGTH) {
-            return "Comment must be at least " + MIN_COMMENT_LENGTH + " character long!";
+        if (comment.isEmpty()) {
+            return "Comment cannot be empty!";
         }
 
         if (comment.length() > MAX_COMMENT_LENGTH) {
@@ -251,17 +249,5 @@ public class ContentValidator {
         }
 
         return "Invalid image URL!";
-    }
-
-    public static String getUrlErrorMessage(String url) {
-        if (url == null || url.trim().isEmpty()) {
-            return "URL cannot be empty!";
-        }
-
-        if (!URL_PATTERN.matcher(url.trim()).matches()) {
-            return "URL must be a valid HTTP/HTTPS format!";
-        }
-
-        return "Invalid URL!";
     }
 }
