@@ -55,7 +55,7 @@ public class MenuFormatter {
         System.out.println();
     }
 
-    public static void printPostCard(int id, String title, String author, boolean isOwnPost,
+    public static void printPostCard(int id, String title, String content, String author, boolean isOwnPost,
                                      String subreddit, int score, int commentCount, String timeAgo, String imageUrl) {
         int width = 80;
         System.out.println(TOP_LEFT + HORIZONTAL_LINE.repeat(width - 2) + TOP_RIGHT);
@@ -64,6 +64,16 @@ public class MenuFormatter {
         String titleLine = String.format("Title: %s%s%s", CYAN + BOLD, title, RESET);
         printBoxLine(idLine, width);
         printBoxLine(titleLine, width);
+
+        if (content != null && !content.trim().isEmpty()) {
+            int maxContentLength = width - 14;
+            String trimmedContent = content.trim();
+            if (trimmedContent.length() > maxContentLength) {
+                trimmedContent = trimmedContent.substring(0, maxContentLength - 3) + "...";
+            }
+            String contentLine = String.format("Content: %s%s%s", BRIGHT_WHITE, trimmedContent, RESET);
+            printBoxLine(contentLine, width);
+        }
 
         String authorDisplay = isOwnPost ?
                 String.format("%s%s%s %s[YOUR POST]%s", GREEN + BOLD, author, RESET, YELLOW, RESET) :

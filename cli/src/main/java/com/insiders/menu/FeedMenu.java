@@ -171,6 +171,7 @@ public class FeedMenu {
             MenuFormatter.printPostCard(
                     simpleId,
                     post.title(),
+                    post.content(),
                     post.author(),
                     isOwnPost,
                     post.subreddit(),

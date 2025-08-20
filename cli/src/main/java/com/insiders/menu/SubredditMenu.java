@@ -440,7 +440,7 @@ public class SubredditMenu {
 
         for (int i = start; i < end; i++) {
             PostResponseDto post = allSubredditPosts.get(i);
-            int simpleId = (i - start) + 1; // Use relative position on current page
+            int simpleId = (i - start) + 1;
             postIdMapping.put(simpleId, post.id());
 
             boolean isOwnPost = post.author().equals(sessionManager.username());
@@ -450,6 +450,7 @@ public class SubredditMenu {
             MenuFormatter.printPostCard(
                 simpleId,
                 post.title(),
+                post.content(),
                 post.author(),
                 isOwnPost,
                 post.subreddit(),
