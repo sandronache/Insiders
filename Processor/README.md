@@ -21,32 +21,36 @@ public class ProcessingRequestDto
 }
 ```
 
-### Operations - JSON example:
+### Operations (JSON), example:
 ```
 [
     {
-        "Type": "GrayscaleFilter",
-        "Parameters": {}
+        "Type": "SharpenFilters",
+        "Parameters": {
+            "Intensity": "0.5"
+        },
     },
     {
-        "Type": "MirrorTransform",
+        "Type": "SepiaFilter",
         "Parameters": {}
     }
 ]
 ```
 
-### Supported Operations
+### Supported Operations:
 
 | Operation | Parameters | Description |
 |-----------|------------|-------------|
-| `BlurFilter` | None | Blur effect. |
+| `BlurFilter` | None | Softens the image. |
+| `BrightnessFilter` | None | Brightness |
 | `GrayscaleFilter` | None | Monochrome effect. |
 | `InvertFilter` | None | Photographic negative. |
+| `NoiseFilter` | `Intensity` (0 - 100) | Grainy texture. |
 | `SepiaFilter` | None | Sepia tone effect. |
-| `SharpenFilter` | `Intensity` (0.1 - 3.0)| Sharpen effect. |
+| `SharpenFilter` | `Intensity` (0.1 - 3.0) | Enhances edges. |
+| `TintFilter` | None | Blue tint effect. |
 
-
-### Examples Request
+### Request, examples:
 
 Requests can be done using `curl` or Postman.
 
