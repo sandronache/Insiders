@@ -38,7 +38,7 @@ public class Main {
             "0. Exit"
         );
 
-        int choice = ConsoleIO.readInt("Enter your choice: ");
+        int choice = ConsoleIO.readIntInRange("Enter your choice: ", 0, 2);
         switch (choice){
             case 1 -> feedMenu.showMenu();
             case 2 -> {
@@ -63,7 +63,7 @@ public class Main {
             "0. Exit"
         );
 
-        int choice = ConsoleIO.readInt("Enter your choice: ");
+        int choice = ConsoleIO.readIntInRange("Enter your choice: ", 0, 1);
         switch (choice){
             case 1 -> {
                 if (authMenu.showMenu()) {

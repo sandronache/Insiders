@@ -11,6 +11,7 @@ import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
 import com.insiders.util.TimeUtils;
 import com.insiders.util.MenuFormatter;
+import com.insiders.util.ContentValidator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -103,33 +104,63 @@ public class SubredditMenu {
     private void createSubreddit() {
         MenuFormatter.printMenuHeader("Create New Subreddit");
 
-        String name = ConsoleIO.readLine("Enter subreddit name (lowercase, alphanumeric and underscore only): ");
-        if (name.trim().isEmpty()) {
-            MenuFormatter.printErrorMessage("Subreddit name cannot be empty!");
-            return;
+        String name;
+        while (true) {
+            name = ConsoleIO.readLine("Enter subreddit name (3-50 characters, alphanumeric and underscore only): ");
+            if (ContentValidator.isValidSubredditName(name)) {
+                name = name.toLowerCase().trim();
+                break;
+            } else {
+                MenuFormatter.printErrorMessage(ContentValidator.getSubredditNameErrorMessage(name));
+                MenuFormatter.printInfoMessage("Example: gaming, technology, funny_memes");
+            }
         }
 
-        String displayName = ConsoleIO.readLine("Enter display name: ");
-        if (displayName.trim().isEmpty()) {
-            MenuFormatter.printErrorMessage("Display name cannot be empty!");
-            return;
+        String displayName;
+        while (true) {
+            displayName = ConsoleIO.readLine("Enter display name: ");
+            if (ContentValidator.isValidTitle(displayName)) {
+                displayName = displayName.trim();
+                break;
+            } else {
+                MenuFormatter.printErrorMessage(ContentValidator.getTitleErrorMessage(displayName));
+                MenuFormatter.printInfoMessage("Display name requirements: 3-300 characters, no inappropriate content.");
+            }
         }
 
-        String description = ConsoleIO.readLine("Enter subreddit description: ");
-        if (description.trim().isEmpty()) {
-            MenuFormatter.printErrorMessage("Description cannot be empty!");
-            return;
+        String description;
+        while (true) {
+            description = ConsoleIO.readLine("Enter subreddit description: ");
+            if (ContentValidator.isValidContent(description)) {
+                description = description.trim();
+                break;
+            } else {
+                MenuFormatter.printErrorMessage(ContentValidator.getContentErrorMessage(description));
+                MenuFormatter.printInfoMessage("Description requirements: maximum 10000 characters, no inappropriate content.");
+            }
         }
 
-        String iconUrl = ConsoleIO.readLine("Enter icon URL (optional, press Enter to skip): ");
-        if (iconUrl.trim().isEmpty()) {
-            iconUrl = null;
+        String iconUrl = null;
+        String iconInput = ConsoleIO.readLine("Enter icon URL (optional, press Enter to skip): ");
+        if (!iconInput.trim().isEmpty()) {
+            while (true) {
+                if (ContentValidator.isValidImageUrl(iconInput)) {
+                    iconUrl = iconInput.trim();
+                    break;
+                } else {
+                    MenuFormatter.printErrorMessage(ContentValidator.getImageUrlErrorMessage(iconInput));
+                    iconInput = ConsoleIO.readLine("Enter a valid image URL or press Enter to skip: ");
+                    if (iconInput.trim().isEmpty()) {
+                        break;
+                    }
+                }
+            }
         }
 
         SubredditCreateRequestDto createRequest = new SubredditCreateRequestDto(
-            name.toLowerCase().trim(),
-            displayName.trim(),
-            description.trim(),
+            name,
+            displayName,
+            description,
             iconUrl
         );
 
@@ -302,8 +333,17 @@ public class SubredditMenu {
         String displayNameLine = String.format("Display Name: %s%s%s", MenuFormatter.GREEN + MenuFormatter.BOLD, subreddit.displayName(), MenuFormatter.RESET);
         printSubredditLine(displayNameLine, width);
 
-        String descriptionLine = String.format("Description: %s%s%s", MenuFormatter.WHITE, subreddit.description(), MenuFormatter.RESET);
+        String description = subreddit.description();
+        if (description == null) {
+            description = "No description available";
+        }
+        int maxDescriptionLength = width - 18;
+        if (description.length() > maxDescriptionLength) {
+            description = description.substring(0, maxDescriptionLength - 3) + "...";
+        }
+        String descriptionLine = String.format("Description: %s%s%s", MenuFormatter.WHITE, description, MenuFormatter.RESET);
         printSubredditLine(descriptionLine, width);
+
         String postsLine = String.format("Posts: %s%d%s", MenuFormatter.PURPLE, subreddit.postCount(), MenuFormatter.RESET);
         printSubredditLine(postsLine, width);
 
@@ -431,7 +471,7 @@ public class SubredditMenu {
 
         for (int i = start; i < end; i++) {
             PostResponseDto post = allSubredditPosts.get(i);
-            int simpleId = (i - start) + 1; // Use relative position on current page
+            int simpleId = (i - start) + 1;
             postIdMapping.put(simpleId, post.id());
 
             boolean isOwnPost = post.author().equals(sessionManager.username());
@@ -441,6 +481,7 @@ public class SubredditMenu {
             MenuFormatter.printPostCard(
                 simpleId,
                 post.title(),
+                post.content(),
                 post.author(),
                 isOwnPost,
                 post.subreddit(),
