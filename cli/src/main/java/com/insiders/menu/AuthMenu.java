@@ -5,6 +5,7 @@ import com.insiders.dto.auth.LoginRequestDto;
 import com.insiders.dto.auth.RegisterRequestDto;
 import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
+import com.insiders.util.EmailValidator;
 import com.insiders.util.MenuFormatter;
 
 public class AuthMenu {
@@ -49,7 +50,18 @@ public class AuthMenu {
         MenuFormatter.printMenuHeader("User Registration");
 
         String username = ConsoleIO.readLine("Username: ");
-        String email = ConsoleIO.readLine("Email: ");
+
+        String email;
+        while (true) {
+            email = ConsoleIO.readLine("Email: ");
+            if (EmailValidator.isValidEmail(email)) {
+                break;
+            } else {
+                MenuFormatter.printErrorMessage(EmailValidator.getEmailErrorMessage(email));
+                MenuFormatter.printInfoMessage("Please try again with a valid email address.");
+            }
+        }
+
         String password = MenuFormatter.readPasswordWithMasking("Password: ");
 
         MenuFormatter.printInfoMessage("Creating your account...");
@@ -78,7 +90,17 @@ public class AuthMenu {
     public boolean login(){
         MenuFormatter.printMenuHeader("User Login");
 
-        String email = ConsoleIO.readLine("Email: ");
+        String email;
+        while (true) {
+            email = ConsoleIO.readLine("Email: ");
+            if (EmailValidator.isValidEmail(email)) {
+                break;
+            } else {
+                MenuFormatter.printErrorMessage(EmailValidator.getEmailErrorMessage(email));
+                MenuFormatter.printInfoMessage("Please try again with a valid email address.");
+            }
+        }
+
         String password = MenuFormatter.readPasswordWithMasking("Password: ");
 
         MenuFormatter.printInfoMessage("Authenticating...");
