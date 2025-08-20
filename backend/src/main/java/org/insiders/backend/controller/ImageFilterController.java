@@ -23,7 +23,11 @@ public class ImageFilterController {
                 new FilterDto(2, "grayscale", "Grayscale"),
                 new FilterDto(3, "invert", "Invert"),
                 new FilterDto(4, "sepia", "Sepia"),
-                new FilterDto(5, "sharpen", "Sharpen")
+                new FilterDto(5, "sharpen", "Sharpen"),
+                new FilterDto(6, "brightness", "Brightness"),
+                new FilterDto(7, "noise", "Noise"),
+                new FilterDto(8, "tint", "BlueTint")
+
         );
 
         return ResponseEntity.ok(new ResponseApi<>(true, filters));

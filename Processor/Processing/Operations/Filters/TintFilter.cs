@@ -4,26 +4,24 @@ using Processing.Interfaces;
 
 namespace Processing.Operations;
 
-public class BrightnessFilter : IImageOperation
+public class TintFilter : IImageOperation
 {
-    /* Parameters: none. */
+    // small blue tint
+    public const byte rTint = 0;
+    public const byte gTint = 50;
+    public const byte bTint = 150;
+
     public void Apply(Image<Rgba32> image, Dictionary<string, string> parameters)
     {
-        float factor = 1.4f;
-
         for (int y = 0; y < image.Height; y++)
         {
             for (int x = 0; x < image.Width; x++)
             {
                 Rgba32 pixel = image[x, y];
 
-                int r = (int)(pixel.R * factor);
-                int g = (int)(pixel.G * factor);
-                int b = (int)(pixel.B * factor);
-
-                r = Math.Clamp(r, 0, 255);
-                g = Math.Clamp(g, 0, 255);
-                b = Math.Clamp(b, 0, 255);
+                int r = Math.Clamp(pixel.R + rTint, 0, 255);
+                int g = Math.Clamp(pixel.G + gTint, 0, 255);
+                int b = Math.Clamp(pixel.B + bTint, 0, 255);
 
                 image[x, y] = new Rgba32((byte)r, (byte)g, (byte)b, pixel.A);
             }
