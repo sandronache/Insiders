@@ -7,6 +7,8 @@ import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
 import com.insiders.util.EmailValidator;
 import com.insiders.util.MenuFormatter;
+import com.insiders.util.PasswordValidator;
+import com.insiders.util.UsernameValidator;
 
 public class AuthMenu {
     private final AuthClient client;
@@ -49,7 +51,16 @@ public class AuthMenu {
     public boolean register(){
         MenuFormatter.printMenuHeader("User Registration");
 
-        String username = ConsoleIO.readLine("Username: ");
+        String username;
+        while (true) {
+            username = ConsoleIO.readLine("Username: ");
+            if (UsernameValidator.isValidUsername(username)) {
+                break;
+            } else {
+                MenuFormatter.printErrorMessage(UsernameValidator.getUsernameErrorMessage(username));
+                MenuFormatter.printInfoMessage("Username requirements: 3-20 characters, start with letter, letters/numbers/underscore/hyphen only.");
+            }
+        }
 
         String email;
         while (true) {
@@ -62,7 +73,28 @@ public class AuthMenu {
             }
         }
 
-        String password = MenuFormatter.readPasswordWithMasking("Password: ");
+        String password;
+        while (true) {
+            password = MenuFormatter.readPasswordWithMasking("Password: ");
+            if (PasswordValidator.isValidPassword(password)) {
+                PasswordValidator.PasswordStrength strength = PasswordValidator.getPasswordStrength(password);
+                MenuFormatter.printInfoMessage("Password strength: " + strength.getDisplayName());
+
+                if (strength.getScore() < 3) {
+                    MenuFormatter.printWarningMessage("Consider using a stronger password:");
+                    MenuFormatter.printInfoMessage(PasswordValidator.getPasswordStrengthTips(password));
+                    String confirm = ConsoleIO.readLine("Continue with this password? (y/n): ");
+                    if (confirm.toLowerCase().startsWith("y")) {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            } else {
+                MenuFormatter.printErrorMessage(PasswordValidator.getPasswordErrorMessage(password));
+                MenuFormatter.printInfoMessage("Password requirements: 8+ characters with at least 2 character types (uppercase, lowercase, numbers, symbols).");
+            }
+        }
 
         MenuFormatter.printInfoMessage("Creating your account...");
         var response = client.register(new RegisterRequestDto(username, email, password));

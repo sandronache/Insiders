@@ -9,6 +9,7 @@ import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
 import com.insiders.util.TimeUtils;
 import com.insiders.util.MenuFormatter;
+import com.insiders.util.ContentValidator;
 
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 public class FeedMenu {
     private final PostClient postClient;
+    private final SubredditClient subredditClient;
     private final SessionManager sessionManager;
     private final PostMenu postMenu;
     private final SubredditMenu subredditMenu;
@@ -48,6 +50,7 @@ public class FeedMenu {
 
     public FeedMenu(PostClient postClient, SubredditClient subredditClient, SessionManager sessionManager) {
         this.postClient = postClient;
+        this.subredditClient = subredditClient;
         this.sessionManager = sessionManager;
         this.postMenu = new PostMenu(postClient, sessionManager);
         this.subredditMenu = new SubredditMenu(postClient, subredditClient, sessionManager);
@@ -192,17 +195,70 @@ public class FeedMenu {
     private void createPost() {
         MenuFormatter.printCreatePostHeader();
 
-        String title = ConsoleIO.readLine("Enter post title: ");
-        if (title.trim().isEmpty()) {
-            MenuFormatter.printErrorMessage("Title cannot be empty!");
-            return;
+        // Title validation (required)
+        String title;
+        while (true) {
+            title = ConsoleIO.readLine("Enter post title: ");
+            if (ContentValidator.isValidTitle(title)) {
+                title = title.trim();
+                break;
+            } else {
+                MenuFormatter.printErrorMessage(ContentValidator.getTitleErrorMessage(title));
+                MenuFormatter.printInfoMessage("Title requirements: 3-300 characters, no inappropriate content.");
+            }
         }
 
-        String content = ConsoleIO.readLine("Enter post content: ");
-        String subreddit = ConsoleIO.readLine("Enter subreddit: ");
-        if (subreddit.trim().isEmpty()) {
-            MenuFormatter.printErrorMessage("Subreddit cannot be empty!");
-            return;
+        // Content validation (optional, but must be valid if provided)
+        String content = null;
+        String contentInput = ConsoleIO.readLine("Enter post content (optional, press Enter to skip): ");
+        if (!contentInput.trim().isEmpty()) {
+            while (true) {
+                if (ContentValidator.isValidContent(contentInput)) {
+                    content = contentInput.trim();
+                    break;
+                } else {
+                    MenuFormatter.printErrorMessage(ContentValidator.getContentErrorMessage(contentInput));
+                    MenuFormatter.printInfoMessage("Content requirements: maximum 10000 characters, no inappropriate content.");
+                    contentInput = ConsoleIO.readLine("Enter valid content (or press Enter to skip): ");
+                    if (contentInput.trim().isEmpty()) {
+                        content = null;
+                        break;
+                    }
+                }
+            }
+        }
+
+        String subreddit;
+        while (true) {
+            subreddit = ConsoleIO.readLine("Enter subreddit name: ");
+
+            // First check format validation
+            if (!ContentValidator.isValidSubredditName(subreddit)) {
+                MenuFormatter.printErrorMessage(ContentValidator.getSubredditNameErrorMessage(subreddit));
+                MenuFormatter.printInfoMessage("Subreddit requirements: 3-50 characters, alphanumeric and underscore only.");
+                continue;
+            }
+
+            subreddit = subreddit.toLowerCase().trim();
+
+            // Then check if subreddit exists
+            MenuFormatter.printInfoMessage("Checking if subreddit 'r/" + subreddit + "' exists...");
+            ApiResult<com.insiders.dto.subreddit.SubredditResponseDto> subredditCheck = subredditClient.getSubredditByName(subreddit);
+
+            if (subredditCheck.success) {
+                MenuFormatter.printInfoMessage("✓ Subreddit 'r/" + subreddit + "' found!");
+                break;
+            } else {
+                if (subredditCheck.status == 404) {
+                    MenuFormatter.printErrorMessage("✗ Subreddit 'r/" + subreddit + "' does not exist!");
+                    MenuFormatter.printInfoMessage("Please create the subreddit first or choose an existing one.");
+                    MenuFormatter.printInfoMessage("Returning to feed menu...");
+                    return;
+                } else {
+                    MenuFormatter.printErrorMessage("Error checking subreddit: " + subredditCheck.message);
+                    MenuFormatter.printInfoMessage("Please try again or contact support if the problem persists.");
+                }
+            }
         }
 
         String author = sessionManager.username();
@@ -263,5 +319,90 @@ public class FeedMenu {
 
         MenuFormatter.printInfoMessage("Posts sorted by " + currentSortType.getDisplayName() + ".");
         currentPage = 0;
+    }
+
+    private boolean createSubredditPrompt(String subredditName) {
+        MenuFormatter.printMenuHeader("Quick Subreddit Creation");
+        MenuFormatter.printInfoMessage("Creating subreddit: r/" + subredditName);
+
+        try {
+            String displayName;
+            while (true) {
+                displayName = ConsoleIO.readLine("Enter display name for r/" + subredditName + ": ");
+                if (ContentValidator.isValidTitle(displayName)) {
+                    displayName = displayName.trim();
+                    break;
+                } else {
+                    MenuFormatter.printErrorMessage(ContentValidator.getTitleErrorMessage(displayName));
+                    MenuFormatter.printInfoMessage("Display name requirements: 3-300 characters, no inappropriate content.");
+                }
+            }
+
+            String description;
+            while (true) {
+                description = ConsoleIO.readLine("Enter description for r/" + subredditName + ": ");
+                if (ContentValidator.isValidContent(description)) {
+                    description = description.trim();
+                    break;
+                } else {
+                    MenuFormatter.printErrorMessage(ContentValidator.getContentErrorMessage(description));
+                    MenuFormatter.printInfoMessage("Description requirements: maximum 10000 characters, no inappropriate content.");
+                }
+            }
+
+            com.insiders.dto.subreddit.SubredditCreateRequestDto createRequest =
+                new com.insiders.dto.subreddit.SubredditCreateRequestDto(subredditName, displayName, description, null);
+
+            MenuFormatter.printInfoMessage("Creating subreddit r/" + subredditName + "...");
+            ApiResult<com.insiders.dto.subreddit.SubredditResponseDto> result = subredditClient.createSubreddit(createRequest);
+
+            if (result.success) {
+                MenuFormatter.printSuccessMessage("Subreddit r/" + subredditName + " created successfully!");
+                return true;
+            } else {
+                MenuFormatter.printErrorMessage("Failed to create subreddit: " + result.message);
+                if (result.status == 409) {
+                    MenuFormatter.printInfoMessage("The subreddit name is already taken.");
+                } else if (result.status == 401) {
+                    MenuFormatter.printInfoMessage("Authentication failed. Please log in again.");
+                }
+                return false;
+            }
+        } catch (Exception e) {
+            MenuFormatter.printErrorMessage("Error creating subreddit: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void showAvailableSubreddits() {
+        MenuFormatter.printMenuHeader("Available Subreddits");
+        MenuFormatter.printInfoMessage("Loading available subreddits...");
+
+        ApiResult<List<com.insiders.dto.subreddit.SubredditResponseDto>> result = subredditClient.getAllSubreddits();
+
+        if (result.success && result.data != null) {
+            if (result.data.isEmpty()) {
+                MenuFormatter.printInfoMessage("No subreddits exist yet. You could be the first to create one!");
+            } else {
+                MenuFormatter.printInfoMessage("Available subreddits (" + result.data.size() + " total):");
+
+                // Show first 10 subreddits for quick reference
+                int count = Math.min(10, result.data.size());
+                for (int i = 0; i < count; i++) {
+                    com.insiders.dto.subreddit.SubredditResponseDto subreddit = result.data.get(i);
+                    MenuFormatter.printInfoMessage("• r/" + subreddit.name() + " - " + subreddit.displayName());
+                }
+
+                if (result.data.size() > 10) {
+                    MenuFormatter.printInfoMessage("... and " + (result.data.size() - 10) + " more.");
+                    MenuFormatter.printInfoMessage("Use 'Subreddit Actions' → 'All Subreddits' to see the complete list.");
+                }
+            }
+        } else {
+            MenuFormatter.printErrorMessage("Could not load subreddits: " + (result.message != null ? result.message : "Unknown error"));
+        }
+
+        MenuFormatter.printInfoMessage("Press Enter to continue...");
+        ConsoleIO.readLine("");
     }
 }

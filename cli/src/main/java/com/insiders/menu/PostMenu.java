@@ -12,6 +12,7 @@ import com.insiders.session.SessionManager;
 import com.insiders.util.ConsoleIO;
 import com.insiders.util.TimeUtils;
 import com.insiders.util.MenuFormatter;
+import com.insiders.util.ContentValidator;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PostMenu {
     private final PostClient client;
     private final SessionManager sessionManager;
-    private java.util.Map<Integer, UUID> commentIdMapping = new java.util.HashMap<>();
+    private final java.util.Map<Integer, UUID> commentIdMapping = new java.util.HashMap<>();
 
     public PostMenu(PostClient client, SessionManager sessionManager) {
         this.client = client;
@@ -112,13 +113,34 @@ public class PostMenu {
         }
 
         MenuFormatter.printMenuHeader("Edit Post");
-        String title = ConsoleIO.readLine("Enter new title (or press Enter to keep current): ");
-        String content = ConsoleIO.readLine("Enter new content (or press Enter to keep current): ");
+        String title = null;
+        String titleInput = ConsoleIO.readLine("Enter new title (or press Enter to keep current): ");
+        if (!titleInput.trim().isEmpty()) {
+            while (true) {
+                if (ContentValidator.isValidTitle(titleInput)) {
+                    title = titleInput.trim();
+                    break;
+                } else {
+                    MenuFormatter.printErrorMessage(ContentValidator.getTitleErrorMessage(titleInput));
+                    titleInput = ConsoleIO.readLine("Enter a valid title (3-300 characters): ");
+                }
+            }
+        }
+        String content = null;
+        String contentInput = ConsoleIO.readLine("Enter new content (or press Enter to keep current): ");
+        if (!contentInput.trim().isEmpty()) {
+            while (true) {
+                if (ContentValidator.isValidContent(contentInput)) {
+                    content = contentInput.trim();
+                    break;
+                } else {
+                    MenuFormatter.printErrorMessage(ContentValidator.getContentErrorMessage(contentInput));
+                    contentInput = ConsoleIO.readLine("Enter valid content (max 10000 characters): ");
+                }
+            }
+        }
 
-        PostUpdateRequestDto updateRequest = new PostUpdateRequestDto(
-            title.isEmpty() ? null : title,
-            content.isEmpty() ? null : content
-        );
+        PostUpdateRequestDto updateRequest = new PostUpdateRequestDto(title, content);
 
         ApiResult<PostResponseDto> result = client.updatePost(postId, updateRequest);
         if (result.success) {
@@ -232,12 +254,10 @@ public class PostMenu {
                     MenuFormatter.printSuccessMessage("Post downvoted successfully!");
                 }
 
-                // Refresh the post display after successful vote
                 MenuFormatter.printInfoMessage("Refreshing post...");
                 viewPostDetails(postId);
             } else {
                 MenuFormatter.printSuccessMessage("Vote successful but no vote data received.");
-                // Still refresh even if no vote data received
                 MenuFormatter.printInfoMessage("Refreshing post...");
                 viewPostDetails(postId);
             }
@@ -316,10 +336,16 @@ public class PostMenu {
     }
 
     private void createTopLevelComment(UUID postId) {
-        String content = ConsoleIO.readLine("Enter your comment: ");
-        if (content.trim().isEmpty()) {
-            MenuFormatter.printErrorMessage("Comment cannot be empty!");
-            return;
+        String content;
+        while (true) {
+            content = ConsoleIO.readLine("Enter your comment: ");
+            if (ContentValidator.isValidComment(content)) {
+                content = content.trim();
+                break;
+            } else {
+                MenuFormatter.printErrorMessage(ContentValidator.getCommentErrorMessage(content));
+                MenuFormatter.printInfoMessage("Comment requirements: 1-1000 characters, no inappropriate content.");
+            }
         }
 
         String author = sessionManager.username();
@@ -345,10 +371,16 @@ public class PostMenu {
                 return;
             }
 
-            String content = ConsoleIO.readLine("Enter your reply: ");
-            if (content.trim().isEmpty()) {
-                MenuFormatter.printErrorMessage("Reply cannot be empty!");
-                return;
+            String content;
+            while (true) {
+                content = ConsoleIO.readLine("Enter your reply: ");
+                if (ContentValidator.isValidComment(content)) {
+                    content = content.trim();
+                    break;
+                } else {
+                    MenuFormatter.printErrorMessage(ContentValidator.getCommentErrorMessage(content));
+                    MenuFormatter.printInfoMessage("Reply requirements: 1-1000 characters, no inappropriate content.");
+                }
             }
 
             String author = sessionManager.username();
@@ -483,11 +515,17 @@ public class PostMenu {
             }
 
             MenuFormatter.printInfoMessage("Current content: " + targetComment.content());
-            String newContent = ConsoleIO.readLine("Enter new content: ");
 
-            if (newContent.trim().isEmpty()) {
-                MenuFormatter.printErrorMessage("Comment content cannot be empty!");
-                return;
+            String newContent;
+            while (true) {
+                newContent = ConsoleIO.readLine("Enter new content: ");
+                if (ContentValidator.isValidComment(newContent)) {
+                    newContent = newContent.trim();
+                    break;
+                } else {
+                    MenuFormatter.printErrorMessage(ContentValidator.getCommentErrorMessage(newContent));
+                    MenuFormatter.printInfoMessage("Comment requirements: 1-1000 characters, no inappropriate content.");
+                }
             }
 
             CommentUpdateRequestDto updateRequest = new CommentUpdateRequestDto(newContent);
