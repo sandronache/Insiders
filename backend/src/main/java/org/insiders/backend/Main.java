@@ -21,7 +21,6 @@ public class Main {
 
     @PreDestroy
     public void onShutdown() {
-        LoggerFacade.info("Application shutting down");
         LoggerFacade.shutdown();
     }
 }
