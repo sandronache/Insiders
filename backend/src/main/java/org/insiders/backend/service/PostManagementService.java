@@ -134,30 +134,7 @@ public class PostManagementService {
         String imagePath = null;
 
         if (image != null && !image.isEmpty()) {
-            String uploadsDir = "/home/ubuntu/images/";
-
-            File dir = new File(uploadsDir);
-            if (!dir.exists() && !dir.mkdirs()) {
-                throw new RuntimeException("Could not create upload directory!");
-            }
-
-            String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
-            File file = new File(dir, filename);
-
-            try {
-                byte[] finalBytes = image.getBytes();
-
-                if (filterName != null && !filterName.isBlank() && !filterName.equalsIgnoreCase("none")) {
-                    finalBytes = FilterService.filterImage(finalBytes, filename, filterName);
-                    filename = filename.replaceAll("\\.(png|jpeg|jpg)$", "") + ".jpg";
-                }
-
-                Files.write(Path.of(uploadsDir + filename), finalBytes);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            imagePath = "http://ec2-3-74-161-90.eu-central-1.compute.amazonaws.com/images/" + filename;
+            imagePath = FilterService.createImage(image, filterName);
         }
 
         Post post = postRepository.saveAndFlush(new Post(title, content, user, subreddit, imagePath));
