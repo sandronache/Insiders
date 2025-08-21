@@ -8,42 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
 
 public class FilterService {
-
-    public static String createImage(MultipartFile image, String filterName) {
-        String uploadsDir = "/home/ubuntu/images/";
-
-        File dir = new File(uploadsDir);
-        if (!dir.exists() && !dir.mkdirs()) {
-            throw new RuntimeException("Could not create upload directory!");
-        }
-
-        String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
-        File file = new File(dir, filename);
-
-        try {
-            byte[] finalBytes = image.getBytes();
-
-            if (filterName != null && !filterName.isBlank() && !filterName.equalsIgnoreCase("none")) {
-                finalBytes = FilterService.filterImage(finalBytes, filename, filterName);
-                filename = filename.replaceAll("\\.(png|jpeg|jpg)$", "") + ".jpg";
-            }
-
-            Files.write(Path.of(uploadsDir + filename), finalBytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return "http://ec2-3-74-161-90.eu-central-1.compute.amazonaws.com/images/" + filename;
-    }
 
     public static byte[] filterImage(byte[] imageBytes, String originalFilename, String filterName) {
 //        try {
