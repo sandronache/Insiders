@@ -19,7 +19,6 @@ public class ImageFilterController {
     // GET /api/filters  -> return supported filter names
     @GetMapping()
     public ResponseEntity<ResponseApi<List<FilterDto>>> getAvailableFilters() {
-        logger.log("INFO", "GET request received for available image filters");
         try {
             List<FilterDto> filters = List.of(
                     new FilterDto(0, "none", "No Filter"),
@@ -27,10 +26,7 @@ public class ImageFilterController {
                     new FilterDto(2, "grayscale", "Grayscale"),
                     new FilterDto(3, "invert", "Invert"),
                     new FilterDto(4, "sepia", "Sepia"),
-                    new FilterDto(5, "sharpen", "Sharpen"),
-                    new FilterDto(6, "brightness", "Brightness"),
-                    new FilterDto(7, "noise", "Noise"),
-                    new FilterDto(8, "tint", "BlueTint")
+                    new FilterDto(5, "sharpen", "Sharpen")
             );
 
             logger.log("INFO", "Successfully retrieved " + filters.size() + " available filters");
