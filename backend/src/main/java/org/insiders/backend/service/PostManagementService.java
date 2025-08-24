@@ -2,6 +2,7 @@ package org.insiders.backend.service;
 
 // TODO: Service is using Dto objects but they must never get past Controller layer. Must only use from "model" package
 
+import org.insiders.backend.controller.ImageFilterController;
 import org.insiders.backend.dto.post.PostUpdateRequestDto;
 import org.insiders.backend.dto.vote.VoteResponseDto;
 import org.insiders.backend.entity.Post;
@@ -13,6 +14,7 @@ import org.insiders.backend.logger.LoggerFacade;
 import org.insiders.backend.model.PostModel;
 import org.insiders.backend.repository.PostRepository;
 import org.insiders.backend.repository.SubredditRepository;
+import org.insiders.backend.service.FilterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -26,6 +28,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.ImageFilter;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -125,7 +128,7 @@ public class PostManagementService {
     }
 
     @Transactional
-    public PostModel createPost(String title, String content, String author, String subredditName, MultipartFile image, String filterName) {
+    public PostModel createPost(String title, String content, String author, String subredditName, MultipartFile image, Integer filterId) {
         User user = userManagementService.findByUsername(author);
         String normalizedSubredditName = subredditName.trim().toLowerCase();
         Subreddit subreddit = subredditRepository.findByNameIgnoreCase(normalizedSubredditName).orElseThrow
@@ -134,30 +137,7 @@ public class PostManagementService {
         String imagePath = null;
 
         if (image != null && !image.isEmpty()) {
-            String uploadsDir = "/home/ubuntu/images/";
-
-            File dir = new File(uploadsDir);
-            if (!dir.exists() && !dir.mkdirs()) {
-                throw new RuntimeException("Could not create upload directory!");
-            }
-
-            String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
-            File file = new File(dir, filename);
-
-            try {
-                byte[] finalBytes = image.getBytes();
-
-                if (filterName != null && !filterName.isBlank() && !filterName.equalsIgnoreCase("none")) {
-                    finalBytes = filterImage(finalBytes, filename, filterName);
-                    filename = filename.replaceAll("\\.(png|jpeg|jpg)$", "") + ".jpg";
-                }
-
-                Files.write(Path.of(uploadsDir + filename), finalBytes);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            imagePath = "http://ec2-3-74-161-90.eu-central-1.compute.amazonaws.com/images/" + filename;
+            imagePath = FilterService.createImage(image, filterId);
         }
 
         Post post = postRepository.saveAndFlush(new Post(title, content, user, subreddit, imagePath));
@@ -211,77 +191,5 @@ public class PostManagementService {
 
         postRepository.deleteById(postId);
         LoggerFacade.info("Postarea a fost stearsa din baza de date: " + postId);
-    }
-
-    private byte[] filterImage(byte[] imageBytes, String originalFilename, String filterName) {
-//        try {
-//            // Build the JSON array of operations
-//            String operations = "[{ \"Type\": \"" + filterName + "\", \"Parameters\": {} }]";
-//            String boundary = "----JavaBoundary-" + UUID.randomUUID();
-//
-//            // Build multipart/form-data body
-//            var sb = new StringBuilder();
-//            sb.append("--").append(boundary).append("\r\n");
-//            sb.append("Content-Disposition: form-data; name=\"Operations\"\r\n\r\n");
-//            sb.append(operations).append("\r\n");
-//
-//            // File header
-//            sb.append("--").append(boundary).append("\r\n");
-//            sb.append("Content-Disposition: form-data; name=\"Image\"; filename=\"")
-//                    .append(originalFilename).append("\"\r\n");
-//            sb.append("Content-Type: image/jpeg\r\n\r\n");
-//
-//            byte[] headerBytes = sb.toString().getBytes();
-//            byte[] endBytes = ("\r\n--" + boundary + "--\r\n").getBytes();
-//
-//            // concatenate => header + image + ending
-//            byte[] body = new byte[headerBytes.length + imageBytes.length + endBytes.length];
-//            System.arraycopy(headerBytes, 0, body, 0, headerBytes.length);
-//            System.arraycopy(imageBytes, 0, body, headerBytes.length, imageBytes.length);
-//            System.arraycopy(endBytes, 0, body, headerBytes.length + imageBytes.length, endBytes.length);
-//
-//            // Send request to C# EC2
-//            HttpRequest request = HttpRequest.newBuilder()
-//                    .uri(new URI("http://16.170.234.239/api/"))
-//                    .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-//                    .POST(HttpRequest.BodyPublishers.ofByteArray(body))
-//                    .build();
-//
-//            HttpClient client = HttpClient.newHttpClient();
-//            HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-//            if (response.statusCode() >= 200 && response.statusCode() < 300) {
-//                return response.body(); // Response is binary JPEG
-//            } else {
-//                throw new RuntimeException("Filtering server returned status: " + response.statusCode());
-//            }
-//        } catch (IOException | InterruptedException | URISyntaxException e) {
-//            throw new RuntimeException("Failed to process image through C# server", e);
-//        }
-
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-
-            String operationsJson = "[{ \"Type\": \"" + filterName + "\", \"Parameters\": {} }]";
-
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("Image", new ByteArrayResource(imageBytes) {
-                @Override public String getFilename() { return originalFilename; }
-            });
-            body.add("Operations", operationsJson);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
-            ResponseEntity<byte[]> response = restTemplate.postForEntity("http://16.170.234.239/api/", request, byte[].class);
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody(); // JPEG bytes from C# server
-            } else {
-                throw new RuntimeException("C# server returned status: " + response.getStatusCode());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to send image to C# server", e);
-        }
     }
 }

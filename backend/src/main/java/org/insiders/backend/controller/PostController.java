@@ -72,7 +72,7 @@ public class PostController {
                                                                             @RequestParam("author") String author,
                                                                             @RequestParam("subreddit") String subreddit,
                                                                             @RequestPart(value = "image", required = false) MultipartFile image,
-                                                                            @RequestParam(value = "filter", required = false) String filterName) {
+                                                                            @RequestParam(value = "filter", required = false) Integer filterId) {
         try {
             logger.log("INFO", "POST request received to create new post with image by user: " + author + " in subreddit: " + subreddit);
 
@@ -82,7 +82,7 @@ public class PostController {
                     author,
                     subreddit,
                     image,
-                    filterName
+                    filterId
             );
 
             logger.log("INFO", "Successfully created post with ID: " + post.getId());
@@ -105,7 +105,7 @@ public class PostController {
                     requestDto.author(),
                     requestDto.subreddit(),
                     requestDto.image(),
-                    requestDto.filterName()
+                    requestDto.filterId()
             );
 
             logger.log("INFO", "Successfully created post with ID: " + post.getId());

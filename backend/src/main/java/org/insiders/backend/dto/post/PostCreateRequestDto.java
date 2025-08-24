@@ -24,6 +24,6 @@ public record PostCreateRequestDto(
         String subreddit,
 
         MultipartFile image,
-        String filterName
+        Integer filterId
 ) {
 }
